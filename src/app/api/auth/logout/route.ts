@@ -1,3 +1,7 @@
-import { handleLogout } from "@auth0/nextjs-auth0";
+import { NextResponse } from "next/server";
+import { supabase } from "../../../../lib/supabase";
 
-export const GET = handleLogout;
+export async function GET() {
+  await supabase.auth.signOut();
+  return NextResponse.redirect(new URL("/", process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"));
+}

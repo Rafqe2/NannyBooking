@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SearchBar from "./SearchBar";
 import Footer from "./Footer";
 import SearchResults from "./SearchResults";
@@ -11,6 +11,19 @@ export default function HomeClient() {
     endDate: null as Date | null,
   });
   const [showResults, setShowResults] = useState(false);
+
+  // Reset results when header logo is clicked
+  useEffect(() => {
+    const handler = () => setShowResults(false);
+    if (typeof window !== "undefined") {
+      window.addEventListener("resetSearch", handler);
+    }
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("resetSearch", handler);
+      }
+    };
+  }, []);
 
   const handleSearch = (
     location: string,

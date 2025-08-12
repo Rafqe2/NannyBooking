@@ -1,17 +1,17 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect } from "react";
-import AuthModal from "./AuthModal";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { supabase } from "../lib/supabase";
+import { useSupabaseUser } from "../lib/useSupabaseUser";
 
-interface HeaderProps {
-  user: any | null;
-}
-
-export default function Header({ user }: HeaderProps) {
+export default function Header() {
+  const { user, isLoading } = useSupabaseUser();
+  const router = useRouter();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showLanguageMenu, setShowLanguageMenu] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState("EN");
-  const [isNavigating, setIsNavigating] = useState(false);
   const userRef = useRef<HTMLDivElement>(null);
   const languageRef = useRef<HTMLDivElement>(null);
   const languages = [
@@ -37,18 +37,14 @@ export default function Header({ user }: HeaderProps) {
   }, [handleClickOutside]);
 
   const handleNavigation = (url: string) => {
-    if (isNavigating) return; // Prevent double clicks
-    setIsNavigating(true);
     setShowUserMenu(false);
-    window.location.href = url;
+    router.push(url);
   };
 
   const handleSignIn = (e: React.MouseEvent) => {
     e.preventDefault();
-    if (isNavigating) return; // Prevent double clicks
-    setIsNavigating(true);
     setShowUserMenu(false);
-    window.location.href = "/api/auth/login";
+    router.push("/login");
   };
 
   return (
@@ -57,12 +53,19 @@ export default function Header({ user }: HeaderProps) {
         <div className="flex-1"></div>
         {/* Center Title */}
         <div className="flex-1 flex justify-center">
-          <h1
-            className="text-2xl font-bold text-purple-600 tracking-wide cursor-pointer hover:text-purple-700 transition-colors"
-            onClick={() => handleNavigation("/")}
+          <button
+            onClick={() => {
+              try {
+                if (typeof window !== "undefined") {
+                  window.dispatchEvent(new CustomEvent("resetSearch"));
+                }
+              } catch {}
+              router.push("/");
+            }}
+            className="text-2xl font-bold text-purple-600 tracking-wide hover:text-purple-700 transition-colors"
           >
-            Auklite.lv
-          </h1>
+            Caring Hands
+          </button>
         </div>
         {/* Language and Menu Controls - Positioned to the right and lower */}
         <div className="flex-1 flex justify-end items-end pt-2 space-x-4">
@@ -106,14 +109,20 @@ export default function Header({ user }: HeaderProps) {
           <div className="relative" ref={userRef}>
             <button
               onClick={() => setShowUserMenu(!showUserMenu)}
-              disabled={isNavigating}
               className="bg-white w-12 h-12 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors duration-200 shadow-lg hover:shadow-xl flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {user ? (
                 <div className="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center text-white text-xs font-semibold">
-                  {user.name?.charAt(0).toUpperCase() ||
-                    user.email?.charAt(0).toUpperCase()}
+                  {(
+                    ((user.user_metadata as any)?.name ||
+                      (user.user_metadata as any)?.full_name ||
+                      "") as string
+                  )
+                    .charAt(0)
+                    .toUpperCase() || user.email?.charAt(0).toUpperCase()}
                 </div>
+              ) : isLoading ? (
+                <div className="w-6 h-6 bg-gray-200 rounded-full animate-pulse" />
               ) : (
                 <div className="flex flex-col space-y-1">
                   <div className="w-5 h-0.5 bg-gray-600"></div>
@@ -133,25 +142,30 @@ export default function Header({ user }: HeaderProps) {
                   <>
                     <button
                       onClick={() => handleNavigation("/profile")}
-                      disabled={isNavigating}
                       className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors duration-200 border-b border-gray-100 text-sm font-medium bg-white disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Profile
                     </button>
-                    <a
-                      href="/api/auth/logout"
+                    <button
+                      onClick={async () => {
+                        setShowUserMenu(false);
+                        await supabase.auth.signOut();
+                        window.location.href = "/";
+                      }}
                       className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors duration-200 text-sm font-medium bg-white block"
-                      onClick={() => setShowUserMenu(false)}
                     >
                       Sign out
-                    </a>
+                    </button>
                   </>
+                ) : isLoading ? (
+                  <div className="px-4 py-3 text-sm text-gray-500">
+                    Loading...
+                  </div>
                 ) : (
                   <>
                     <button
                       onClick={handleSignIn}
-                      disabled={isNavigating}
-                      className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors duration-200 border-b border-gray-100 text-sm font-medium bg-white disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors duration-200 border-b border-gray-100 text-sm font-medium bg-white"
                     >
                       Sign in
                     </button>

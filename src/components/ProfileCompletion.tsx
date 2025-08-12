@@ -1,25 +1,26 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useUser } from "@auth0/nextjs-auth0/client";
 import { UserService } from "../lib/userService";
-import { supabase } from "../lib/supabase";
 import Header from "./Header";
 import Footer from "./Footer";
+import { useSupabaseUser } from "../lib/useSupabaseUser";
+import { supabase } from "../lib/supabase";
 
 export default function ProfileCompletion() {
-  const { user: auth0User, error, isLoading } = useUser();
+  const { user: auth0User, isLoading } = useSupabaseUser();
   const [userType, setUserType] = useState<"parent" | "nanny">("parent");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
 
-  // Pre-fill name and surname from Auth0 when user data is available
+  // Pre-fill name and surname from user metadata when available
   useEffect(() => {
     if (auth0User) {
-      setFirstName((auth0User.given_name as string) || "");
-      setLastName((auth0User.family_name as string) || "");
+      const meta: any = auth0User.user_metadata || {};
+      setFirstName(meta.given_name || meta.name || "");
+      setLastName(meta.family_name || "");
     }
   }, [auth0User]);
 
@@ -38,22 +39,23 @@ export default function ProfileCompletion() {
     setSubmitError(null);
 
     try {
-      // First, save Auth0 user data to Supabase with name and surname
+      // First, save user data to Supabase with name and surname
       const userData = {
         email: auth0User.email,
         name: firstName.trim(),
         surname: lastName.trim(),
-        picture: auth0User.picture || null,
+        picture:
+          (auth0User.user_metadata as any)?.avatar_url ||
+          (auth0User.user_metadata as any)?.picture ||
+          null,
         user_type: "pending", // Temporary value, will be updated in the next step
         updated_at: new Date().toISOString(),
       };
 
       const { data: savedUser, error: saveError } = await supabase
         .from("users")
-        .upsert(userData, {
-          onConflict: "email",
-          ignoreDuplicates: false,
-        })
+        .update(userData)
+        .eq("id", auth0User.id)
         .select()
         .single();
 
@@ -100,17 +102,15 @@ export default function ProfileCompletion() {
     );
   }
 
-  if (error || !auth0User) {
+  if (!auth0User) {
     return (
       <div className="min-h-screen flex flex-col bg-gray-50">
         <Header user={null} />
         <main className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <p className="text-red-600">
-              Error: {error?.message || "User not found"}
-            </p>
+            <p className="text-red-600">User not found</p>
             <a
-              href="/api/auth/login"
+              href="/login"
               className="mt-4 inline-block bg-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-purple-700 transition-colors duration-200"
             >
               Sign In Again
@@ -131,9 +131,13 @@ export default function ProfileCompletion() {
           <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
             <div className="text-center mb-8">
               <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                {auth0User.picture ? (
+                {(auth0User.user_metadata as any)?.avatar_url ||
+                (auth0User.user_metadata as any)?.picture ? (
                   <img
-                    src={auth0User.picture}
+                    src={
+                      (auth0User.user_metadata as any)?.avatar_url ||
+                      (auth0User.user_metadata as any)?.picture
+                    }
                     alt="Profile"
                     className="w-16 h-16 rounded-full"
                   />

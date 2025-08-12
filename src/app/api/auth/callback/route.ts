@@ -1,3 +1,2 @@
-import { handleCallback } from "@auth0/nextjs-auth0";
-
-export const GET = handleCallback;
+// Supabase handles OAuth callback internally on the client via signInWithOAuth redirect.
+export { };

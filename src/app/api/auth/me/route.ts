@@ -1,3 +1,7 @@
-import { handleProfile } from "@auth0/nextjs-auth0";
+import { NextResponse } from "next/server";
+import { supabase } from "../../../../lib/supabase";
 
-export const GET = handleProfile;
+export async function GET() {
+  const { data: { user } } = await supabase.auth.getUser();
+  return NextResponse.json({ user });
+}

@@ -21,28 +21,24 @@ export class UserService {
     auth0User: any
   ): Promise<UserProfile | null> {
     try {
-      // Save only name and surname from Auth0 data
-      // Use "pending" as temporary user_type to indicate incomplete profile
       const userData = {
         email: auth0User.email,
         name: auth0User.given_name || "",
         surname: auth0User.family_name || "",
         picture: auth0User.picture || null,
-        user_type: "pending", // Temporary value, will be updated during profile completion
+        user_type: "pending",
         updated_at: new Date().toISOString(),
       };
 
       const { data, error } = await supabase
         .from("users")
-        .upsert(userData, {
-          onConflict: "email",
-          ignoreDuplicates: false,
-        })
+        .update(userData)
+        .eq("id", auth0User.id)
         .select()
         .single();
 
       if (error) {
-        console.error("Error upserting user:", error);
+        console.error("Error updating user:", error);
         return null;
       }
 
@@ -146,6 +142,34 @@ export class UserService {
       return data;
     } catch (error) {
       console.error("Error in updateProfile:", error);
+      return null;
+    }
+  }
+
+  // Update profile by user id (preferred for RLS)
+  static async updateProfileById(
+    userId: string,
+    updates: Partial<UserProfile>
+  ): Promise<UserProfile | null> {
+    try {
+      const { data, error } = await supabase
+        .from("users")
+        .update({
+          ...updates,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", userId)
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Error updating profile by id:", error);
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error("Error in updateProfileById:", error);
       return null;
     }
   }

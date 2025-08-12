@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import { SEARCH_LOCATIONS } from "../lib/constants/cities";
+import { formatDateRange } from "../lib/date";
 import Calendar from "./Calendar";
 
 interface SearchBarProps {
@@ -23,25 +25,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
   const locationRef = useRef<HTMLDivElement>(null);
   const dateRef = useRef<HTMLDivElement>(null);
 
-  const locations = useMemo(
-    () => [
-      "Riga, Latvia",
-      "Daugavpils, Latvia",
-      "Liepāja, Latvia",
-      "Jelgava, Latvia",
-      "Jūrmala, Latvia",
-      "Ventspils, Latvia",
-      "Tallinn, Estonia",
-      "Tartu, Estonia",
-      "Vilnius, Lithuania",
-      "Kaunas, Lithuania",
-      "Stockholm, Sweden",
-      "Gothenburg, Sweden",
-      "Helsinki, Finland",
-      "Copenhagen, Denmark",
-    ],
-    []
-  );
+  const locations = useMemo(() => SEARCH_LOCATIONS, []);
 
   // Filter locations based on search input
   useEffect(() => {
@@ -71,22 +55,10 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [handleClickOutside]);
 
-  const formatDateRange = useMemo(() => {
-    if (!startDate) return "Date";
-    if (!endDate) {
-      return startDate.toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-      });
-    }
-    return `${startDate.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-    })} - ${endDate.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-    })}`;
-  }, [startDate, endDate]);
+  const dateRangeLabel = useMemo(
+    () => formatDateRange(startDate, endDate),
+    [startDate, endDate]
+  );
 
   const handleDateSelect = useCallback(
     (date: Date) => {
@@ -188,7 +160,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
                 onClick={() => setShowDatePicker((prev) => !prev)}
                 className="w-full text-left px-4 lg:px-6 py-3 lg:py-4 border lg:border-0 border-gray-200 lg:border-transparent rounded-xl lg:rounded-2xl hover:bg-gray-50 transition-colors text-base lg:text-lg font-medium"
               >
-                {formatDateRange}
+                {dateRangeLabel}
               </button>
               {showDatePicker && (
                 <div className="absolute top-full left-0 mt-2 lg:mt-3 bg-white rounded-xl lg:rounded-2xl shadow-2xl border border-gray-200 p-4 lg:p-8 z-50">
