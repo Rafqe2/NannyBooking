@@ -3,22 +3,21 @@
 import { useEffect, useState } from "react";
 import { UserService, UserProfile } from "../../lib/userService";
 import { AdvertisementService } from "../../lib/advertisementService";
+import LocationAutocomplete from "../../components/LocationAutocomplete";
+import MultiDatePicker from "../../components/MultiDatePicker";
+import { toLocalYYYYMMDD } from "../../lib/date";
+import { NANNY_SKILLS } from "../../lib/constants/skills";
 import Header from "../../components/Header";
 import { supabase } from "../../lib/supabase";
 import Footer from "../../components/Footer";
 import { Database } from "../../types/database";
 import { useSupabaseUser } from "../../lib/useSupabaseUser";
+import AdvertisementPreview from "../../components/AdvertisementPreview";
 
 type Advertisement = Database["public"]["Tables"]["advertisements"]["Row"];
 
 export default function ProfilePage() {
   const { user, isLoading } = useSupabaseUser();
-  const displayName =
-    (user?.user_metadata as any)?.name ||
-    (user?.user_metadata as any)?.full_name ||
-    (user?.user_metadata as any)?.given_name ||
-    user?.email ||
-    "User";
   const avatarUrl =
     (user?.user_metadata as any)?.avatar_url ||
     (user?.user_metadata as any)?.picture ||
@@ -42,6 +41,8 @@ export default function ProfilePage() {
     null
   );
   const [isSavingAd, setIsSavingAd] = useState(false);
+  const [previewAdId, setPreviewAdId] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [adEditForm, setAdEditForm] = useState({
     title: "",
     price_per_hour: 0 as number,
@@ -51,6 +52,11 @@ export default function ProfilePage() {
     availability_end_time: "",
     skills: [] as string[],
   });
+  const [editExtraLocations, setEditExtraLocations] = useState<string[]>([]);
+  const [editSelectedDates, setEditSelectedDates] = useState<Date[]>([]);
+  const [editPerDateTimes, setEditPerDateTimes] = useState<
+    Record<string, { start: string; end: string }>
+  >({});
 
   const isParent = userProfile?.user_type === "parent";
   const isNanny = userProfile?.user_type === "nanny";
@@ -102,8 +108,26 @@ export default function ProfilePage() {
   }
 
   if (!user) {
-    window.location.href = "/login";
-    return null;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="text-center">
+          <p className="text-gray-700 mb-4">Redirecting to login…</p>
+          <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+        </div>
+      </div>
+    );
+  }
+
+  // Avoid flashing placeholders or empty sections until profile and ads are fully loaded
+  if (isLoadingProfile) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading your profile…</p>
+        </div>
+      </div>
+    );
   }
 
   const handleEditSubmit = async (e: React.FormEvent) => {
@@ -225,7 +249,14 @@ export default function ProfilePage() {
               {advertisements.map((ad) => (
                 <div
                   key={ad.id}
-                  className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow duration-200"
+                  className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow duration-200 cursor-pointer"
+                  onClick={(e) => {
+                    const target = e.target as HTMLElement;
+                    // Prevent opening preview when clicking action controls inside the card
+                    if (target.closest("a,button,input,select,textarea"))
+                      return;
+                    setPreviewAdId(ad.id);
+                  }}
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div>
@@ -250,33 +281,25 @@ export default function ProfilePage() {
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => {
-                          setAdBeingEdited(ad);
-                          setAdEditForm({
-                            title: ad.title,
-                            price_per_hour: Number(ad.price_per_hour) || 0,
-                            description: ad.description || "",
-                            location_city: ad.location_city || "",
-                            availability_start_time:
-                              ad.availability_start_time || "",
-                            availability_end_time:
-                              ad.availability_end_time || "",
-                            skills: (ad.skills as any) || [],
-                          });
-                        }}
-                        className="text-purple-600 hover:text-purple-700 text-sm font-medium"
-                      >
-                        Edit
-                      </button>
+                      {ad.is_active ? (
+                        <span
+                          className="inline-flex items-center px-3 py-1.5 rounded-lg border border-gray-300 bg-gray-100 text-gray-400 text-sm font-medium cursor-not-allowed"
+                          title="Deactivate ad to edit"
+                        >
+                          Edit
+                        </span>
+                      ) : (
+                        <a
+                          className="inline-flex items-center px-3 py-1.5 rounded-lg border border-purple-600 text-purple-600 text-sm font-medium hover:bg-purple-50"
+                          href={`/edit-advertisement/${ad.id}`}
+                          title="Edit"
+                        >
+                          Edit
+                        </a>
+                      )}
                       {ad.is_active ? (
                         <button
                           onClick={async () => {
-                            console.log("Deactivating ad", {
-                              adId: ad.id,
-                              adUserId: ad.user_id,
-                              currentUid: user?.id,
-                            });
                             const { error } = await supabase.rpc("ad_toggle", {
                               p_ad_id: ad.id,
                               p_active: false,
@@ -302,11 +325,6 @@ export default function ProfilePage() {
                               (a) => a.is_active
                             );
                             if (anotherActive) return;
-                            console.log("Activating ad", {
-                              adId: ad.id,
-                              adUserId: ad.user_id,
-                              currentUid: user?.id,
-                            });
                             const { error } = await supabase.rpc("ad_toggle", {
                               p_ad_id: ad.id,
                               p_active: true,
@@ -448,10 +466,10 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* Edit Ad Modal */}
-      {adBeingEdited && (
+      {/* Edit Ad Modal disabled in favor of full edit page */}
+      {false && adBeingEdited && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white w-full max-w-2xl rounded-2xl shadow-xl p-6">
+          <div className="bg-white w-full max-w-3xl rounded-2xl shadow-xl p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-semibold">Edit Advertisement</h3>
               <button
@@ -461,97 +479,120 @@ export default function ProfilePage() {
                 ✕
               </button>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Title
-                </label>
-                <input
-                  type="text"
-                  value={adEditForm.title}
-                  onChange={(e) =>
-                    setAdEditForm({ ...adEditForm, title: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border rounded-lg"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Price per Hour (€)
-                </label>
-                <input
-                  type="number"
-                  value={adEditForm.price_per_hour}
-                  onChange={(e) =>
-                    setAdEditForm({
-                      ...adEditForm,
-                      price_per_hour: Number(e.target.value),
-                    })
-                  }
-                  className="w-full px-3 py-2 border rounded-lg"
-                />
-              </div>
-              <div className="sm:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Description
-                </label>
-                <textarea
-                  rows={3}
-                  value={adEditForm.description}
-                  onChange={(e) =>
-                    setAdEditForm({
-                      ...adEditForm,
-                      description: e.target.value,
-                    })
-                  }
-                  className="w-full px-3 py-2 border rounded-lg"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  City
-                </label>
-                <input
-                  type="text"
-                  value={adEditForm.location_city}
-                  onChange={(e) =>
-                    setAdEditForm({
-                      ...adEditForm,
-                      location_city: e.target.value,
-                    })
-                  }
-                  className="w-full px-3 py-2 border rounded-lg"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Availability
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  <input
-                    type="time"
-                    value={adEditForm.availability_start_time}
-                    onChange={(e) =>
-                      setAdEditForm({
-                        ...adEditForm,
-                        availability_start_time: e.target.value,
-                      })
-                    }
+            {/* Reuse Create form UX for edit: type, title, desc, skills, city via autocomplete, locations, availability dates + per-date overrides */}
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Type
+                  </label>
+                  <select
+                    value={(adBeingEdited as any)?.type || "short-term"}
+                    onChange={(e) => {
+                      setAdBeingEdited({
+                        ...(adBeingEdited as any),
+                        type: e.target.value,
+                      } as any);
+                    }}
                     className="w-full px-3 py-2 border rounded-lg"
-                  />
+                  >
+                    <option value="short-term">Short-term</option>
+                    <option value="long-term">Long-term</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Price per Hour (€)
+                  </label>
                   <input
-                    type="time"
-                    value={adEditForm.availability_end_time}
+                    type="number"
+                    value={adEditForm.price_per_hour}
                     onChange={(e) =>
                       setAdEditForm({
                         ...adEditForm,
-                        availability_end_time: e.target.value,
+                        price_per_hour: Number(e.target.value),
                       })
                     }
                     className="w-full px-3 py-2 border rounded-lg"
                   />
                 </div>
+                <div className="sm:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Title
+                  </label>
+                  <input
+                    type="text"
+                    value={adEditForm.title}
+                    onChange={(e) =>
+                      setAdEditForm({ ...adEditForm, title: e.target.value })
+                    }
+                    className="w-full px-3 py-2 border rounded-lg"
+                  />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Description
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={adEditForm.description}
+                    onChange={(e) =>
+                      setAdEditForm({
+                        ...adEditForm,
+                        description: e.target.value,
+                      })
+                    }
+                    className="w-full px-3 py-2 border rounded-lg"
+                  />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    City
+                  </label>
+                  <LocationAutocomplete
+                    value={adEditForm.location_city || ""}
+                    onChange={(v) =>
+                      setAdEditForm({ ...adEditForm, location_city: v.label })
+                    }
+                    placeholder="Search city, country or street"
+                  />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Availability (default)
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <input
+                      type="time"
+                      value={adEditForm.availability_start_time}
+                      onChange={(e) =>
+                        setAdEditForm({
+                          ...adEditForm,
+                          availability_start_time: e.target.value,
+                        })
+                      }
+                      className="w-full px-3 py-2 border rounded-lg"
+                    />
+                    <input
+                      type="time"
+                      value={adEditForm.availability_end_time}
+                      onChange={(e) =>
+                        setAdEditForm({
+                          ...adEditForm,
+                          availability_end_time: e.target.value,
+                        })
+                      }
+                      className="w-full px-3 py-2 border rounded-lg"
+                    />
+                  </div>
+                </div>
               </div>
+
+              {/* Note: For a complete parity with create, we’d embed MultiDatePicker with per-date overrides and a small locations manager here. */}
+              <p className="text-sm text-gray-500">
+                Advanced date overrides and multiple locations editing can be
+                added here similarly to the create flow.
+              </p>
             </div>
             <div className="flex justify-end mt-6 space-x-3">
               <button
@@ -561,7 +602,7 @@ export default function ProfilePage() {
                 Cancel
               </button>
               <button
-                disabled={isSavingAd}
+                disabled={isSavingAd || adBeingEdited?.is_active}
                 onClick={async () => {
                   if (!adBeingEdited) return;
                   setIsSavingAd(true);
@@ -596,6 +637,12 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
+      )}
+      {previewAdId && (
+        <AdvertisementPreview
+          advertisementId={previewAdId}
+          onClose={() => setPreviewAdId(null)}
+        />
       )}
     </div>
   );
@@ -727,18 +774,15 @@ export default function ProfilePage() {
     </div>
   );
 
+  const displayNameFromProfile =
+    [userProfile?.name, (userProfile as any)?.surname]
+      .filter(Boolean)
+      .join(" ") ||
+    user?.email ||
+    "User";
+
   const renderProfileTab = () => (
     <div className="space-y-6">
-      {/* Welcome Header */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Welcome back, {String(displayName).split(" ")[0]}!
-        </h1>
-        <p className="text-gray-600">
-          Manage your profile and account settings here.
-        </p>
-      </div>
-
       {/* Profile Header */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="bg-gradient-to-r from-purple-600 to-purple-700 px-8 py-8 text-white">
@@ -767,7 +811,9 @@ export default function ProfilePage() {
               )}
             </div>
             <div className="flex-1">
-              <h2 className="text-3xl font-bold mb-2">{displayName}</h2>
+              <h2 className="text-3xl font-bold mb-2">
+                {displayNameFromProfile}
+              </h2>
               <p className="text-purple-100 text-lg mb-3">{user?.email}</p>
               <div className="flex items-center space-x-4">
                 <span
@@ -939,6 +985,46 @@ export default function ProfilePage() {
               <div className="flex justify-end space-x-4 pt-4">
                 <button
                   type="button"
+                  onClick={async () => {
+                    if (!user?.id || isDeleting) return;
+                    const sure = confirm(
+                      "Delete your account? This will remove your profile and ads. This cannot be undone."
+                    );
+                    if (!sure) return;
+                    setIsDeleting(true);
+                    try {
+                      // Call API to delete profile + auth user (service role)
+                      const token = (await supabase.auth.getSession()).data
+                        .session?.access_token;
+                      const resp = await fetch("/api/account/delete", {
+                        method: "POST",
+                        headers: {
+                          "content-type": "application/json",
+                          authorization: token ? `Bearer ${token}` : "",
+                        },
+                        body: JSON.stringify({ userId: user.id }),
+                      });
+                      if (!resp.ok) {
+                        const body = await resp.json().catch(() => ({} as any));
+                        alert(
+                          body?.error ||
+                            "Failed to delete account. Check server env."
+                        );
+                        return;
+                      }
+                      await supabase.auth.signOut();
+                      window.location.href = "/";
+                    } finally {
+                      setIsDeleting(false);
+                    }
+                  }}
+                  disabled={isUpdating || isDeleting}
+                  className="px-6 py-3 border border-red-300 text-red-700 rounded-lg font-medium hover:bg-red-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isDeleting ? "Deleting..." : "Delete Account"}
+                </button>
+                <button
+                  type="button"
                   onClick={() => setIsEditing(false)}
                   disabled={isUpdating}
                   className="px-6 py-3 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -973,7 +1059,7 @@ export default function ProfilePage() {
                   Full Name
                 </label>
                 <p className="text-gray-900 font-medium">
-                  {displayName || "Not set"}
+                  {displayNameFromProfile || "Not set"}
                 </p>
               </div>
               <div>

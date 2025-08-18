@@ -54,8 +54,7 @@ export default function ProfileCompletion() {
 
       const { data: savedUser, error: saveError } = await supabase
         .from("users")
-        .update(userData)
-        .eq("id", auth0User.id)
+        .upsert({ id: auth0User.id, ...userData }, { onConflict: "id" })
         .select()
         .single();
 
@@ -90,7 +89,7 @@ export default function ProfileCompletion() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col bg-gray-50">
-        <Header user={null} />
+        <Header />
         <main className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
@@ -105,7 +104,7 @@ export default function ProfileCompletion() {
   if (!auth0User) {
     return (
       <div className="min-h-screen flex flex-col bg-gray-50">
-        <Header user={null} />
+        <Header />
         <main className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <p className="text-red-600">User not found</p>
@@ -124,7 +123,7 @@ export default function ProfileCompletion() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <Header user={auth0User} />
+      <Header />
 
       <main className="flex-1 px-8 py-16">
         <div className="max-w-2xl mx-auto">

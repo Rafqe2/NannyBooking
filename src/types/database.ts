@@ -5,35 +5,38 @@ export interface Database {
         Row: {
           id: string;
           email: string;
-          given_name: string | null;
-          family_name: string | null;
           name: string | null;
           picture: string | null;
           user_type: "parent" | "nanny" | "pending" | null;
           created_at: string;
           updated_at: string;
+          phone: string | null;
+          location: string | null;
+          surname: string | null;
         };
         Insert: {
           id?: string;
           email: string;
-          given_name?: string | null;
-          family_name?: string | null;
           name?: string | null;
           picture?: string | null;
           user_type?: "parent" | "nanny" | "pending" | null;
           created_at?: string;
           updated_at?: string;
+          phone?: string | null;
+          location?: string | null;
+          surname?: string | null;
         };
         Update: {
           id?: string;
           email?: string;
-          given_name?: string | null;
-          family_name?: string | null;
           name?: string | null;
           picture?: string | null;
           user_type?: "parent" | "nanny" | "pending" | null;
           created_at?: string;
           updated_at?: string;
+          phone?: string | null;
+          location?: string | null;
+          surname?: string | null;
         };
       };
       advertisements: {
@@ -93,6 +96,29 @@ export interface Database {
           is_active?: boolean;
           created_at?: string;
           updated_at?: string;
+        };
+      };
+      advertisement_locations: {
+        Row: {
+          id: string;
+          advertisement_id: string;
+          label: string;
+          order_index: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          advertisement_id: string;
+          label: string;
+          order_index?: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          advertisement_id?: string;
+          label?: string;
+          order_index?: number;
+          created_at?: string;
         };
       };
     };

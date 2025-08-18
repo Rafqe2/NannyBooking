@@ -57,6 +57,18 @@ export default function Header() {
             onClick={() => {
               try {
                 if (typeof window !== "undefined") {
+                  // Suppress restoring last search when explicitly going Home
+                  try {
+                    window.sessionStorage.removeItem("auklite:restoreNext");
+                    window.sessionStorage.removeItem("auklite:lastSearch");
+                    window.sessionStorage.setItem("auklite:forceHome", "1");
+                    window.sessionStorage.setItem(
+                      "auklite:suppressRestore",
+                      "1"
+                    );
+                    // Also clear any persisted search UI state
+                    window.localStorage.removeItem("auklite:lastSearch");
+                  } catch {}
                   window.dispatchEvent(new CustomEvent("resetSearch"));
                 }
               } catch {}

@@ -6,6 +6,8 @@ import { LV_CITIES } from "../lib/constants/cities";
 import { NANNY_SKILLS } from "../lib/constants/skills";
 import { AdvertisementService } from "../lib/advertisementService";
 import { UserService } from "../lib/userService";
+import LocationAutocomplete from "./LocationAutocomplete";
+import MultiDatePicker from "./MultiDatePicker";
 
 interface AdvertisementForm {
   type: "short-term" | "long-term";
@@ -53,6 +55,13 @@ export default function CreateAdvertisement() {
     pricePerHour: 0,
     additionalInfo: "",
   });
+  const [extraLocations, setExtraLocations] = useState<string[]>([]);
+  const [editingDate, setEditingDate] = useState<Date | null>(null);
+  const [editStart, setEditStart] = useState<string>("09:00");
+  const [editEnd, setEditEnd] = useState<string>("17:00");
+  const [perDateTimes, setPerDateTimes] = useState<
+    Record<string, { start: string; end: string }>
+  >({});
 
   const availableSkills = NANNY_SKILLS;
 
@@ -87,6 +96,33 @@ export default function CreateAdvertisement() {
 
     if (!user?.id || !user?.email) {
       setError("User not authenticated");
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Client-side validation with user-facing messages
+    if (formData.title.trim().length < 6) {
+      setError("Title must be at least 6 characters long");
+      setIsSubmitting(false);
+      return;
+    }
+    if (!formData.location.city || formData.location.city.trim().length < 2) {
+      setError("Please select a location");
+      setIsSubmitting(false);
+      return;
+    }
+    if (formData.pricePerHour <= 0) {
+      setError("Price per hour must be greater than 0");
+      setIsSubmitting(false);
+      return;
+    }
+    if (
+      formData.type === "short-term" &&
+      formData.availability.startTime &&
+      formData.availability.endTime &&
+      formData.availability.startTime >= formData.availability.endTime
+    ) {
+      setError("Start time must be earlier than end time");
       setIsSubmitting(false);
       return;
     }
@@ -135,6 +171,37 @@ export default function CreateAdvertisement() {
         setError("Failed to create advertisement");
         setIsSubmitting(false);
         return;
+      }
+      // Save availability slots if any dates are selected
+      if (formData.availability.dates.length > 0) {
+        const slots = formData.availability.dates.map((d) => {
+          const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
+            2,
+            "0"
+          )}-${String(d.getDate()).padStart(2, "0")}`;
+          const ov = perDateTimes[key];
+          return {
+            available_date: key,
+            start_time: ov?.start || formData.availability.startTime,
+            end_time: ov?.end || formData.availability.endTime,
+          };
+        });
+        await AdvertisementService.addAvailabilitySlots(
+          createdAdvertisement.id,
+          slots
+        );
+      }
+
+      // Save up to 3 locations (primary + up to 2 extras)
+      const allLocations = [formData.location.city, ...extraLocations]
+        .map((x) => x.trim())
+        .filter((x) => x.length > 0)
+        .slice(0, 3);
+      if (allLocations.length > 0) {
+        await AdvertisementService.addLocations(
+          createdAdvertisement.id,
+          allLocations
+        );
       }
 
       console.log("Advertisement created successfully:", createdAdvertisement);
@@ -270,127 +337,169 @@ export default function CreateAdvertisement() {
             </div>
           </div>
 
-          {/* Availability */}
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              Availability
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Start Time
-                </label>
-                <input
-                  type="time"
-                  value={formData.availability.startTime}
-                  onChange={(e) =>
+          {/* Availability (hidden for long-term) */}
+          {formData.type === "short-term" && (
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                Availability
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Start Time
+                  </label>
+                  <input
+                    type="time"
+                    value={formData.availability.startTime}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        availability: {
+                          ...prev.availability,
+                          startTime: e.target.value,
+                        },
+                      }))
+                    }
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    End Time
+                  </label>
+                  <input
+                    type="time"
+                    value={formData.availability.endTime}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        availability: {
+                          ...prev.availability,
+                          endTime: e.target.value,
+                        },
+                      }))
+                    }
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+              <div className="mt-4">
+                <MultiDatePicker
+                  selectedDates={formData.availability.dates}
+                  onChange={(dates) =>
                     setFormData((prev) => ({
                       ...prev,
-                      availability: {
-                        ...prev.availability,
-                        startTime: e.target.value,
-                      },
+                      availability: { ...prev.availability, dates },
                     }))
                   }
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  End Time
-                </label>
-                <input
-                  type="time"
-                  value={formData.availability.endTime}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
+                  minDate={(() => {
+                    const d = new Date();
+                    d.setHours(0, 0, 0, 0);
+                    return d;
+                  })()}
+                  perDateTimes={perDateTimes}
+                  defaultStartTime={formData.availability.startTime}
+                  defaultEndTime={formData.availability.endTime}
+                  onUpdateDateTime={(date, start, end) => {
+                    const key = `${date.getFullYear()}-${String(
+                      date.getMonth() + 1
+                    ).padStart(2, "0")}-${String(date.getDate()).padStart(
+                      2,
+                      "0"
+                    )}`;
+                    setPerDateTimes((prev) => ({
                       ...prev,
-                      availability: {
-                        ...prev.availability,
-                        endTime: e.target.value,
-                      },
-                    }))
-                  }
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      [key]: { start, end },
+                    }));
+                  }}
+                  onRemoveDate={(date) => {
+                    const key = `${date.getFullYear()}-${String(
+                      date.getMonth() + 1
+                    ).padStart(2, "0")}-${String(date.getDate()).padStart(
+                      2,
+                      "0"
+                    )}`;
+                    setPerDateTimes((prev) => {
+                      const n = { ...prev } as any;
+                      delete n[key];
+                      return n;
+                    });
+                  }}
                 />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Available Dates
-                </label>
-                <input
-                  type="date"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  placeholder="Select dates"
-                />
+                {formData.availability.dates.length > 0 && (
+                  <div className="text-sm text-gray-600 mt-2">
+                    {formData.availability.dates.length} date(s) selected
+                  </div>
+                )}
               </div>
             </div>
-          </div>
+          )}
 
           {/* Location */}
           <div>
             <h2 className="text-xl font-semibold text-gray-900 mb-4">
               Location
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  City *
+                  City / Address / Country *
                 </label>
-                <input
-                  type="text"
+                <LocationAutocomplete
                   value={formData.location.city}
-                  onChange={(e) =>
+                  onChange={(next) =>
                     setFormData((prev) => ({
                       ...prev,
-                      location: { ...prev.location, city: e.target.value },
+                      location: {
+                        ...prev.location,
+                        city: next.label,
+                        address: "",
+                        zipCode: "",
+                      },
                     }))
                   }
-                  list="city-options"
-                  placeholder="Rīga"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  required
-                />
-                <datalist id="city-options">
-                  {cities.map((c) => (
-                    <option key={c} value={c} />
-                  ))}
-                </datalist>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Address
-                </label>
-                <input
-                  type="text"
-                  value={formData.location.address}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      location: { ...prev.location, address: e.target.value },
-                    }))
-                  }
-                  placeholder="Brīvības iela 123"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  placeholder="Start typing to search..."
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  ZIP Code
-                </label>
-                <input
-                  type="text"
-                  value={formData.location.zipCode}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      location: { ...prev.location, zipCode: e.target.value },
-                    }))
-                  }
-                  placeholder="LV-1010"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                />
-              </div>
+              {/* Extra locations (up to 2) */}
+              {extraLocations.map((loc, idx) => (
+                <div key={idx} className="flex items-center gap-2">
+                  <div className="flex-1">
+                    <LocationAutocomplete
+                      value={loc}
+                      onChange={(next) =>
+                        setExtraLocations((prev) => {
+                          const n = [...prev];
+                          n[idx] = next.label;
+                          return n;
+                        })
+                      }
+                      placeholder="Additional location"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setExtraLocations((prev) =>
+                        prev.filter((_, i) => i !== idx)
+                      )
+                    }
+                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50"
+                    aria-label="Remove location"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+              {extraLocations.length < 2 && (
+                <button
+                  type="button"
+                  onClick={() => setExtraLocations((prev) => [...prev, ""])}
+                  className="mt-2 px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 text-sm"
+                >
+                  + Add another location
+                </button>
+              )}
             </div>
           </div>
 

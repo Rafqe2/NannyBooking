@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { SEARCH_LOCATIONS } from "../lib/constants/cities";
 import { formatDateRange } from "../lib/date";
 import Calendar from "./Calendar";
+import LocationAutocomplete from "./LocationAutocomplete";
 
 interface SearchBarProps {
   onSearch: (
@@ -55,6 +56,25 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [handleClickOutside]);
 
+  // Reset fields when global resetSearch event is dispatched (e.g., clicking site title)
+  useEffect(() => {
+    const handleReset = () => {
+      setSelectedLocation("Location");
+      setStartDate(null);
+      setEndDate(null);
+      setShowDatePicker(false);
+      setShowLocationPicker(false);
+    };
+    if (typeof window !== "undefined") {
+      window.addEventListener("resetSearch", handleReset);
+    }
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("resetSearch", handleReset);
+      }
+    };
+  }, []);
+
   const dateRangeLabel = useMemo(
     () => formatDateRange(startDate, endDate),
     [startDate, endDate]
@@ -92,60 +112,29 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
   }, []);
 
   return (
-    <div className="bg-white py-8 px-8">
+    <div className="bg-white py-6 px-4 md:px-8">
       <div className="max-w-7xl mx-auto relative">
         {/* Single Responsive Search Bar */}
-        <div className="flex justify-center px-16">
-          <div className="w-full max-w-4xl bg-white shadow-2xl border border-gray-100 p-6 hover:shadow-3xl transition-shadow duration-300 rounded-3xl lg:rounded-full lg:flex lg:items-center lg:space-x-4 lg:space-y-0 space-y-4">
+        <div className="flex justify-center px-2 sm:px-4 md:px-8 lg:px-16">
+          <div className="w-full max-w-4xl bg-white shadow-2xl border border-gray-100 p-4 md:p-6 hover:shadow-3xl transition-shadow duration-300 rounded-3xl lg:rounded-full lg:flex lg:items-center lg:space-x-4 lg:space-y-0 space-y-4">
             {/* Where */}
             <div className="relative flex-1" ref={locationRef}>
               <label className="block text-sm font-medium text-gray-700 mb-2 lg:hidden">
                 Where
               </label>
-              <button
-                onClick={() => setShowLocationPicker((prev) => !prev)}
-                className="w-full text-left px-4 lg:px-6 py-3 lg:py-4 border lg:border-0 border-gray-200 lg:border-transparent rounded-xl lg:rounded-2xl hover:bg-gray-50 transition-colors text-base lg:text-lg font-medium"
-              >
-                {selectedLocation}
-              </button>
-              {showLocationPicker && (
-                <div className="absolute top-full left-0 mt-2 lg:mt-3 bg-white rounded-xl lg:rounded-2xl shadow-2xl border border-gray-200 w-full lg:w-80 z-50 overflow-hidden">
-                  <div className="p-4 bg-gray-50 border-b border-gray-200">
-                    <h3 className="font-semibold text-gray-700 mb-3">
-                      Search locations
-                    </h3>
-                    <input
-                      type="text"
-                      placeholder="Type to search..."
-                      value={locationSearch}
-                      onChange={(e) => setLocationSearch(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                      autoFocus
-                    />
-                  </div>
-                  <div className="max-h-64 overflow-y-auto">
-                    {filteredLocations.length > 0 ? (
-                      filteredLocations.map((location) => (
-                        <button
-                          key={location}
-                          onClick={() => {
-                            setSelectedLocation(location);
-                            setShowLocationPicker(false);
-                            setLocationSearch("");
-                          }}
-                          className="w-full text-left px-4 lg:px-6 py-3 lg:py-4 hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0 text-base lg:text-lg bg-white"
-                        >
-                          {location}
-                        </button>
-                      ))
-                    ) : (
-                      <div className="px-4 lg:px-6 py-3 lg:py-4 text-gray-500 text-base lg:text-lg">
-                        No locations found
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
+              <div className="w-full">
+                <LocationAutocomplete
+                  value={
+                    selectedLocation === "Location" ? "" : selectedLocation
+                  }
+                  onChange={(next) => {
+                    setSelectedLocation(next.label);
+                    setShowLocationPicker(false);
+                  }}
+                  placeholder="Search city, country or street"
+                  variant="borderless"
+                />
+              </div>
             </div>
 
             {/* Divider - Only visible on desktop */}
@@ -158,7 +147,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
               </label>
               <button
                 onClick={() => setShowDatePicker((prev) => !prev)}
-                className="w-full text-left px-4 lg:px-6 py-3 lg:py-4 border lg:border-0 border-gray-200 lg:border-transparent rounded-xl lg:rounded-2xl hover:bg-gray-50 transition-colors text-base lg:text-lg font-medium"
+                className="w-full text-left px-0 lg:px-0 py-3 lg:py-4 border-0 lg:border-0 rounded-xl lg:rounded-2xl hover:bg-gray-50 transition-colors text-base lg:text-lg font-medium"
               >
                 {dateRangeLabel}
               </button>

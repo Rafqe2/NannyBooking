@@ -4,13 +4,51 @@ import SearchBar from "./SearchBar";
 import Footer from "./Footer";
 import SearchResults from "./SearchResults";
 
-export default function HomeClient() {
+export default function HomeClient({
+  initialLocation,
+  initialStartDate,
+  initialEndDate,
+  initialShowResults,
+}: {
+  initialLocation?: string;
+  initialStartDate?: Date | null;
+  initialEndDate?: Date | null;
+  initialShowResults?: boolean;
+}) {
   const [searchParams, setSearchParams] = useState({
-    location: "Location",
-    startDate: null as Date | null,
-    endDate: null as Date | null,
+    location: initialLocation || "Location",
+    startDate: (initialStartDate as Date | null) || null,
+    endDate: (initialEndDate as Date | null) || null,
   });
-  const [showResults, setShowResults] = useState(false);
+  const [showResults, setShowResults] = useState(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const forceHome = sessionStorage.getItem("auklite:forceHome");
+        if (forceHome) return false;
+      } catch {}
+    }
+    return !!initialShowResults;
+  });
+
+  useEffect(() => {
+    try {
+      if (typeof window !== "undefined") {
+        const forceHome = sessionStorage.getItem("auklite:forceHome");
+        if (forceHome) {
+          // Reset search inputs and hide results when home is forced
+          setSearchParams({
+            location: "Location",
+            startDate: null,
+            endDate: null,
+          });
+          setShowResults(false);
+          sessionStorage.removeItem("auklite:forceHome");
+          // Explicitly broadcast the reset so nested components clear their own local state
+          window.dispatchEvent(new CustomEvent("resetSearch"));
+        }
+      }
+    } catch {}
+  }, []);
 
   // Reset results when header logo is clicked
   useEffect(() => {
@@ -42,7 +80,7 @@ export default function HomeClient() {
       </div>
       {/* Main Content */}
       {!showResults ? (
-        <main className="flex-1 px-8 py-16">
+        <main className="flex-1 px-4 sm:px-6 md:px-8 py-10 md:py-16">
           <div className="text-center max-w-6xl mx-auto">
             <h1 className="text-5xl md:text-7xl font-bold mb-8 text-gray-900 leading-tight">
               Find Your Perfect

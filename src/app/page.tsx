@@ -5,12 +5,19 @@ import { UserService } from "../lib/userService";
 import Header from "../components/Header";
 import HomeClient from "../components/HomeClient";
 import { useSupabaseUser } from "../lib/useSupabaseUser";
+import BlockingLoader from "../components/BlockingLoader";
 
 export default function Home() {
   const { user, isLoading } = useSupabaseUser();
   const [isCheckingProfile, setIsCheckingProfile] = useState(false);
   const [hasCheckedProfile, setHasCheckedProfile] = useState(false);
   const [debugInfo, setDebugInfo] = useState<string[]>([]);
+  const [initialSearch, setInitialSearch] = useState<{
+    location: string;
+    startDate: Date | null;
+    endDate: Date | null;
+    openResults: boolean;
+  } | null>(null);
 
   const addDebugInfo = (info: string) => {
     setDebugInfo((prev) => [...prev, `${new Date().toISOString()}: ${info}`]);
@@ -49,6 +56,30 @@ export default function Home() {
     checkProfileCompletion();
   }, [user, isLoading, hasCheckedProfile]);
 
+  useEffect(() => {
+    // Restore last search only when returning from details in the same session
+    try {
+      if (typeof window !== "undefined") {
+        const restore = sessionStorage.getItem("auklite:restoreNext");
+        const raw = restore
+          ? sessionStorage.getItem("auklite:lastSearch")
+          : null;
+        if (raw && restore) {
+          const parsed = JSON.parse(raw);
+          setInitialSearch({
+            location: parsed.location || "Location",
+            startDate: parsed.startDate ? new Date(parsed.startDate) : null,
+            endDate: parsed.endDate ? new Date(parsed.endDate) : null,
+            openResults: !!parsed.openResults,
+          });
+        }
+        // Always clear flags so normal home nav doesn’t restore
+        sessionStorage.removeItem("auklite:restoreNext");
+        sessionStorage.removeItem("auklite:suppressRestore");
+      }
+    } catch {}
+  }, []);
+
   // No explicit error handling here; Supabase errors are surfaced in flows
 
   // Show loading while checking profile completion
@@ -57,13 +88,14 @@ export default function Home() {
       <div className="min-h-screen flex flex-col bg-white">
         <Header />
         <main className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">
-              {isLoading ? "Loading authentication..." : "Checking profile..."}
-            </p>
+          <div className="w-full max-w-md">
+            <BlockingLoader
+              message={
+                isLoading ? "Loading authentication…" : "Checking profile…"
+              }
+            />
             {debugInfo.length > 0 && (
-              <details className="mt-4 text-left max-w-md mx-auto">
+              <details className="mt-4 text-left">
                 <summary className="cursor-pointer text-sm text-gray-500">
                   Debug Info
                 </summary>
@@ -85,7 +117,12 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Header />
-      <HomeClient />
+      <HomeClient
+        initialLocation={initialSearch?.location}
+        initialStartDate={initialSearch?.startDate || null}
+        initialEndDate={initialSearch?.endDate || null}
+        initialShowResults={!!initialSearch?.openResults}
+      />
     </div>
   );
 }
