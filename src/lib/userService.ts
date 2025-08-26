@@ -16,24 +16,26 @@ export interface UserProfile {
 }
 
 export class UserService {
-  // Save or update user profile from Auth0 data
-  static async upsertUserFromAuth0(
-    auth0User: any
-  ): Promise<UserProfile | null> {
+  // Upsert/refresh user profile from Supabase auth user metadata
+  static async upsertUserFromAuth(sessionUser: {
+    id: string;
+    email: string;
+    user_metadata?: Record<string, any> | null;
+  }): Promise<UserProfile | null> {
     try {
+      const meta = sessionUser.user_metadata || {};
       const userData = {
-        email: auth0User.email,
-        name: auth0User.given_name || "",
-        surname: auth0User.family_name || "",
-        picture: auth0User.picture || null,
-        user_type: "pending",
+        email: sessionUser.email,
+        name: (meta as any).given_name || (meta as any).name || "",
+        surname: (meta as any).family_name || "",
+        picture: (meta as any).picture || null,
         updated_at: new Date().toISOString(),
-      };
+      } as Partial<UserProfile>;
 
       const { data, error } = await supabase
         .from("users")
         .update(userData)
-        .eq("id", auth0User.id)
+        .eq("id", sessionUser.id)
         .select()
         .single();
 
@@ -42,9 +44,44 @@ export class UserService {
         return null;
       }
 
-      return data;
+      return data as any;
     } catch (error) {
-      console.error("Error in upsertUserFromAuth0:", error);
+      console.error("Error in upsertUserFromAuth:", error);
+      return null;
+    }
+  }
+
+  // Get public profile via RPC (safe for viewers)
+  static async getPublicProfileById(userId: string): Promise<
+    | {
+        user_id: string;
+        full_name: string | null;
+        picture: string | null;
+        member_since: string | null;
+        bio: string | null;
+        user_type: string | null;
+        rating: number | null;
+        reviews_count: number | null;
+      }
+    | null
+  > {
+    try {
+      const { data, error } = await supabase.rpc(
+        "get_user_public_profile",
+        {
+          p_user_id: userId,
+        }
+      );
+      if (error) {
+        // eslint-disable-next-line no-console
+        console.error("Error getting public user:", error);
+        return null;
+      }
+      const row = Array.isArray(data) ? (data[0] as any) : (data as any);
+      return row || null;
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error("Error in getPublicProfileById:", error);
       return null;
     }
   }
@@ -66,6 +103,27 @@ export class UserService {
       return data;
     } catch (error) {
       console.error("Error in getUserByEmail:", error);
+      return null;
+    }
+  }
+
+  // Get user profile by ID
+  static async getUserById(userId: string): Promise<UserProfile | null> {
+    try {
+      const { data, error } = await supabase
+        .from("users")
+        .select("*")
+        .eq("id", userId)
+        .single();
+
+      if (error) {
+        console.error("Error getting user by id:", error);
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error("Error in getUserById:", error);
       return null;
     }
   }

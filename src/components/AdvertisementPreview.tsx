@@ -32,7 +32,7 @@ export default function AdvertisementPreview({
         );
         if (!advertisement) throw new Error("Advertisement not found");
         setAd(advertisement);
-        const s = await AdvertisementService.getAvailabilitySlots(
+        const s = await AdvertisementService.getFilteredAvailabilitySlots(
           advertisementId
         );
         setSlots(s);

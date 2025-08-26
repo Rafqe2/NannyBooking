@@ -22,8 +22,22 @@ export function useSupabaseUser() {
     };
 
     const { data: subscription } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        setUser(session?.user ?? null);
+      async (event, session) => {
+        if (!isMounted) return;
+        
+        try {
+          setUser(session?.user ?? null);
+          
+          // Handle logout specifically
+          if (event === 'SIGNED_OUT') {
+            // Clear any cached data and ensure we're in a clean state
+            setUser(null);
+          }
+        } catch (error) {
+          console.error("Auth state change error:", error);
+          // Still update the user state even if there's an error
+          setUser(session?.user ?? null);
+        }
       }
     );
 

@@ -1,3 +1,5 @@
+"use client";
+
 import ProfileCompletion from "../../components/ProfileCompletion";
 import BlockingLoader from "../../components/BlockingLoader";
 import Header from "../../components/Header";

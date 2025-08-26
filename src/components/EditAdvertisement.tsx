@@ -96,6 +96,17 @@ export default function EditAdvertisement({
     });
   };
 
+  const removeDateCompletely = (date: Date) => {
+    const key = toLocalYYYYMMDD(date);
+    setSelectedDates((prev) => prev.filter((d) => toLocalYYYYMMDD(d) !== key));
+    onRemoveDate(date);
+  };
+
+  const clearAllDates = () => {
+    setSelectedDates([]);
+    setPerDateTimes({});
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -125,7 +136,8 @@ export default function EditAdvertisement({
         </h1>
         {isActive && (
           <span className="text-sm text-gray-500">
-            Deactivate this ad to make changes
+            Title, type, price, description and skills are locked while active.
+            Availability and locations can be edited.
           </span>
         )}
       </div>
@@ -308,7 +320,7 @@ export default function EditAdvertisement({
                 Default start
               </label>
               <input
-                disabled={isActive}
+                disabled={false}
                 type="time"
                 value={defaultStart}
                 onChange={(e) => setDefaultStart(e.target.value)}
@@ -320,7 +332,7 @@ export default function EditAdvertisement({
                 Default end
               </label>
               <input
-                disabled={isActive}
+                disabled={false}
                 type="time"
                 value={defaultEnd}
                 onChange={(e) => setDefaultEnd(e.target.value)}
@@ -328,11 +340,7 @@ export default function EditAdvertisement({
               />
             </div>
           </div>
-          <div
-            className={
-              "mt-4 " + (isActive ? "pointer-events-none opacity-60" : "")
-            }
-          >
+          <div className={"mt-4"}>
             <MultiDatePicker
               selectedDates={selectedDates}
               onChange={setSelectedDates}
@@ -352,8 +360,18 @@ export default function EditAdvertisement({
           </div>
           {selectedDates.length > 0 && (
             <div className="mt-4 p-4 border border-gray-200 rounded-xl bg-white">
-              <div className="text-sm font-medium text-gray-900 mb-2">
-                Selected dates
+              <div className="flex items-center justify-between mb-2">
+                <div className="text-sm font-medium text-gray-900">
+                  Selected dates
+                </div>
+                <button
+                  type="button"
+                  disabled={false}
+                  onClick={clearAllDates}
+                  className="text-red-600 hover:text-red-700 text-sm disabled:opacity-50"
+                >
+                  Clear all
+                </button>
               </div>
               <ul className="space-y-1 text-sm text-gray-700">
                 {selectedDates
@@ -370,9 +388,21 @@ export default function EditAdvertisement({
                         className="flex items-center justify-between"
                       >
                         <span>{d.toLocaleDateString()}</span>
-                        <span className="text-gray-600">
-                          {start} - {end}
-                        </span>
+                        <div className="flex items-center">
+                          <span className="text-gray-600">
+                            {start} - {end}
+                          </span>
+                          <button
+                            type="button"
+                            disabled={false}
+                            onClick={() => removeDateCompletely(d)}
+                            title="Remove this date"
+                            aria-label="Remove date"
+                            className="ml-3 inline-flex items-center justify-center w-6 h-6 rounded-full border border-red-300 text-red-600 hover:bg-red-50 hover:text-red-700 disabled:opacity-50"
+                          >
+                            ✕
+                          </button>
+                        </div>
                       </li>
                     );
                   })}
@@ -395,9 +425,8 @@ export default function EditAdvertisement({
         </button>
         <button
           type="button"
-          disabled={saving || isActive}
+          disabled={saving}
           onClick={async () => {
-            if (isActive) return;
             setSaving(true);
             try {
               // update base ad

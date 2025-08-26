@@ -1,12 +1,15 @@
 "use client";
 
-import { use as useUnwrap, useEffect, useMemo, useState } from "react";
+import { use as useUnwrap } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import Header from "../../../components/Header";
 import Footer from "../../../components/Footer";
 import BlockingLoader from "../../../components/BlockingLoader";
 import { AdvertisementService } from "../../../lib/advertisementService";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { UserService } from "../../../lib/userService";
+import BookingModal from "../../../components/BookingModal";
 import { useSupabaseUser } from "../../../lib/useSupabaseUser";
 
 interface Slot {
@@ -15,38 +18,35 @@ interface Slot {
   end_time: string;
 }
 
+interface Owner {
+  fullName: string;
+  memberSince: string | null;
+  picture: string | null;
+  userType: "parent" | "nanny" | "pending" | null;
+}
+
 export default function AdvertisementDetails({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const router = useRouter();
   const { id } = useUnwrap(params);
+  const router = useRouter();
   const { user } = useSupabaseUser();
-  const [viewerType, setViewerType] = useState<"parent" | "nanny" | null>(null);
   const [ad, setAd] = useState<any | null>(null);
+  const [owner, setOwner] = useState<Owner | null>(null);
   const [slots, setSlots] = useState<Slot[]>([]);
-  const [owner, setOwner] = useState<{
-    fullName: string;
-    memberSince: string | null;
-    picture: string | null;
-  } | null>(null);
   const [locations, setLocations] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showBooking, setShowBooking] = useState(false);
+  const [viewerType, setViewerType] = useState<null | "parent" | "nanny">(null);
 
   useEffect(() => {
     const run = async () => {
       setLoading(true);
       setError(null);
       try {
-        // Load viewer type to hide own ads when browsing
-        if (user?.id) {
-          const prof = await fetch(`/api/auth/me`)
-            .then((r) => r.json())
-            .catch(() => null);
-          // We don't have a user_type endpoint; fallback not critical for view-only
-        }
         const advertisement = await AdvertisementService.getAdvertisementById(
           id
         );
@@ -56,15 +56,28 @@ export default function AdvertisementDetails({
           return;
         }
         setAd(advertisement);
-        setOwner({
-          fullName:
-            [advertisement.name, advertisement.surname]
-              .filter(Boolean)
-              .join(" ") || "",
-          memberSince: advertisement.created_at || null,
-          picture: advertisement.picture || null,
-        } as any);
-        const s = await AdvertisementService.getAvailabilitySlots(id);
+
+        // Fetch owner data
+        const ownerData = await UserService.getPublicProfileById(
+          advertisement.user_id
+        );
+        if (ownerData) {
+          setOwner({
+            fullName: ownerData.full_name || "",
+            memberSince: ownerData.member_since || null,
+            picture: ownerData.picture || null,
+            userType: (ownerData.user_type as any) ?? null,
+          });
+        } else {
+          setOwner({
+            fullName: "",
+            memberSince: null,
+            picture: null,
+            userType: null,
+          });
+        }
+
+        const s = await AdvertisementService.getFilteredAvailabilitySlots(id);
         setSlots(s);
         // Load extra locations (best-effort)
         try {
@@ -82,6 +95,32 @@ export default function AdvertisementDetails({
     run();
   }, [id]);
 
+  // Determine viewer type for CTA rules
+  useEffect(() => {
+    const checkViewer = async () => {
+      try {
+        if (!user?.id) {
+          setViewerType(null);
+          return;
+        }
+        const { data } = await (await import("@/lib/supabase")).supabase
+          .from("users")
+          .select("user_type")
+          .eq("id", user.id)
+          .maybeSingle();
+        if (data?.user_type === "parent" || data?.user_type === "nanny") {
+          setViewerType(data.user_type as any);
+        } else {
+          setViewerType(null);
+        }
+      } catch (error) {
+        console.error("Error checking viewer type:", error);
+        setViewerType(null);
+      }
+    };
+    checkViewer();
+  }, [user?.id]);
+
   const groupedSlots = useMemo(() => {
     const map = new Map<string, Slot[]>();
     for (const s of slots) {
@@ -89,8 +128,12 @@ export default function AdvertisementDetails({
       if (!map.has(key)) map.set(key, []);
       map.get(key)!.push(s);
     }
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayKey = today.toISOString().slice(0, 10);
     return Array.from(map.entries())
       .sort(([a], [b]) => (a < b ? -1 : 1))
+      .filter(([date]) => date >= todayKey)
       .map(([date, items]) => ({ date, items }));
   }, [slots]);
 
@@ -312,9 +355,80 @@ export default function AdvertisementDetails({
                   </div>
                 )}
               </div>
+
+              {/* Call to action */}
+              <div className="mt-8 bg-white rounded-2xl border border-gray-200 p-6">
+                <div className="mb-3 text-gray-800">
+                  Looking good? You should book and contact the{" "}
+                  {owner
+                    ? owner.fullName ||
+                      (ad.type === "short-term" ? "nanny" : "parent")
+                    : ad.type === "short-term"
+                    ? "nanny"
+                    : "parent"}
+                  .
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  {(() => {
+                    const ownerIsNanny = owner?.userType === "nanny";
+                    const ownerIsParent = owner?.userType === "parent";
+                    const canBook =
+                      !!user && ownerIsNanny && viewerType === "parent";
+                    // Nannies should not be able to book parents: if ownerIsParent, hide Book.
+                    return canBook ? (
+                      <button
+                        type="button"
+                        onClick={() => setShowBooking(true)}
+                        className="px-5 py-2 rounded-lg font-medium bg-purple-600 text-white hover:bg-purple-700"
+                        title="Book this ad"
+                      >
+                        Book
+                      </button>
+                    ) : null;
+                  })()}
+                  <a
+                    href={user ? `/user/${ad.user_id}` : undefined}
+                    onClick={(e) => {
+                      if (!user) e.preventDefault();
+                    }}
+                    className={
+                      "px-5 py-2 rounded-lg font-medium border " +
+                      (!user
+                        ? "bg-gray-50 text-gray-500 border-gray-200 cursor-not-allowed"
+                        : "border-purple-600 text-purple-700 hover:bg-purple-50")
+                    }
+                    title={
+                      !user
+                        ? "Create an account or sign in to contact"
+                        : "Go to profile to contact"
+                    }
+                  >
+                    Contact
+                  </a>
+                </div>
+                {!user && (
+                  <div className="mt-2 text-sm text-gray-600">
+                    You need to register or sign in to contact and book.
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
+        {showBooking && user && (
+          <BookingModal
+            adId={ad.id}
+            onClose={() => setShowBooking(false)}
+            ownerType={
+              owner?.userType === "nanny"
+                ? "nanny"
+                : owner?.userType === "parent"
+                ? "parent"
+                : undefined
+            }
+            availableSlots={slots as any}
+          />
+        )}
       </main>
       <Footer />
     </div>

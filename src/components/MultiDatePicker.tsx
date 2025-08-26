@@ -13,6 +13,9 @@ interface MultiDatePickerProps {
   onUpdateDateTime?: (date: Date, start: string, end: string) => void;
   onRemoveDate?: (date: Date) => void;
   initialMonthDate?: Date;
+  showRemoveBadges?: boolean; // optional: show small remove x on calendar cells
+  allowedDateKeys?: Set<string> | string[]; // optional: if provided, only allow selecting these YYYY-MM-DD dates
+  autoOpenTimeEditor?: boolean; // optional: if true, opens time editor immediately on first click
 }
 
 function toDateKey(d: Date): string {
@@ -35,6 +38,9 @@ export default function MultiDatePicker({
   onUpdateDateTime,
   onRemoveDate,
   initialMonthDate,
+  showRemoveBadges = false,
+  allowedDateKeys,
+  autoOpenTimeEditor = false,
 }: MultiDatePickerProps) {
   const [currentMonth, setCurrentMonth] = useState<Date>(() => {
     const base = initialMonthDate || new Date();
@@ -69,6 +75,12 @@ export default function MultiDatePicker({
     [currentMonth]
   );
 
+  const allowedSet = useMemo<Set<string> | null>(() => {
+    if (!allowedDateKeys) return null;
+    if (allowedDateKeys instanceof Set) return allowedDateKeys;
+    return new Set<string>(allowedDateKeys);
+  }, [allowedDateKeys]);
+
   const isPast = (day: number) => {
     if (!minDate) return false;
     const d = new Date(
@@ -89,27 +101,33 @@ export default function MultiDatePicker({
     d.setHours(0, 0, 0, 0);
     if (minDate && d < minDate) return;
     const key = toDateKey(d);
+    if (allowedSet && !allowedSet.has(key)) return;
     const next = new Map<string, Date>();
     for (const sd of selectedDates) next.set(toDateKey(sd), new Date(sd));
     if (next.has(key)) {
-      // Second click opens inline editor instead of immediate removal
-      const ov = perDateTimes && perDateTimes[key];
-      setEditStart(ov?.start || defaultStartTime || "09:00");
-      setEditEnd(ov?.end || defaultEndTime || "17:00");
-      setEditingKey(key);
-      if (onSelectedDateClick) onSelectedDateClick(d);
-      return;
+      // Second click removes the date
+      next.delete(key);
+      if (onRemoveDate) onRemoveDate(d);
     } else {
       next.set(key, d);
+      if (onSelectedDateClick) onSelectedDateClick(d);
     }
     const out = Array.from(next.values()).sort(
       (a, b) => a.getTime() - b.getTime()
     );
     onChange(out);
+
+    // Auto-open editor for newly added dates if enabled
+    if (autoOpenTimeEditor && next.has(key)) {
+      const ov = perDateTimes && perDateTimes[key];
+      setEditStart(ov?.start || defaultStartTime || "09:00");
+      setEditEnd(ov?.end || defaultEndTime || "17:00");
+      setEditingKey(key);
+    }
   };
 
   return (
-    <div className="w-full max-w-md">
+    <div className="w-full">
       <div className="flex items-center justify-between mb-4">
         <button
           type="button"
@@ -166,28 +184,75 @@ export default function MultiDatePicker({
           const dateKey = toDateKey(date);
           const selected = selectedKeys.has(dateKey);
           const past = isPast(day);
+          const isAvailable = allowedSet && allowedSet.has(dateKey);
           const ov = perDateTimes && perDateTimes[dateKey];
           return (
-            <button
-              type="button"
-              key={day}
-              disabled={past}
-              onClick={() => toggleDay(day)}
-              className={
-                "h-10 rounded-lg text-sm transition " +
-                (past
-                  ? "text-gray-300 cursor-not-allowed"
-                  : selected
-                  ? "bg-purple-600 text-white hover:bg-purple-700"
-                  : "hover:bg-gray-100")
-              }
-              title={ov ? `${ov.start} - ${ov.end}` : undefined}
-            >
-              {day}
-            </button>
+            <div key={day} className="relative">
+              <button
+                type="button"
+                disabled={past || (allowedSet && !isAvailable)}
+                onClick={() => {
+                  // Single click toggles selection (add or remove)
+                  toggleDay(day);
+                }}
+                onDoubleClick={() => {
+                  if (selected) {
+                    // Double-click on selected date opens editor
+                    const ov = perDateTimes && perDateTimes[dateKey];
+                    setEditStart(ov?.start || defaultStartTime || "09:00");
+                    setEditEnd(ov?.end || defaultEndTime || "17:00");
+                    setEditingKey(dateKey);
+                  }
+                }}
+                className={
+                  "h-10 w-full rounded-lg text-sm transition " +
+                  (past
+                    ? "text-gray-300 cursor-not-allowed"
+                    : allowedSet && !isAvailable
+                    ? "text-gray-400 cursor-not-allowed"
+                    : selected
+                    ? "bg-purple-600 text-white hover:bg-purple-700"
+                    : isAvailable
+                    ? "border-2 border-green-400 text-green-700 hover:bg-green-50"
+                    : "hover:bg-gray-100")
+                }
+                title={ov ? `${ov.start} - ${ov.end}` : undefined}
+              >
+                {day}
+              </button>
+              {showRemoveBadges && selected && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const keyToRemove = toDateKey(date);
+                    const out = selectedDates.filter(
+                      (sd) => toDateKey(sd) !== keyToRemove
+                    );
+                    onChange(out);
+                    if (onRemoveDate) onRemoveDate(date);
+                  }}
+                  className="absolute -top-1 -right-1 h-5 w-5 rounded-full border border-red-300 bg-white text-red-600 text-xs leading-5 flex items-center justify-center hover:bg-red-50"
+                  aria-label={`Remove ${date.toLocaleDateString()}`}
+                  title="Remove date"
+                >
+                  ×
+                </button>
+              )}
+            </div>
           );
         })}
       </div>
+
+      {!editingKey && selectedDates.length > 0 && (
+        <div className="mt-3 p-3 border border-dashed border-gray-300 rounded-xl bg-white">
+          <div className="text-xs text-gray-600">
+            {autoOpenTimeEditor
+              ? "Tip: Click to select dates and edit time, click again to deselect."
+              : "Tip: Click to select/deselect dates, double-click to edit time."}
+          </div>
+        </div>
+      )}
 
       {editingKey && (
         <div className="mt-3 p-3 border border-gray-200 rounded-xl bg-white shadow-sm">

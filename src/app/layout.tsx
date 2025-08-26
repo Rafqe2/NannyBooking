@@ -1,18 +1,19 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import ErrorBoundary from "../components/ErrorBoundary";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Auklite - Your Perfect Travel Companion | Baltic Region Travel",
+  title: "auklite.lv – Parents meet trusted nannies",
   description:
-    "Discover amazing destinations across the Baltic region and beyond with Auklite. Find the best accommodations, experiences, and travel deals in Latvia, Lithuania, Estonia, and Sweden.",
+    "auklite.lv connects parents with trusted, verified nannies. Create or discover childcare ads, manage availability, and book care with confidence.",
   keywords:
-    "travel, Baltic region, Latvia, Lithuania, Estonia, Sweden, accommodation, experiences, booking, Auklite",
-  authors: [{ name: "Auklite Team" }],
-  creator: "Auklite",
-  publisher: "Auklite",
+    "childcare, nanny, babysitting, parents, bookings, availability, Latvia, Lithuania, Estonia, Sweden",
+  authors: [{ name: "auklite.lv Team" }],
+  creator: "auklite.lv",
+  publisher: "auklite.lv",
   formatDetection: {
     email: false,
     address: false,
@@ -23,19 +24,18 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "Auklite - Your Perfect Travel Companion",
+    title: "auklite.lv – Parents meet trusted nannies",
     description:
-      "Discover amazing destinations across the Baltic region and beyond with Auklite.",
+      "Find trusted nannies or families. Manage childcare ads, availability and bookings in one place.",
     url: "https://auklite.lv",
-    siteName: "Auklite",
+    siteName: "auklite.lv",
     locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Auklite - Your Perfect Travel Companion",
-    description:
-      "Discover amazing destinations across the Baltic region and beyond with Auklite.",
+    title: "auklite.lv – Parents meet trusted nannies",
+    description: "Find trusted childcare, list services, and manage bookings.",
   },
   robots: {
     index: true,
@@ -63,7 +63,9 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#fffEE0" />
       </head>
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <ErrorBoundary>{children}</ErrorBoundary>
+      </body>
     </html>
   );
 }

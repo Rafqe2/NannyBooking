@@ -13,6 +13,9 @@ import Footer from "../../components/Footer";
 import { Database } from "../../types/database";
 import { useSupabaseUser } from "../../lib/useSupabaseUser";
 import AdvertisementPreview from "../../components/AdvertisementPreview";
+import BookingCalendar from "../../components/BookingCalendar";
+import { BookingService } from "../../lib/bookingService";
+import CancelBookingModal from "../../components/CancelBookingModal";
 
 type Advertisement = Database["public"]["Tables"]["advertisements"]["Row"];
 
@@ -42,6 +45,21 @@ export default function ProfilePage() {
   );
   const [isSavingAd, setIsSavingAd] = useState(false);
   const [previewAdId, setPreviewAdId] = useState<string | null>(null);
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [pendingBookings, setPendingBookings] = useState<number>(0);
+  const [selectedCalendarDate, setSelectedCalendarDate] = useState<
+    string | null
+  >(null);
+  const selectedDateBookings = bookings.filter(
+    (b) => b.booking_date && b.booking_date === selectedCalendarDate
+  );
+  const [bookingView, setBookingView] = useState<"upcoming" | "past">(
+    "upcoming"
+  );
+  const [selectedBooking, setSelectedBooking] = useState<any | null>(null);
+  const [cancellingBooking, setCancellingBooking] = useState<any | null>(null);
+  const [currentBookingPage, setCurrentBookingPage] = useState(1);
+  const bookingsPerPage = 4;
   const [isDeleting, setIsDeleting] = useState(false);
   const [adEditForm, setAdEditForm] = useState({
     title: "",
@@ -77,11 +95,54 @@ export default function ProfilePage() {
             location: profile.location || "",
           });
 
-          // Load user advertisements
-          const userAds = await AdvertisementService.getUserAdvertisements(
+          // Load user advertisements, auto-disable expired short-term ones
+          let userAds = await AdvertisementService.getUserAdvertisements(
             profile.id
           );
-          setAdvertisements(userAds);
+          try {
+            for (const ad of userAds) {
+              if (ad.type === "short-term" && ad.is_active) {
+                // Trigger server-side check which auto-disables if all dates are past
+                await supabase.rpc("update_ad_active_status", {
+                  p_ad_id: ad.id,
+                });
+              }
+            }
+            // Reload after potential changes
+            userAds = await AdvertisementService.getUserAdvertisements(
+              profile.id
+            );
+            setAdvertisements(userAds);
+          } catch {
+            setAdvertisements(userAds);
+          }
+
+          // Load bookings + pending count
+          try {
+            const { data: bdata, error: berror } = await supabase.rpc(
+              "get_my_bookings"
+            );
+            console.log("Bookings data:", bdata); // Debug log
+            console.log("Bookings error:", berror); // Debug log
+            if (berror) {
+              console.error("Error loading bookings:", berror);
+            }
+            setBookings((bdata as any[]) || []);
+          } catch (error) {
+            console.error("Exception loading bookings:", error);
+          }
+          try {
+            const { data: pcount, error: perror } = await supabase.rpc(
+              "get_pending_booking_count_for_me"
+            );
+            console.log("Pending count:", pcount, "Error:", perror); // Debug log
+            if (perror) {
+              console.error("Error loading pending count:", perror);
+            }
+            setPendingBookings(Number(pcount || 0));
+          } catch (error) {
+            console.error("Exception loading pending count:", error);
+          }
         }
       } catch (error) {
         console.error("Error loading profile:", error);
@@ -183,7 +244,11 @@ export default function ProfilePage() {
       label: isParent ? "Your Advertisement" : "Your Advertisement",
       icon: isParent ? "📋" : "💼",
     },
-    { id: "bookings", label: "Bookings", icon: "📅" },
+    {
+      id: "bookings",
+      label: "Bookings",
+      icon: pendingBookings > 0 ? "⚠️" : "📅",
+    },
     { id: "messages", label: "Messages", icon: "💬" },
     { id: "profile", label: "Profile", icon: "👤" },
   ] as const;
@@ -249,7 +314,11 @@ export default function ProfilePage() {
               {advertisements.map((ad) => (
                 <div
                   key={ad.id}
-                  className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow duration-200 cursor-pointer"
+                  className={`border rounded-xl p-6 transition-shadow duration-200 cursor-pointer ${
+                    ad.is_active
+                      ? "bg-white border-gray-200 hover:shadow-md"
+                      : "bg-gray-50 border-gray-200"
+                  }`}
                   onClick={(e) => {
                     const target = e.target as HTMLElement;
                     // Prevent opening preview when clicking action controls inside the card
@@ -314,7 +383,7 @@ export default function ProfilePage() {
                               );
                             setAdvertisements(userAds);
                           }}
-                          className="text-red-600 hover:text-red-700 text-sm font-medium"
+                          className="inline-flex items-center px-3 py-1.5 rounded-lg border border-gray-300 text-gray-700 text-sm font-medium hover:bg-gray-100"
                         >
                           Deactivate
                         </button>
@@ -346,10 +415,10 @@ export default function ProfilePage() {
                               : ""
                           }
                           className={
-                            `text-sm font-medium ` +
+                            `inline-flex items-center px-3 py-1.5 rounded-lg border text-sm font-medium ` +
                             (advertisements.some((a) => a.is_active)
-                              ? "text-gray-400 cursor-not-allowed"
-                              : "text-green-600 hover:text-green-700")
+                              ? "text-gray-400 border-gray-300 cursor-not-allowed"
+                              : "text-green-700 border-green-600 hover:bg-green-50")
                           }
                         >
                           Activate
@@ -382,7 +451,7 @@ export default function ProfilePage() {
                               );
                             setAdvertisements(userAds);
                           }}
-                          className="text-red-700 hover:text-red-800 text-sm font-medium"
+                          className="inline-flex items-center px-3 py-1.5 rounded-lg border border-red-600 text-red-700 text-sm font-medium hover:bg-red-50"
                         >
                           Delete
                         </button>
@@ -390,7 +459,11 @@ export default function ProfilePage() {
                     </div>
                   </div>
 
-                  <p className="text-gray-700 mb-4 line-clamp-3">
+                  <p
+                    className={`mb-4 line-clamp-3 ${
+                      ad.is_active ? "text-gray-700" : "text-gray-500"
+                    }`}
+                  >
                     {ad.description}
                   </p>
 
@@ -414,7 +487,11 @@ export default function ProfilePage() {
                     </div>
                   )}
 
-                  <div className="flex items-center justify-between text-sm text-gray-500">
+                  <div
+                    className={`flex items-center justify-between text-sm ${
+                      ad.is_active ? "text-gray-500" : "text-gray-500"
+                    }`}
+                  >
                     <span>Created {formatDate(ad.created_at)}</span>
                     <span
                       className={
@@ -647,70 +724,512 @@ export default function ProfilePage() {
     </div>
   );
 
+  // duplicate removed, see top-level definition
+
   const renderBookingsTab = () => (
     <div className="space-y-6">
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-        {/* Header */}
-        <div className="px-8 py-6 border-b border-gray-100 bg-gray-50">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-semibold text-gray-900">Bookings</h2>
-              <p className="text-gray-600 mt-1">
-                {userProfile?.user_type === "parent"
-                  ? "Manage your childcare appointments"
-                  : userProfile?.user_type === "nanny"
-                  ? "Manage your childcare bookings and schedule"
-                  : "Complete your profile to get started"}
-              </p>
-            </div>
-            <div className="flex space-x-3">
-              <button className="px-4 py-2 text-purple-600 border border-purple-600 rounded-lg font-medium hover:bg-purple-50 transition-colors duration-200">
-                Upcoming
-              </button>
-              <button className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition-colors duration-200">
-                Past
-              </button>
-            </div>
-          </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-1">
+          <BookingCalendar
+            bookings={bookings}
+            selectedDate={selectedCalendarDate}
+            onSelectDate={(date) => setSelectedCalendarDate(date || null)}
+          />
         </div>
-
-        {/* Content */}
-        <div className="p-6 sm:p-8">
-          {/* Empty State */}
-          <div className="text-center py-12">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg
-                className="w-8 h-8 text-green-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
-              </svg>
+        <div className="lg:col-span-2">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="px-8 py-5 border-b border-gray-100 bg-gray-50">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-semibold text-gray-900">
+                    Your bookings
+                  </h2>
+                </div>
+                {selectedCalendarDate && (
+                  <div className="text-sm text-gray-700">
+                    Selected date:{" "}
+                    {new Date(
+                      selectedCalendarDate + "T00:00:00"
+                    ).toLocaleDateString()}
+                  </div>
+                )}
+              </div>
+              <div className="mt-2 flex items-center justify-between">
+                <div className="inline-flex rounded-xl border border-gray-200 overflow-hidden">
+                  <button
+                    className={`px-4 py-2 text-sm font-medium ${
+                      bookingView === "upcoming"
+                        ? "bg-purple-600 text-white"
+                        : "bg-white text-gray-700"
+                    }`}
+                    onClick={() => {
+                      setBookingView("upcoming");
+                      setCurrentBookingPage(1);
+                    }}
+                  >
+                    Upcoming
+                  </button>
+                  <button
+                    className={`px-4 py-2 text-sm font-medium border-l border-gray-200 ${
+                      bookingView === "past"
+                        ? "bg-purple-600 text-white"
+                        : "bg-white text-gray-700"
+                    }`}
+                    onClick={() => {
+                      setBookingView("past");
+                      setCurrentBookingPage(1);
+                    }}
+                  >
+                    Past bookings
+                  </button>
+                </div>
+                <div className="text-sm text-gray-600">
+                  {pendingBookings > 0
+                    ? `${pendingBookings} pending`
+                    : "No pending requests"}
+                </div>
+              </div>
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              No Bookings Yet
-            </h3>
-            <p className="text-gray-600 mb-6 max-w-md mx-auto">
-              {userProfile?.user_type === "parent"
-                ? "Your upcoming childcare appointments will appear here once you make bookings."
-                : userProfile?.user_type === "nanny"
-                ? "Your upcoming childcare bookings will appear here once families book your services."
-                : "Complete your profile to get started"}
-            </p>
-            <button className="bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 transition-colors duration-200 shadow-sm">
-              {userProfile?.user_type === "parent"
-                ? "Browse Nannies"
-                : "View Available Jobs"}
-            </button>
+            <div className="p-6 sm:p-8">
+              {bookings.length === 0 ? (
+                <div className="text-gray-600">No bookings yet.</div>
+              ) : (
+                <div className="h-[304px] flex flex-col justify-between">
+                  <div
+                    className={(() => {
+                      const todayKey = new Date();
+                      todayKey.setHours(0, 0, 0, 0);
+                      const toKey = (s?: string | null) =>
+                        s ? new Date(s + "T00:00:00") : null;
+                      const base = selectedCalendarDate
+                        ? selectedDateBookings
+                        : bookings;
+                      const filtered = base.filter((b) => {
+                        // Always exclude declined bookings
+                        if (b.status === "declined") return false;
+
+                        const d = toKey(b.booking_date);
+                        if (!d) return bookingView === "upcoming";
+
+                        const isPast = d < todayKey;
+                        const isUpcoming = d >= todayKey;
+
+                        if (bookingView === "past") {
+                          // Always show cancelled bookings in past view, regardless of original date
+                          if (b.status === "cancelled") return true;
+                          // Show other past bookings
+                          return isPast;
+                        } else {
+                          // Upcoming view: exclude cancelled bookings, show others
+                          if (b.status === "cancelled") return false;
+                          return isUpcoming;
+                        }
+                      });
+                      const split = filtered;
+                      const totalPages = Math.ceil(
+                        split.length / bookingsPerPage
+                      );
+
+                      return totalPages > 1 ? "space-y-2" : "space-y-3";
+                    })()}
+                  >
+                    {(() => {
+                      const todayKey = new Date();
+                      todayKey.setHours(0, 0, 0, 0);
+                      const toKey = (s?: string | null) =>
+                        s ? new Date(s + "T00:00:00") : null;
+                      const base = selectedCalendarDate
+                        ? selectedDateBookings
+                        : bookings;
+                      const filtered = base.filter((b) => {
+                        // Always exclude declined bookings
+                        if (b.status === "declined") return false;
+
+                        const d = toKey(b.booking_date);
+                        if (!d) return bookingView === "upcoming";
+
+                        const isPast = d < todayKey;
+                        const isUpcoming = d >= todayKey;
+
+                        if (bookingView === "past") {
+                          // Always show cancelled bookings in past view, regardless of original date
+                          if (b.status === "cancelled") return true;
+                          // Show other past bookings
+                          return isPast;
+                        } else {
+                          // Upcoming view: exclude cancelled bookings, show others
+                          if (b.status === "cancelled") return false;
+                          return isUpcoming;
+                        }
+                      });
+                      const split = filtered;
+
+                      // Pagination logic
+                      const totalPages = Math.ceil(
+                        split.length / bookingsPerPage
+                      );
+                      const startIndex =
+                        (currentBookingPage - 1) * bookingsPerPage;
+                      const endIndex = startIndex + bookingsPerPage;
+                      const paginatedBookings = split.slice(
+                        startIndex,
+                        endIndex
+                      );
+
+                      return (
+                        <>
+                          {paginatedBookings.map((b) => (
+                            <div
+                              key={b.id}
+                              onClick={() => setSelectedBooking(b)}
+                              className={`w-full text-left flex items-center justify-between border border-gray-200 rounded-2xl bg-white hover:shadow-sm transition-shadow cursor-pointer ${
+                                totalPages > 1 ? "p-3" : "p-5"
+                              }`}
+                              title="View details"
+                            >
+                              <div className="flex items-center gap-5">
+                                <div className="text-gray-900 font-medium text-base">
+                                  {b.booking_date
+                                    ? new Date(
+                                        b.booking_date + "T00:00:00"
+                                      ).toLocaleDateString()
+                                    : "No date"}
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                  with {b.counterparty_full_name || "User"}
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-3">
+                                {b.status === "confirmed" && (
+                                  <span className="text-xs px-2.5 py-1 rounded-full bg-green-50 text-green-700 border border-green-200">
+                                    Confirmed
+                                  </span>
+                                )}
+                                {b.status === "cancelled" && (
+                                  <span className="text-xs px-2.5 py-1 rounded-full bg-gray-50 text-gray-700 border border-gray-200">
+                                    Cancelled
+                                  </span>
+                                )}
+                                {b.status === "pending" &&
+                                  userProfile?.user_type === "nanny" && (
+                                    <div
+                                      className="flex gap-2"
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      <button
+                                        onClick={async () => {
+                                          const success =
+                                            await BookingService.respond(
+                                              b.id,
+                                              "confirm"
+                                            );
+                                          if (success) {
+                                            // Reload bookings
+                                            const { data: bdata } =
+                                              await supabase.rpc(
+                                                "get_my_bookings"
+                                              );
+                                            setBookings((bdata as any[]) || []);
+                                          }
+                                        }}
+                                        className="text-xs px-2.5 py-1 rounded-full bg-green-50 text-green-700 border border-green-200 hover:bg-green-100"
+                                      >
+                                        Accept
+                                      </button>
+                                      <button
+                                        onClick={async () => {
+                                          const success =
+                                            await BookingService.respond(
+                                              b.id,
+                                              "cancel"
+                                            );
+                                          if (success) {
+                                            // Reload bookings
+                                            const { data: bdata } =
+                                              await supabase.rpc(
+                                                "get_my_bookings"
+                                              );
+                                            setBookings((bdata as any[]) || []);
+                                          }
+                                        }}
+                                        className="text-xs px-2.5 py-1 rounded-full bg-red-50 text-red-700 border border-red-200 hover:bg-red-100"
+                                      >
+                                        Decline
+                                      </button>
+                                    </div>
+                                  )}
+                                {b.status === "pending" &&
+                                  userProfile?.user_type === "parent" && (
+                                    <div
+                                      className="flex gap-2"
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      <span className="text-xs px-2.5 py-1 rounded-full bg-yellow-50 text-yellow-700 border border-yellow-200">
+                                        Pending
+                                      </span>
+                                      <button
+                                        onClick={async () => {
+                                          const success =
+                                            await BookingService.respond(
+                                              b.id,
+                                              "cancel"
+                                            );
+                                          if (success) {
+                                            // Reload bookings
+                                            const { data: bdata } =
+                                              await supabase.rpc(
+                                                "get_my_bookings"
+                                              );
+                                            setBookings((bdata as any[]) || []);
+                                          }
+                                        }}
+                                        className="text-xs px-2.5 py-1 rounded-full bg-red-50 text-red-700 border border-red-200 hover:bg-red-100"
+                                      >
+                                        Cancel
+                                      </button>
+                                    </div>
+                                  )}
+                              </div>
+                            </div>
+                          ))}
+                        </>
+                      );
+                    })()}
+                  </div>
+
+                  {/* Pagination always at bottom */}
+                  {(() => {
+                    const todayKey = new Date();
+                    todayKey.setHours(0, 0, 0, 0);
+                    const toKey = (s?: string | null) =>
+                      s ? new Date(s + "T00:00:00") : null;
+                    const base = selectedCalendarDate
+                      ? selectedDateBookings
+                      : bookings;
+                    const filtered = base.filter((b) => {
+                      // Always exclude declined bookings
+                      if (b.status === "declined") return false;
+
+                      const d = toKey(b.booking_date);
+                      if (!d) return bookingView === "upcoming";
+
+                      const isPast = d < todayKey;
+                      const isUpcoming = d >= todayKey;
+
+                      if (bookingView === "past") {
+                        // Show cancelled bookings in past if they're actually past dates
+                        if (b.status === "cancelled") return isPast;
+                        // Show other past bookings
+                        return isPast;
+                      } else {
+                        // Upcoming view: exclude cancelled bookings, show others
+                        if (b.status === "cancelled") return false;
+                        return isUpcoming;
+                      }
+                    });
+                    const split = filtered;
+                    const totalPages = Math.ceil(
+                      split.length / bookingsPerPage
+                    );
+
+                    return totalPages > 1 ? (
+                      <div className="flex items-center justify-center gap-1 mt-2">
+                        <button
+                          onClick={() =>
+                            setCurrentBookingPage((prev) =>
+                              Math.max(prev - 1, 1)
+                            )
+                          }
+                          disabled={currentBookingPage === 1}
+                          className="px-2 py-1 text-xs border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          Previous
+                        </button>
+
+                        <div className="flex gap-1">
+                          {Array.from(
+                            { length: totalPages },
+                            (_, i) => i + 1
+                          ).map((page) => (
+                            <button
+                              key={page}
+                              onClick={() => setCurrentBookingPage(page)}
+                              className={`px-2 py-1 text-xs rounded-md ${
+                                currentBookingPage === page
+                                  ? "bg-purple-600 text-white"
+                                  : "border hover:bg-gray-50"
+                              }`}
+                            >
+                              {page}
+                            </button>
+                          ))}
+                        </div>
+
+                        <button
+                          onClick={() =>
+                            setCurrentBookingPage((prev) =>
+                              Math.min(prev + 1, totalPages)
+                            )
+                          }
+                          disabled={currentBookingPage === totalPages}
+                          className="px-2 py-1 text-xs border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          Next
+                        </button>
+                      </div>
+                    ) : null;
+                  })()}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
+      {selectedBooking && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setSelectedBooking(null)}
+          />
+          <div className="relative bg-white w-full max-w-md rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
+            <div className="px-5 py-3 border-b border-gray-100 flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900">
+                Booking details
+              </h3>
+              <button
+                onClick={() => setSelectedBooking(null)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="p-5 space-y-3 text-sm text-gray-800">
+              <div className="flex items-center justify-between">
+                <span className="text-gray-600">Date</span>
+                <span className="font-medium">
+                  {selectedBooking.booking_date
+                    ? new Date(
+                        selectedBooking.booking_date + "T00:00:00"
+                      ).toLocaleDateString()
+                    : "—"}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-600">Status</span>
+                <span className="font-medium">{selectedBooking.status}</span>
+              </div>
+              {selectedBooking.message && (
+                <div>
+                  <div className="text-gray-600 mb-1">Message</div>
+                  <div className="p-2 rounded-lg bg-gray-50 border border-gray-200">
+                    {selectedBooking.message}
+                  </div>
+                </div>
+              )}
+              <div className="flex items-center justify-between">
+                <span className="text-gray-600">Counterparty</span>
+                <span className="font-medium">
+                  {selectedBooking.counterparty_full_name || "User"}
+                </span>
+              </div>
+              {selectedBooking.status === "cancelled" &&
+                selectedBooking.cancellation_reason && (
+                  <div className="border-t border-gray-100 pt-3 mt-3">
+                    <div className="space-y-3">
+                      <div>
+                        <div className="text-gray-600 mb-1">
+                          Cancellation Reason
+                        </div>
+                        <div className="text-sm font-medium text-red-700 bg-red-50 px-2 py-1 rounded border border-red-200">
+                          {selectedBooking.cancellation_reason}
+                        </div>
+                      </div>
+                      {selectedBooking.cancellation_note && (
+                        <div>
+                          <div className="text-gray-600 mb-1">
+                            Cancellation Note
+                          </div>
+                          <div className="p-2 rounded-lg bg-red-50 border border-red-200 text-sm text-red-900">
+                            {selectedBooking.cancellation_note}
+                          </div>
+                        </div>
+                      )}
+                      {selectedBooking.cancelled_at && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-600">Cancelled At</span>
+                          <span className="text-sm text-gray-700">
+                            {new Date(
+                              selectedBooking.cancelled_at
+                            ).toLocaleString()}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+            </div>
+            <div className="px-5 py-3 border-t border-gray-100 flex justify-between">
+              {selectedBooking?.status === "confirmed" &&
+                (() => {
+                  const bookingDate = selectedBooking.booking_date;
+                  if (!bookingDate) return false;
+                  const today = new Date();
+                  today.setHours(0, 0, 0, 0);
+                  const bookingDay = new Date(bookingDate + "T00:00:00");
+                  return bookingDay >= today; // Only show cancel for today or future bookings
+                })() && (
+                  <button
+                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                    onClick={() => {
+                      setCancellingBooking(selectedBooking);
+                      setSelectedBooking(null);
+                    }}
+                  >
+                    Cancel Booking
+                  </button>
+                )}
+
+              <div
+                className={(() => {
+                  if (selectedBooking?.status === "confirmed") {
+                    const bookingDate = selectedBooking.booking_date;
+                    if (!bookingDate) return "w-full flex justify-end";
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    const bookingDay = new Date(bookingDate + "T00:00:00");
+                    // If confirmed and future booking, cancel button will show, so don't take full width
+                    if (bookingDay >= today) return "";
+                  }
+                  // For all other cases (past confirmed, pending, cancelled), take full width
+                  return "w-full flex justify-end";
+                })()}
+              >
+                <button
+                  className="px-4 py-2 border rounded-lg"
+                  onClick={() => setSelectedBooking(null)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {cancellingBooking && (
+        <CancelBookingModal
+          booking={cancellingBooking}
+          onClose={() => setCancellingBooking(null)}
+          onSuccess={async () => {
+            // Reload bookings after successful cancellation
+            try {
+              const { data: bdata } = await supabase.rpc("get_my_bookings");
+              setBookings((bdata as any[]) || []);
+            } catch (error) {
+              console.error("Error reloading bookings:", error);
+            }
+          }}
+        />
+      )}
     </div>
   );
 
@@ -1013,7 +1532,7 @@ export default function ProfilePage() {
                         return;
                       }
                       await supabase.auth.signOut();
-                      window.location.href = "/";
+                      window.location.replace("/");
                     } finally {
                       setIsDeleting(false);
                     }

@@ -51,6 +51,33 @@ export class AdvertisementService {
     }
   }
 
+  static async getFilteredAvailabilitySlots(
+    advertisementId: string
+  ): Promise<
+    { available_date: string; start_time: string; end_time: string; remaining_hours?: number }[]
+  > {
+    try {
+      const { data, error } = await supabase.rpc(
+        "get_filtered_ad_availability",
+        { p_ad_id: advertisementId }
+      );
+      if (error) {
+        // If RPC doesn't exist yet, fallback to regular availability
+        if (error.message?.includes("function") && error.message?.includes("does not exist")) {
+          console.warn("get_filtered_ad_availability RPC not found, falling back to regular availability");
+          return this.getAvailabilitySlots(advertisementId);
+        }
+        console.error("Error fetching filtered availability slots:", error);
+        return [];
+      }
+      return (data as any[]) || [];
+    } catch (error) {
+      console.error("Error fetching filtered availability slots:", error);
+      // Fallback to regular availability on any error
+      return this.getAvailabilitySlots(advertisementId);
+    }
+  }
+
   static async addLocations(
     advertisementId: string,
     labels: string[]

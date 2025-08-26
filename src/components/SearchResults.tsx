@@ -52,15 +52,12 @@ export default function SearchResults({
           setViewerType(null);
           return;
         }
-        const { data, error } = await supabase
+        const { data } = await supabase
           .from("users")
           .select("user_type")
           .eq("id", user.id)
-          .single();
-        if (
-          !error &&
-          (data?.user_type === "parent" || data?.user_type === "nanny")
-        ) {
+          .maybeSingle();
+        if (data?.user_type === "parent" || data?.user_type === "nanny") {
           setViewerType(data.user_type as any);
         } else {
           setViewerType(null);

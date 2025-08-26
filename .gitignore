@@ -12,7 +12,7 @@
 .env.local
 # testing
 /coverage
-
+/supabase/tablesInSB
 # next.js
 /.next/
 /out/

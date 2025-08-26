@@ -8,6 +8,36 @@ import { useSupabaseUser } from "../lib/useSupabaseUser";
 
 export default function Header() {
   const { user, isLoading } = useSupabaseUser();
+  const [pendingCount, setPendingCount] = useState<number>(0);
+
+  useEffect(() => {
+    let active = true;
+    const load = async () => {
+      try {
+        if (!user?.id) {
+          if (active) setPendingCount(0);
+          return;
+        }
+        const { data, error } = await supabase.rpc(
+          "get_pending_booking_count_for_me"
+        );
+        if (!active) return;
+        if (error) {
+          setPendingCount(0);
+        } else {
+          setPendingCount(Number(data || 0));
+        }
+      } catch {
+        if (active) setPendingCount(0);
+      }
+    };
+    load();
+    const id = setInterval(load, 30000);
+    return () => {
+      active = false;
+      clearInterval(id);
+    };
+  }, [user?.id]);
   const router = useRouter();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showLanguageMenu, setShowLanguageMenu] = useState(false);
@@ -76,7 +106,7 @@ export default function Header() {
             }}
             className="text-2xl font-bold text-purple-600 tracking-wide hover:text-purple-700 transition-colors"
           >
-            Caring Hands
+            auklite.lv
           </button>
         </div>
         {/* Language and Menu Controls - Positioned to the right and lower */}
@@ -124,14 +154,21 @@ export default function Header() {
               className="bg-white w-12 h-12 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors duration-200 shadow-lg hover:shadow-xl flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {user ? (
-                <div className="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center text-white text-xs font-semibold">
-                  {(
-                    ((user.user_metadata as any)?.name ||
-                      (user.user_metadata as any)?.full_name ||
-                      "") as string
-                  )
-                    .charAt(0)
-                    .toUpperCase() || user.email?.charAt(0).toUpperCase()}
+                <div className="relative">
+                  <div className="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center text-white text-xs font-semibold">
+                    {(
+                      ((user.user_metadata as any)?.name ||
+                        (user.user_metadata as any)?.full_name ||
+                        "") as string
+                    )
+                      .charAt(0)
+                      .toUpperCase() || user.email?.charAt(0).toUpperCase()}
+                  </div>
+                  {pendingCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-600 text-white text-[10px] rounded-full flex items-center justify-center">
+                      !
+                    </span>
+                  )}
                 </div>
               ) : isLoading ? (
                 <div className="w-6 h-6 bg-gray-200 rounded-full animate-pulse" />
@@ -161,8 +198,15 @@ export default function Header() {
                     <button
                       onClick={async () => {
                         setShowUserMenu(false);
-                        await supabase.auth.signOut();
-                        window.location.href = "/";
+                        try {
+                          await supabase.auth.signOut();
+                          // Force a hard navigation to avoid HMR issues
+                          window.location.replace("/");
+                        } catch (error) {
+                          console.error("Logout error:", error);
+                          // Fallback: still navigate to home even if logout fails
+                          window.location.replace("/");
+                        }
                       }}
                       className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors duration-200 text-sm font-medium bg-white block"
                     >
