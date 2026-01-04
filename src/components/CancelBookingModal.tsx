@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { BookingService } from "../lib/bookingService";
+import { useTranslation } from "./LanguageProvider";
+import { getTranslatedCancellationReason } from "../lib/constants/skills";
+import { formatDateDDMMYYYY } from "../lib/date";
 
 interface CancelBookingModalProps {
   booking: any;
@@ -24,6 +27,7 @@ export default function CancelBookingModal({
   onClose,
   onSuccess,
 }: CancelBookingModalProps) {
+  const { t, language } = useTranslation();
   const [selectedReason, setSelectedReason] = useState<string>("");
   const [note, setNote] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -31,13 +35,11 @@ export default function CancelBookingModal({
 
   const handleSubmit = async () => {
     if (!selectedReason) {
-      setError("Please select a reason for cancellation");
+      setError(t("cancelBooking.selectReason"));
       return;
     }
     if (note.trim().length < 10) {
-      setError(
-        "Please provide a detailed explanation (at least 10 characters)"
-      );
+      setError(t("cancelBooking.detailedExplanation"));
       return;
     }
 
@@ -55,10 +57,10 @@ export default function CancelBookingModal({
         onSuccess();
         onClose();
       } else {
-        setError("Failed to cancel booking. Please try again.");
+        setError(t("cancelBooking.failed"));
       }
     } catch (err: any) {
-      setError(err.message || "Failed to cancel booking");
+      setError(err.message || t("cancelBooking.failed"));
     } finally {
       setIsSubmitting(false);
     }
@@ -70,7 +72,7 @@ export default function CancelBookingModal({
       <div className="relative bg-white w-full max-w-md rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
         <div className="px-5 py-3 border-b border-gray-100 flex items-center justify-between">
           <h3 className="text-lg font-semibold text-gray-900">
-            Cancel Booking
+            {t("cancelBooking.title")}
           </h3>
           <button
             onClick={onClose}
@@ -89,13 +91,13 @@ export default function CancelBookingModal({
 
           <div className="bg-gray-50 rounded-lg p-3">
             <div className="text-sm font-medium text-gray-900 mb-1">
-              Booking Details:
+              {t("cancelBooking.bookingDetails")}:
             </div>
             <div className="text-sm text-gray-700">
               {booking.booking_date
-                ? new Date(
-                    booking.booking_date + "T00:00:00"
-                  ).toLocaleDateString()
+                ? formatDateDDMMYYYY(
+                    new Date(booking.booking_date + "T00:00:00")
+                  )
                 : "No date"}
               {booking.start_time && booking.end_time && (
                 <span>
@@ -105,23 +107,26 @@ export default function CancelBookingModal({
               )}
             </div>
             <div className="text-sm text-gray-600 mt-1">
-              with {booking.counterparty_full_name || "User"}
+              {t("cancelBooking.with")}{" "}
+              {booking.counterparty_full_name || t("common.user")}
             </div>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Reason for cancellation *
+              {t("cancelBooking.reasonLabel")}
             </label>
             <select
               value={selectedReason}
               onChange={(e) => setSelectedReason(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             >
-              <option value="">Select a reason...</option>
+              <option value="">
+                {t("cancelBooking.selectReasonPlaceholder")}
+              </option>
               {CANCELLATION_REASONS.map((reason) => (
                 <option key={reason} value={reason}>
-                  {reason}
+                  {getTranslatedCancellationReason(reason, language)}
                 </option>
               ))}
             </select>
@@ -129,25 +134,24 @@ export default function CancelBookingModal({
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Additional explanation *
+              {t("cancelBooking.explanationLabel")}
             </label>
             <textarea
               rows={4}
               value={note}
               onChange={(e) => setNote(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
-              placeholder="Please provide details about why you need to cancel this booking..."
+              placeholder={t("cancelBooking.explanationPlaceholder")}
             />
             <div className="text-xs text-gray-500 mt-1">
-              {note.length}/10 characters minimum
+              {note.length}/10 {t("cancelBooking.charactersMinimum")}
             </div>
           </div>
 
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
             <div className="text-sm text-yellow-800">
-              <strong>Important:</strong> Cancelling confirmed bookings may
-              affect your reputation. The other party will be notified of your
-              cancellation and reason.
+              <strong>{t("cancelBooking.importantLabel")}:</strong>{" "}
+              {t("cancelBooking.importantMessage")}
             </div>
           </div>
         </div>
@@ -158,7 +162,7 @@ export default function CancelBookingModal({
             disabled={isSubmitting}
             className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
           >
-            Keep Booking
+            {t("cancelBooking.keepBooking")}
           </button>
           <button
             onClick={handleSubmit}
@@ -167,7 +171,9 @@ export default function CancelBookingModal({
             }
             className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
           >
-            {isSubmitting ? "Cancelling..." : "Cancel Booking"}
+            {isSubmitting
+              ? t("cancelBooking.cancelling")
+              : t("cancelBooking.confirmCancel")}
           </button>
         </div>
       </div>

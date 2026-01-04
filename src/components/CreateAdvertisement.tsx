@@ -8,6 +8,9 @@ import { AdvertisementService } from "../lib/advertisementService";
 import { UserService } from "../lib/userService";
 import LocationAutocomplete from "./LocationAutocomplete";
 import MultiDatePicker from "./MultiDatePicker";
+import { useTranslation } from "./LanguageProvider";
+import { getTranslatedSkill } from "../lib/constants/skills";
+import { formatDateDDMMYYYY } from "../lib/date";
 
 interface AdvertisementForm {
   type: "short-term" | "long-term";
@@ -31,6 +34,7 @@ interface AdvertisementForm {
 
 export default function CreateAdvertisement() {
   const { user } = useSupabaseUser();
+  const { t, language } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [userType, setUserType] = useState<
@@ -95,7 +99,7 @@ export default function CreateAdvertisement() {
     setError(null);
 
     if (!user?.id || !user?.email) {
-      setError("User not authenticated");
+      setError(t("adCreate.errorNotAuthenticated"));
       setIsSubmitting(false);
       return;
     }
@@ -147,7 +151,7 @@ export default function CreateAdvertisement() {
       // Enforce limits: one active, up to three inactive
       const hasActive = await AdvertisementService.hasActiveAd(user.id);
       if (hasActive) {
-        setError("You already have an active advertisement.");
+        setError(t("adCreate.errorActiveAd"));
         setIsSubmitting(false);
         return;
       }
@@ -155,7 +159,7 @@ export default function CreateAdvertisement() {
         user.id
       );
       if (inactiveCount >= 3) {
-        setError("You already have 3 inactive advertisements.");
+        setError(t("adCreate.errorInactiveLimit"));
         setIsSubmitting(false);
         return;
       }
@@ -168,7 +172,7 @@ export default function CreateAdvertisement() {
         );
 
       if (!createdAdvertisement) {
-        setError("Failed to create advertisement");
+        setError(t("adCreate.errorCreateFailed"));
         setIsSubmitting(false);
         return;
       }
@@ -208,24 +212,24 @@ export default function CreateAdvertisement() {
       window.location.href = "/profile";
     } catch (error) {
       console.error("Error creating advertisement:", error);
-      setError("An error occurred while creating the advertisement");
+      setError(t("adCreate.errorGeneral"));
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const titlePlaceholder = isParent
-    ? "e.g., Looking for a caring nanny in Rīga"
-    : "e.g., Experienced Nanny Available for Weekend Care";
+    ? t("adCreate.titlePlaceholderParent")
+    : t("adCreate.titlePlaceholderNanny");
   const priceLabel = isParent
-    ? "Budget per Hour (€) *"
-    : "Price per Hour (€) *";
+    ? t("adCreate.budgetPerHour")
+    : t("adCreate.pricePerHour");
   const experienceLabel = isParent
-    ? "Requirements & Preferences *"
-    : "Experience & Background *";
+    ? t("adCreate.requirementsPreferences")
+    : t("adCreate.experienceBackground");
   const descriptionLabel = isParent
-    ? "Job Description *"
-    : "Service Description *";
+    ? t("adCreate.jobDescription")
+    : t("adCreate.serviceDescription");
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -233,12 +237,9 @@ export default function CreateAdvertisement() {
         {/* Header */}
         <div className="px-8 py-6 border-b border-gray-100 bg-gray-50">
           <h1 className="text-3xl font-bold text-gray-900">
-            Create Advertisement
+            {t("adCreate.title")}
           </h1>
-          <p className="text-gray-600 mt-2">
-            Create a professional advertisement to showcase your childcare
-            services
-          </p>
+          <p className="text-gray-600 mt-2">{t("adCreate.subtitle")}</p>
         </div>
 
         {/* Form */}
@@ -246,7 +247,7 @@ export default function CreateAdvertisement() {
           {/* Service Type */}
           <div>
             <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              {isParent ? "Care Needed" : "Service Type"}
+              {isParent ? t("adCreate.careNeeded") : t("adCreate.serviceType")}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <label className="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
@@ -265,10 +266,12 @@ export default function CreateAdvertisement() {
                 />
                 <div>
                   <div className="font-medium text-gray-900">
-                    {isParent ? "Short-term Need" : "Short-term Care"}
+                    {isParent
+                      ? t("adCreate.shortTermNeed")
+                      : t("adCreate.shortTermCare")}
                   </div>
                   <div className="text-sm text-gray-600">
-                    One-time or occasional childcare
+                    {t("adCreate.oneTimeOccasional")}
                   </div>
                 </div>
               </label>
@@ -288,10 +291,12 @@ export default function CreateAdvertisement() {
                 />
                 <div>
                   <div className="font-medium text-gray-900">
-                    {isParent ? "Long-term Need" : "Long-term Care"}
+                    {isParent
+                      ? t("adCreate.longTermNeed")
+                      : t("adCreate.longTermCare")}
                   </div>
                   <div className="text-sm text-gray-600">
-                    Regular, ongoing childcare
+                    {t("adCreate.regularOngoing")}
                   </div>
                 </div>
               </label>
@@ -302,7 +307,7 @@ export default function CreateAdvertisement() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Advertisement Title *
+                {t("adCreate.adTitle")}
               </label>
               <input
                 type="text"
@@ -341,57 +346,42 @@ export default function CreateAdvertisement() {
           {formData.type === "short-term" && (
             <div>
               <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                Availability
+                {t("adCreate.availabilitySchedule")}
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Start Time
-                  </label>
-                  <input
-                    type="time"
-                    value={formData.availability.startTime}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        availability: {
-                          ...prev.availability,
-                          startTime: e.target.value,
-                        },
-                      }))
-                    }
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    End Time
-                  </label>
-                  <input
-                    type="time"
-                    value={formData.availability.endTime}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        availability: {
-                          ...prev.availability,
-                          endTime: e.target.value,
-                        },
-                      }))
-                    }
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
+              <p className="text-sm text-gray-600 mb-4">
+                {t("adCreate.selectDatesAndTimes")} ({t("adCreate.max5Dates")})
+              </p>
               <div className="mt-4">
                 <MultiDatePicker
                   selectedDates={formData.availability.dates}
-                  onChange={(dates) =>
+                  onChange={(dates) => {
+                    // Limit to 5 dates
+                    const limitedDates = dates.slice(0, 5);
                     setFormData((prev) => ({
                       ...prev,
-                      availability: { ...prev.availability, dates },
-                    }))
-                  }
+                      availability: { ...prev.availability, dates: limitedDates },
+                    }));
+                    // Remove times for dates that were removed
+                    if (limitedDates.length < dates.length) {
+                      const limitedKeys = new Set(
+                        limitedDates.map((d) => {
+                          const key = `${d.getFullYear()}-${String(
+                            d.getMonth() + 1
+                          ).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+                          return key;
+                        })
+                      );
+                      setPerDateTimes((prev) => {
+                        const n = { ...prev };
+                        Object.keys(n).forEach((key) => {
+                          if (!limitedKeys.has(key)) {
+                            delete n[key];
+                          }
+                        });
+                        return n;
+                      });
+                    }
+                  }}
                   minDate={(() => {
                     const d = new Date();
                     d.setHours(0, 0, 0, 0);
@@ -425,10 +415,89 @@ export default function CreateAdvertisement() {
                       return n;
                     });
                   }}
+                  autoOpenTimeEditor={true}
                 />
+                
+                {/* Selected Dates with Times - Compact List */}
                 {formData.availability.dates.length > 0 && (
-                  <div className="text-sm text-gray-600 mt-2">
-                    {formData.availability.dates.length} date(s) selected
+                  <div className="mt-4 space-y-1.5">
+                    <div className="text-xs font-medium text-gray-700 mb-2">
+                      {t("adCreate.selectedDates")} ({formData.availability.dates.length}/5)
+                    </div>
+                    {formData.availability.dates
+                      .sort((a, b) => a.getTime() - b.getTime())
+                      .map((date) => {
+                        const key = `${date.getFullYear()}-${String(
+                          date.getMonth() + 1
+                        ).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+                        const times = perDateTimes[key] || {
+                          start: formData.availability.startTime,
+                          end: formData.availability.endTime,
+                        };
+                        return (
+                          <div
+                            key={key}
+                            className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 hover:bg-gray-100 transition-colors"
+                          >
+                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                              <div className="text-sm font-medium text-gray-900 whitespace-nowrap">
+                                {formatDateDDMMYYYY(date)}
+                              </div>
+                              <div className="text-xs text-gray-600 flex items-center gap-1">
+                                <span>🕐</span>
+                                <span className="font-mono">
+                                  {times.start} - {times.end}
+                                </span>
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                // Remove this date
+                                const newDates = formData.availability.dates.filter(
+                                  (d) => {
+                                    const dKey = `${d.getFullYear()}-${String(
+                                      d.getMonth() + 1
+                                    ).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+                                    return dKey !== key;
+                                  }
+                                );
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  availability: { ...prev.availability, dates: newDates },
+                                }));
+                                // Remove from perDateTimes
+                                setPerDateTimes((prev) => {
+                                  const n = { ...prev };
+                                  delete n[key];
+                                  return n;
+                                });
+                              }}
+                              className="ml-2 text-gray-400 hover:text-red-600 transition-colors p-1 rounded"
+                              title={t("adCreate.removeDate")}
+                            >
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M6 18L18 6M6 6l12 12"
+                                />
+                              </svg>
+                            </button>
+                          </div>
+                        );
+                      })}
+                    {formData.availability.dates.length >= 5 && (
+                      <div className="text-xs text-amber-600 mt-2">
+                        {t("adCreate.maxReached")}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -438,12 +507,12 @@ export default function CreateAdvertisement() {
           {/* Location */}
           <div>
             <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              Location
+              {t("adCreate.location")}
             </h2>
             <div className="grid grid-cols-1 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  City / Address / Country *
+                  {t("adCreate.primaryLocation")}
                 </label>
                 <LocationAutocomplete
                   value={formData.location.city}
@@ -458,7 +527,7 @@ export default function CreateAdvertisement() {
                       },
                     }))
                   }
-                  placeholder="Start typing to search..."
+                  placeholder={t("adCreate.placeholderSearch")}
                 />
               </div>
               {/* Extra locations (up to 2) */}
@@ -474,7 +543,7 @@ export default function CreateAdvertisement() {
                           return n;
                         })
                       }
-                      placeholder="Additional location"
+                      placeholder={t("adCreate.additionalLocation")}
                     />
                   </div>
                   <button
@@ -487,7 +556,7 @@ export default function CreateAdvertisement() {
                     className="px-3 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50"
                     aria-label="Remove location"
                   >
-                    Remove
+                    {t("adCreate.remove")}
                   </button>
                 </div>
               ))}
@@ -497,7 +566,7 @@ export default function CreateAdvertisement() {
                   onClick={() => setExtraLocations((prev) => [...prev, ""])}
                   className="mt-2 px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 text-sm"
                 >
-                  + Add another location
+                  {t("adCreate.addAnotherLocation")}
                 </button>
               )}
             </div>
@@ -508,7 +577,7 @@ export default function CreateAdvertisement() {
             {!isParent && (
               <>
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                  Skills & Certifications
+                  {t("adCreate.skills")}
                 </h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   {availableSkills.map((skill) => (
@@ -522,7 +591,9 @@ export default function CreateAdvertisement() {
                         onChange={() => handleSkillToggle(skill)}
                         className="mr-2"
                       />
-                      <span className="text-sm">{skill}</span>
+                      <span className="text-sm">
+                        {getTranslatedSkill(skill, language)}
+                      </span>
                     </label>
                   ))}
                 </div>
@@ -578,7 +649,7 @@ export default function CreateAdvertisement() {
           {/* Additional Information */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Additional Information
+              {t("adCreate.additionalInfo")}
             </label>
             <textarea
               value={formData.additionalInfo}
@@ -589,7 +660,7 @@ export default function CreateAdvertisement() {
                 }))
               }
               rows={3}
-              placeholder="Any additional information you'd like families to know about you or your services..."
+              placeholder={t("adCreate.additionalInfoPlaceholder")}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
             />
           </div>
@@ -607,7 +678,7 @@ export default function CreateAdvertisement() {
               }}
               className="px-6 py-3 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200"
             >
-              Cancel
+              {t("adCreate.cancel")}
             </button>
             <button
               type="submit"
@@ -617,10 +688,10 @@ export default function CreateAdvertisement() {
               {isSubmitting ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>Creating...</span>
+                  <span>{t("adCreate.submitting")}</span>
                 </>
               ) : (
-                "Create Advertisement"
+                t("adCreate.submitAd")
               )}
             </button>
           </div>

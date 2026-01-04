@@ -1,9 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { toLocalYYYYMMDD } from "../lib/date";
+import { toLocalYYYYMMDD, formatDateDDMMYYYY } from "../lib/date";
 import { BookingService } from "../lib/bookingService";
 import MultiDatePicker from "./MultiDatePicker";
+import { useTranslation } from "./LanguageProvider";
 
 type Slot = { available_date: string; start_time: string; end_time: string };
 
@@ -18,6 +19,7 @@ export default function BookingModal({
   ownerType?: "nanny" | "parent";
   availableSlots?: Slot[];
 }) {
+  const { t } = useTranslation();
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
   const [perDateTimes, setPerDateTimes] = useState<
     Record<string, { start: string; end: string }>
@@ -60,9 +62,16 @@ export default function BookingModal({
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
       <div className="relative bg-white w-full max-w-4xl max-h-[90vh] rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
         <div className="px-5 py-3 border-b border-gray-100 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900">{`Book this ${
-            ownerType ?? "ad"
-          }`}</h3>
+          <h3 className="text-lg font-semibold text-gray-900">
+            {t("booking.bookThis", {
+              type:
+                ownerType === "nanny"
+                  ? t("userType.nanny")
+                  : ownerType === "parent"
+                  ? t("userType.parent")
+                  : "ad",
+            })}
+          </h3>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
@@ -88,7 +97,7 @@ export default function BookingModal({
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm text-gray-700 mb-2">
-                    Select available dates
+                    {t("booking.selectDates")}
                   </label>
                   <MultiDatePicker
                     selectedDates={selectedDates}
@@ -124,7 +133,7 @@ export default function BookingModal({
                 {selectedDates.length > 0 && (
                   <div className="bg-gray-50 rounded-lg p-4">
                     <div className="text-sm font-medium text-gray-900 mb-3">
-                      Selected dates:
+                      {t("booking.selectedDates")}:
                     </div>
                     <div className="space-y-2">
                       {selectedDates.map((date) => {
@@ -140,7 +149,7 @@ export default function BookingModal({
                             className="text-sm text-gray-700 bg-white rounded-md p-2 border"
                           >
                             <div className="font-medium">
-                              {date.toLocaleDateString()}
+                              {formatDateDDMMYYYY(date)}
                             </div>
                             <div className="text-gray-600">
                               {times.start} - {times.end}
@@ -154,24 +163,22 @@ export default function BookingModal({
 
                 <div>
                   <label className="block text-sm text-gray-700 mb-2">
-                    Message (optional)
+                    {t("booking.message")}
                   </label>
                   <textarea
                     rows={4}
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     className="w-full px-3 py-2 border rounded-lg resize-none"
-                    placeholder="Share details about your request…"
+                    placeholder={t("booking.messagePlaceholder")}
                   />
                 </div>
               </div>
             </div>
           ) : (
             <div className="text-center py-8 text-gray-500 p-5">
-              <div className="text-lg mb-2">No availability</div>
-              <div className="text-sm">
-                This nanny has no available dates in the future.
-              </div>
+              <div className="text-lg mb-2">{t("booking.noAvailability")}</div>
+              <div className="text-sm">{t("booking.noAvailabilityDesc")}</div>
             </div>
           )}
         </div>
@@ -181,7 +188,7 @@ export default function BookingModal({
             onClick={onClose}
             disabled={saving}
           >
-            Cancel
+            {t("common.cancel")}
           </button>
           <button
             className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50"
@@ -191,7 +198,7 @@ export default function BookingModal({
               setSuccess(null);
 
               if (selectedDates.length === 0) {
-                setError("Please select at least one date");
+                setError(t("booking.errorSelectDate"));
                 return;
               }
 
@@ -210,52 +217,68 @@ export default function BookingModal({
               // Validate all slots
               for (const s of toSubmit) {
                 if (!s.available_date || !s.start_time || !s.end_time) {
-                  setError(
-                    "Please select date and time for all selected dates"
-                  );
+                  setError(t("booking.selectDateAndTime"));
                   return;
                 }
                 if (s.end_time <= s.start_time) {
-                  setError("End time must be after start time for all dates");
+                  setError(t("booking.endTimeAfterStart"));
                   return;
                 }
               }
 
               setSaving(true);
               let successCount = 0;
+              let conflictError = false;
 
               for (const s of toSubmit) {
-                const id = await BookingService.createBooking({
+                const result = await BookingService.createBooking({
                   adId,
                   date: s.available_date,
                   start: s.start_time,
                   end: s.end_time,
                   message: message.trim() || undefined,
                 });
-                if (id) {
+
+                if (result.success) {
                   successCount++;
+                } else {
+                  // Check if it's a booking conflict error
+                  if (result.error.includes("BOOKING_CONFLICT")) {
+                    conflictError = true;
+                    break; // Stop trying other bookings
+                  }
                 }
               }
 
               setSaving(false);
 
-              if (successCount === 0) {
-                setError("Failed to create any bookings. Please try again.");
+              if (conflictError) {
+                setError(t("booking.conflictError"));
+              } else if (successCount === 0) {
+                setError(t("booking.createFailed"));
               } else if (successCount < toSubmit.length) {
                 setError(
-                  `Only ${successCount} of ${toSubmit.length} bookings were created. Some may have failed.`
+                  t("booking.partialSuccess", {
+                    successCount,
+                    totalCount: toSubmit.length,
+                  })
                 );
               } else {
-                const plural = toSubmit.length > 1 ? "s" : "";
                 setSuccess(
-                  `Booking request${plural} sent! The owner will be notified.`
+                  toSubmit.length > 1
+                    ? t("booking.requestsSentMultiple")
+                    : t("booking.requestSent")
                 );
               }
             }}
           >
-            {selectedDates.length > 1
-              ? `Send ${selectedDates.length} booking requests`
-              : "Send booking request"}
+            {saving
+              ? t("booking.submitting")
+              : selectedDates.length > 1
+              ? t("booking.sendMultipleRequests", {
+                  count: selectedDates.length,
+                })
+              : t("booking.submitRequest")}
           </button>
         </div>
       </div>

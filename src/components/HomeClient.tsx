@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import SearchBar from "./SearchBar";
 import Footer from "./Footer";
 import SearchResults from "./SearchResults";
+import { useTranslation } from "./LanguageProvider";
 
 export default function HomeClient({
   initialLocation,
@@ -15,6 +16,7 @@ export default function HomeClient({
   initialEndDate?: Date | null;
   initialShowResults?: boolean;
 }) {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useState({
     location: initialLocation || "Location",
     startDate: (initialStartDate as Date | null) || null,
@@ -23,7 +25,7 @@ export default function HomeClient({
   const [showResults, setShowResults] = useState(() => {
     if (typeof window !== "undefined") {
       try {
-        const forceHome = sessionStorage.getItem("auklite:forceHome");
+        const forceHome = sessionStorage.getItem("nannybooking:forceHome");
         if (forceHome) return false;
       } catch {}
     }
@@ -33,7 +35,7 @@ export default function HomeClient({
   useEffect(() => {
     try {
       if (typeof window !== "undefined") {
-        const forceHome = sessionStorage.getItem("auklite:forceHome");
+        const forceHome = sessionStorage.getItem("nannybooking:forceHome");
         if (forceHome) {
           // Reset search inputs and hide results when home is forced
           setSearchParams({
@@ -42,7 +44,7 @@ export default function HomeClient({
             endDate: null,
           });
           setShowResults(false);
-          sessionStorage.removeItem("auklite:forceHome");
+          sessionStorage.removeItem("nannybooking:forceHome");
           // Explicitly broadcast the reset so nested components clear their own local state
           window.dispatchEvent(new CustomEvent("resetSearch"));
         }
@@ -83,40 +85,38 @@ export default function HomeClient({
         <main className="flex-1 px-4 sm:px-6 md:px-8 py-10 md:py-16">
           <div className="text-center max-w-6xl mx-auto">
             <h1 className="text-5xl md:text-7xl font-bold mb-8 text-gray-900 leading-tight">
-              Find Your Perfect
-              <span className="block text-purple-600">Childcare Match</span>
+              {t("home.heroTitle")}
+              <span className="block text-purple-600">
+                {t("home.heroSubtitle")}
+              </span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed mb-12">
-              Connect trusted parents with qualified nannies in your area. Safe,
-              reliable, and professional childcare solutions.
+              {t("home.heroDescription")}
             </p>
             {/* Feature Cards */}
             <div className="grid md:grid-cols-3 gap-8 mb-16">
               <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
                 <h3 className="text-xl font-semibold mb-4 text-gray-900">
-                  For Parents
+                  {t("home.forParents")}
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Find experienced, background-checked nannies who match your
-                  family's needs and schedule.
+                  {t("home.forParentsDesc")}
                 </p>
               </div>
               <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
                 <h3 className="text-xl font-semibold mb-4 text-gray-900">
-                  For Nannies
+                  {t("home.forNannies")}
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Connect with families looking for quality childcare. Set your
-                  rates and availability.
+                  {t("home.forNanniesDesc")}
                 </p>
               </div>
               <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
                 <h3 className="text-xl font-semibold mb-4 text-gray-900">
-                  Safe & Secure
+                  {t("home.safeSecure")}
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  All users are verified with background checks and references
-                  for peace of mind.
+                  {t("home.safeSecureDesc")}
                 </p>
               </div>
             </div>
@@ -126,19 +126,19 @@ export default function HomeClient({
                 <div className="text-3xl font-bold text-purple-600 mb-2">
                   500+
                 </div>
-                <div className="text-gray-600">Trusted Nannies</div>
+                <div className="text-gray-600">{t("home.trustedNannies")}</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-purple-600 mb-2">
                   1,200+
                 </div>
-                <div className="text-gray-600">Happy Families</div>
+                <div className="text-gray-600">{t("home.happyFamilies")}</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-purple-600 mb-2">
                   98%
                 </div>
-                <div className="text-gray-600">Success Rate</div>
+                <div className="text-gray-600">{t("home.successRate")}</div>
               </div>
             </div>
           </div>

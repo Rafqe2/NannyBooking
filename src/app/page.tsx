@@ -5,10 +5,12 @@ import { UserService } from "../lib/userService";
 import Header from "../components/Header";
 import HomeClient from "../components/HomeClient";
 import { useSupabaseUser } from "../lib/useSupabaseUser";
+import { useTranslation } from "../components/LanguageProvider";
 import BlockingLoader from "../components/BlockingLoader";
 
 export default function Home() {
   const { user, isLoading } = useSupabaseUser();
+  const { t } = useTranslation();
   const [isCheckingProfile, setIsCheckingProfile] = useState(false);
   const [hasCheckedProfile, setHasCheckedProfile] = useState(false);
   const [debugInfo, setDebugInfo] = useState<string[]>([]);
@@ -60,9 +62,9 @@ export default function Home() {
     // Restore last search only when returning from details in the same session
     try {
       if (typeof window !== "undefined") {
-        const restore = sessionStorage.getItem("auklite:restoreNext");
+        const restore = sessionStorage.getItem("nannybooking:restoreNext");
         const raw = restore
-          ? sessionStorage.getItem("auklite:lastSearch")
+          ? sessionStorage.getItem("nannybooking:lastSearch")
           : null;
         if (raw && restore) {
           const parsed = JSON.parse(raw);
@@ -73,9 +75,9 @@ export default function Home() {
             openResults: !!parsed.openResults,
           });
         }
-        // Always clear flags so normal home nav doesn’t restore
-        sessionStorage.removeItem("auklite:restoreNext");
-        sessionStorage.removeItem("auklite:suppressRestore");
+        // Always clear flags so normal home nav doesn't restore
+        sessionStorage.removeItem("nannybooking:restoreNext");
+        sessionStorage.removeItem("nannybooking:suppressRestore");
       }
     } catch {}
   }, []);
@@ -90,9 +92,7 @@ export default function Home() {
         <main className="flex-1 flex items-center justify-center">
           <div className="w-full max-w-md">
             <BlockingLoader
-              message={
-                isLoading ? "Loading authentication…" : "Checking profile…"
-              }
+              message={isLoading ? t("common.loading") : "Checking profile…"}
             />
             {debugInfo.length > 0 && (
               <details className="mt-4 text-left">

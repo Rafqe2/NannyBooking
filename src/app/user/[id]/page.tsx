@@ -4,6 +4,8 @@ import { use as useUnwrap, useEffect, useState } from "react";
 import Header from "../../../components/Header";
 import Footer from "../../../components/Footer";
 import BlockingLoader from "../../../components/BlockingLoader";
+import ReviewsList from "../../../components/ReviewsList";
+import { useTranslation } from "../../../components/LanguageProvider";
 
 export default function UserProfile({
   params,
@@ -11,6 +13,7 @@ export default function UserProfile({
   params: Promise<{ id: string }>;
 }) {
   const { id } = useUnwrap(params);
+  const { t } = useTranslation();
   const [profile, setProfile] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -38,14 +41,14 @@ export default function UserProfile({
       <main className="flex-1 px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {loading ? (
-            <BlockingLoader message="Loading profile…" />
+            <BlockingLoader message={t("profile.loadingProfile")} />
           ) : error || !profile ? (
             <div className="bg-white border border-gray-200 p-8 rounded-2xl text-center">
               <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                Profile not found
+                {t("profile.notFound")}
               </h2>
               <p className="text-gray-600">
-                {error || "This user does not exist or is private."}
+                {error || t("profile.userDoesNotExist")}
               </p>
             </div>
           ) : (
@@ -66,10 +69,17 @@ export default function UserProfile({
                 <div>
                   <h1 className="text-3xl font-bold">{profile.full_name}</h1>
                   <div className="mt-2 text-purple-100 text-sm flex items-center gap-4">
-                    <span>👤 {profile.user_type || "user"}</span>
+                    <span>
+                      👤{" "}
+                      {profile.user_type === "nanny"
+                        ? t("common.nanny")
+                        : profile.user_type === "parent"
+                        ? t("common.parent")
+                        : t("common.user")}
+                    </span>
                     {profile.member_since && (
                       <span>
-                        Joined{" "}
+                        {t("ad.joined")}{" "}
                         {new Date(profile.member_since).toLocaleDateString(
                           undefined,
                           { year: "numeric", month: "short" }
@@ -88,11 +98,19 @@ export default function UserProfile({
 
               <div className="p-8">
                 <h2 className="text-xl font-semibold text-gray-900 mb-3">
-                  About
+                  {t("profile.about")}
                 </h2>
                 <p className="text-gray-700 whitespace-pre-wrap">
-                  {profile.bio || "No bio provided."}
+                  {profile.bio || t("profile.noBioProvided")}
                 </p>
+              </div>
+
+              {/* Reviews Section */}
+              <div className="px-8 pb-8 border-t border-gray-200 pt-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                  {t("review.reviews")}
+                </h2>
+                <ReviewsList userId={id} showStats={true} />
               </div>
             </div>
           )}

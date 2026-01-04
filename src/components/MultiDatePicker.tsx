@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useTranslation } from "./LanguageProvider";
 
 interface MultiDatePickerProps {
   selectedDates: Date[];
@@ -42,6 +43,7 @@ export default function MultiDatePicker({
   allowedDateKeys,
   autoOpenTimeEditor = false,
 }: MultiDatePickerProps) {
+  const { t } = useTranslation();
   const [currentMonth, setCurrentMonth] = useState<Date>(() => {
     const base = initialMonthDate || new Date();
     return new Date(base.getFullYear(), base.getMonth(), 1);
@@ -248,8 +250,8 @@ export default function MultiDatePicker({
         <div className="mt-3 p-3 border border-dashed border-gray-300 rounded-xl bg-white">
           <div className="text-xs text-gray-600">
             {autoOpenTimeEditor
-              ? "Tip: Click to select dates and edit time, click again to deselect."
-              : "Tip: Click to select/deselect dates, double-click to edit time."}
+              ? t("calendar.tipClick")
+              : t("calendar.tipDoubleClick")}
           </div>
         </div>
       )}
@@ -261,7 +263,9 @@ export default function MultiDatePicker({
           </div>
           <div className="grid grid-cols-2 gap-2 mb-3">
             <div>
-              <label className="block text-xs text-gray-600 mb-1">Start</label>
+              <label className="block text-xs text-gray-600 mb-1">
+                {t("booking.startTime")}
+              </label>
               <input
                 type="time"
                 value={editStart}
@@ -270,7 +274,9 @@ export default function MultiDatePicker({
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-600 mb-1">End</label>
+              <label className="block text-xs text-gray-600 mb-1">
+                {t("booking.endTime")}
+              </label>
               <input
                 type="time"
                 value={editEnd}
@@ -292,14 +298,14 @@ export default function MultiDatePicker({
                   setEditingKey(null);
                 }}
               >
-                OK
+                {t("common.ok")}
               </button>
               <button
                 type="button"
                 className="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50"
                 onClick={() => setEditingKey(null)}
               >
-                Cancel
+                {t("common.cancel")}
               </button>
             </div>
             <button

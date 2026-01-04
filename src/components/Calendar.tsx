@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslation } from "./LanguageProvider";
+import { formatDateDDMMYYYY } from "../lib/date";
 
 interface CalendarProps {
   startDate: Date | null;
@@ -15,6 +17,7 @@ export default function Calendar({
   onDateSelect,
   minDate,
 }: CalendarProps) {
+  const { t, language } = useTranslation();
   const [currentDate, setCurrentDate] = useState(new Date());
 
   const getDaysInMonth = (date: Date) => {
@@ -94,10 +97,17 @@ export default function Calendar({
   };
 
   const { daysInMonth, startingDayOfWeek } = getDaysInMonth(currentDate);
-  const monthName = currentDate.toLocaleDateString("en-US", {
+
+  // Get localized month name
+  const locale =
+    language === "lv" ? "lv-LV" : language === "ru" ? "ru-RU" : "en-US";
+  const monthName = currentDate.toLocaleDateString(locale, {
     month: "long",
     year: "numeric",
   });
+
+  // Get localized day names
+  const dayNames = t("calendar.dayNames").split(",");
 
   const days = [];
   for (let i = 0; i < startingDayOfWeek; i++) {
@@ -191,9 +201,9 @@ export default function Calendar({
 
       {/* Days of week */}
       <div className="grid grid-cols-7 gap-2 mb-6">
-        {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
+        {dayNames.map((day, index) => (
           <div
-            key={day}
+            key={index}
             className="w-12 h-12 flex items-center justify-center text-sm font-bold text-gray-500"
           >
             {day}
@@ -208,10 +218,13 @@ export default function Calendar({
       <div className="mt-6 p-4 bg-gray-50 rounded-xl">
         <p className="text-sm text-gray-600">
           {!startDate
-            ? "Click a date to select your arrival"
+            ? t("calendar.selectArrival")
             : !endDate
-            ? "Click another date to select your departure, or click the same date for a single day"
-            : `Selected: ${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`}
+            ? t("calendar.selectDeparture")
+            : t("calendar.selected", {
+                startDate: formatDateDDMMYYYY(startDate),
+                endDate: formatDateDDMMYYYY(endDate),
+              })}
         </p>
       </div>
     </div>

@@ -2,39 +2,40 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import ErrorBoundary from "../components/ErrorBoundary";
+import { LanguageProvider } from "../components/LanguageProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "auklite.lv – Parents meet trusted nannies",
+  title: "NannyBooking.lv – Parents meet trusted nannies",
   description:
-    "auklite.lv connects parents with trusted, verified nannies. Create or discover childcare ads, manage availability, and book care with confidence.",
+    "NannyBooking.lv connects parents with trusted, verified nannies. Create or discover childcare ads, manage availability, and book care with confidence.",
   keywords:
     "childcare, nanny, babysitting, parents, bookings, availability, Latvia, Lithuania, Estonia, Sweden",
-  authors: [{ name: "auklite.lv Team" }],
-  creator: "auklite.lv",
-  publisher: "auklite.lv",
+  authors: [{ name: "NannyBooking.lv Team" }],
+  creator: "NannyBooking.lv",
+  publisher: "NannyBooking.lv",
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://auklite.lv"),
+  metadataBase: new URL("https://NannyBooking.lv"),
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "auklite.lv – Parents meet trusted nannies",
+    title: "NannyBooking.lv – Parents meet trusted nannies",
     description:
       "Find trusted nannies or families. Manage childcare ads, availability and bookings in one place.",
-    url: "https://auklite.lv",
-    siteName: "auklite.lv",
+    url: "https://NannyBooking.lv",
+    siteName: "NannyBooking.lv",
     locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "auklite.lv – Parents meet trusted nannies",
+    title: "NannyBooking.lv – Parents meet trusted nannies",
     description: "Find trusted childcare, list services, and manage bookings.",
   },
   robots: {
@@ -64,7 +65,9 @@ export default function RootLayout({
         <meta name="theme-color" content="#fffEE0" />
       </head>
       <body className={inter.className}>
-        <ErrorBoundary>{children}</ErrorBoundary>
+        <LanguageProvider>
+          <ErrorBoundary>{children}</ErrorBoundary>
+        </LanguageProvider>
       </body>
     </html>
   );

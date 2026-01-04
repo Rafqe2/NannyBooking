@@ -9,7 +9,7 @@ export interface CreateBookingInput {
 }
 
 export class BookingService {
-  static async createBooking(input: CreateBookingInput): Promise<string | null> {
+  static async createBooking(input: CreateBookingInput): Promise<{success: true, id: string} | {success: false, error: string}> {
     const { data, error } = await supabase.rpc("create_booking_from_ad", {
       p_ad_id: input.adId,
       p_date: input.date,
@@ -20,9 +20,9 @@ export class BookingService {
     if (error) {
       // eslint-disable-next-line no-console
       console.error("createBooking error", error);
-      return null;
+      return { success: false, error: error.message || 'Unknown error' };
     }
-    return data as string;
+    return { success: true, id: data as string };
   }
 
   static async respond(bookingId: string, action: "confirm" | "cancel"): Promise<boolean> {

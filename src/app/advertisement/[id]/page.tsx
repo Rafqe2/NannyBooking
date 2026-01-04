@@ -11,6 +11,9 @@ import { AdvertisementService } from "../../../lib/advertisementService";
 import { UserService } from "../../../lib/userService";
 import BookingModal from "../../../components/BookingModal";
 import { useSupabaseUser } from "../../../lib/useSupabaseUser";
+import { useTranslation } from "../../../components/LanguageProvider";
+import { getTranslatedSkill } from "../../../lib/constants/skills";
+import { formatDateDDMMYYYY } from "../../../lib/date";
 
 interface Slot {
   available_date: string;
@@ -33,6 +36,7 @@ export default function AdvertisementDetails({
   const { id } = useUnwrap(params);
   const router = useRouter();
   const { user } = useSupabaseUser();
+  const { t, language } = useTranslation();
   const [ad, setAd] = useState<any | null>(null);
   const [owner, setOwner] = useState<Owner | null>(null);
   const [slots, setSlots] = useState<Slot[]>([]);
@@ -51,7 +55,7 @@ export default function AdvertisementDetails({
           id
         );
         if (!advertisement) {
-          setError("Advertisement not found");
+          setError(t("ad.notFound"));
           setLoading(false);
           return;
         }
@@ -87,7 +91,7 @@ export default function AdvertisementDetails({
           if (Array.isArray(res)) setLocations(res.map((x: any) => x.label));
         } catch {}
       } catch (e: any) {
-        setError(e?.message || "Failed to load advertisement");
+        setError(e?.message || t("ad.errorLoadFailed"));
       } finally {
         setLoading(false);
       }
@@ -142,7 +146,7 @@ export default function AdvertisementDetails({
       <div className="min-h-screen flex flex-col bg-white">
         <Header />
         <main className="flex-1 flex items-center justify-center">
-          <BlockingLoader message="Loading advertisement…" />
+          <BlockingLoader message={t("ad.loading")} />
         </main>
         <Footer />
       </div>
@@ -156,17 +160,14 @@ export default function AdvertisementDetails({
         <main className="flex-1 flex items-center justify-center px-4">
           <div className="bg-white border border-gray-200 rounded-2xl p-8 max-w-md text-center shadow-sm">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">
-              {error || "Advertisement not found"}
+              {error || t("ad.notFound")}
             </h2>
-            <p className="text-gray-600 mb-6">
-              The advertisement you are looking for may have been removed or is
-              not available.
-            </p>
+            <p className="text-gray-600 mb-6">{t("ad.notAvailable")}</p>
             <button
               onClick={() => router.back()}
               className="px-6 py-3 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700"
             >
-              Go Back
+              {t("common.goBack")}
             </button>
           </div>
         </main>
@@ -196,7 +197,7 @@ export default function AdvertisementDetails({
               className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50"
             >
               <span>←</span>
-              <span>Back to results</span>
+              <span>{t("ad.backToResults")}</span>
             </button>
           </div>
           {/* Title and key facts */}
@@ -206,13 +207,15 @@ export default function AdvertisementDetails({
                 <h1 className="text-2xl sm:text-3xl font-bold">{ad.title}</h1>
                 <div className="flex items-center gap-3">
                   <span className="px-4 py-2 bg-white/20 rounded-full text-sm">
-                    {ad.type === "short-term" ? "Short-term" : "Long-term"}
+                    {ad.type === "short-term"
+                      ? t("profile.shortTerm")
+                      : t("profile.longTerm")}
                   </span>
                   <Link
                     href={`/user/${ad.user_id}`}
                     className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-full text-sm font-medium border border-white/30 hover:border-white/50"
                   >
-                    View profile
+                    {t("ad.viewProfile")}
                   </Link>
                 </div>
               </div>
@@ -223,9 +226,12 @@ export default function AdvertisementDetails({
                 </span>
                 <span className="inline-flex items-center gap-1">
                   <span>💰</span>
-                  <span>€{Number(ad.price_per_hour)}/hour</span>
+                  <span>
+                    €{Number(ad.price_per_hour)}
+                    {t("ad.perHour")}
+                  </span>
                 </span>
-                {ad.availability_start_time && ad.availability_end_time && (
+                {ad.type === "long-term" && ad.availability_start_time && ad.availability_end_time && (
                   <span className="inline-flex items-center gap-1">
                     <span>⏰</span>
                     <span>
@@ -233,15 +239,19 @@ export default function AdvertisementDetails({
                     </span>
                   </span>
                 )}
-                <span
-                  className={
-                    "inline-flex items-center gap-1 " +
-                    (ad.is_active ? "text-green-100" : "text-gray-200")
-                  }
-                >
-                  <span>●</span>
-                  <span>{ad.is_active ? "Active" : "Inactive"}</span>
-                </span>
+                {user?.id === ad.user_id && (
+                  <span
+                    className={
+                      "inline-flex items-center gap-1 " +
+                      (ad.is_active ? "text-green-100" : "text-gray-200")
+                    }
+                  >
+                    <span>●</span>
+                    <span>
+                      {ad.is_active ? t("ad.active") : t("ad.inactive")}
+                    </span>
+                  </span>
+                )}
               </div>
             </div>
 
@@ -249,7 +259,7 @@ export default function AdvertisementDetails({
               {/* Description */}
               <div className="mb-8">
                 <h2 className="text-xl font-semibold text-gray-900 mb-3">
-                  Description
+                  {t("ad.description")}
                 </h2>
                 <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
                   {ad.description}
@@ -261,15 +271,17 @@ export default function AdvertisementDetails({
                 <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
                   <h3 className="font-semibold text-gray-900 mb-2">
                     {ad.type === "short-term"
-                      ? "Requirements & Preferences"
-                      : "Experience & Background"}
+                      ? t("ad.requirements")
+                      : t("ad.experience")}
                   </h3>
                   <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
                     {ad.experience || "—"}
                   </p>
                 </div>
                 <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
-                  <h3 className="font-semibold text-gray-900 mb-2">Skills</h3>
+                  <h3 className="font-semibold text-gray-900 mb-2">
+                    {t("ad.skills")}
+                  </h3>
                   {ad.skills && ad.skills.length > 0 ? (
                     <div className="flex flex-wrap gap-2">
                       {ad.skills.map((s: string) => (
@@ -277,7 +289,7 @@ export default function AdvertisementDetails({
                           key={s}
                           className="px-3 py-1 bg-purple-100 text-purple-700 text-xs rounded-full"
                         >
-                          {s}
+                          {getTranslatedSkill(s, language)}
                         </span>
                       ))}
                     </div>
@@ -290,7 +302,7 @@ export default function AdvertisementDetails({
               {/* Availability calendar-like list */}
               <div className="mb-8">
                 <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                  Availability
+                  {t("search.availability")}
                 </h3>
                 {groupedSlots.length > 0 ? (
                   <div className="space-y-3">
@@ -300,7 +312,7 @@ export default function AdvertisementDetails({
                         className="flex items-start justify-between bg-white rounded-xl border border-gray-200 p-4"
                       >
                         <div className="text-gray-900 font-medium">
-                          {new Date(date + "T00:00:00Z").toLocaleDateString()}
+                          {formatDateDDMMYYYY(new Date(date + "T00:00:00Z"))}
                         </div>
                         <div className="flex flex-wrap gap-2">
                           {items.map((s, idx) => (
@@ -316,14 +328,16 @@ export default function AdvertisementDetails({
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-600">No specific dates provided.</p>
+                  <p className="text-gray-600">{t("ad.noAvailability")}</p>
                 )}
               </div>
 
               {/* Location & extra */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-white rounded-xl border border-gray-200 p-5">
-                  <h3 className="font-semibold text-gray-900 mb-2">Location</h3>
+                  <h3 className="font-semibold text-gray-900 mb-2">
+                    {t("adCreate.location")}
+                  </h3>
                   <p className="text-gray-700">
                     {ad.location_address ? (
                       <>
@@ -341,14 +355,18 @@ export default function AdvertisementDetails({
                   </p>
                   {locations.length > 0 && (
                     <p className="text-sm text-gray-500 mt-2">
-                      Also serves: {locations.slice(0, 5).join(", ")}
+                      {t("ad.alsoServes", {
+                        locations: locations.slice(0, 5).join(", "),
+                      })}
                       {locations.length > 5 ? ` +${locations.length - 5}` : ""}
                     </p>
                   )}
                 </div>
                 {ad.additional_info && (
                   <div className="bg-white rounded-xl border border-gray-200 p-5">
-                    <h3 className="font-semibold text-gray-900 mb-2">Notes</h3>
+                    <h3 className="font-semibold text-gray-900 mb-2">
+                      {t("ad.notes")}
+                    </h3>
                     <p className="text-gray-700 whitespace-pre-wrap">
                       {ad.additional_info}
                     </p>
@@ -359,14 +377,16 @@ export default function AdvertisementDetails({
               {/* Call to action */}
               <div className="mt-8 bg-white rounded-2xl border border-gray-200 p-6">
                 <div className="mb-3 text-gray-800">
-                  Looking good? You should book and contact the{" "}
-                  {owner
-                    ? owner.fullName ||
-                      (ad.type === "short-term" ? "nanny" : "parent")
-                    : ad.type === "short-term"
-                    ? "nanny"
-                    : "parent"}
-                  .
+                  {t("ad.lookingGood", {
+                    providerType: owner
+                      ? owner.fullName ||
+                        (ad.type === "short-term"
+                          ? t("common.nanny")
+                          : t("common.parent"))
+                      : ad.type === "short-term"
+                      ? t("common.nanny")
+                      : t("common.parent"),
+                  })}
                 </div>
                 <div className="flex flex-wrap gap-3">
                   {(() => {
@@ -382,7 +402,7 @@ export default function AdvertisementDetails({
                         className="px-5 py-2 rounded-lg font-medium bg-purple-600 text-white hover:bg-purple-700"
                         title="Book this ad"
                       >
-                        Book
+                        {t("ad.book")}
                       </button>
                     ) : null;
                   })()}
@@ -403,12 +423,12 @@ export default function AdvertisementDetails({
                         : "Go to profile to contact"
                     }
                   >
-                    Contact
+                    {t("ad.contact")}
                   </a>
                 </div>
                 {!user && (
                   <div className="mt-2 text-sm text-gray-600">
-                    You need to register or sign in to contact and book.
+                    {t("ad.needToRegister")}
                   </div>
                 )}
               </div>

@@ -1,4 +1,9 @@
+"use client";
+
+import { useTranslation } from "./LanguageProvider";
+
 export default function Footer() {
+  const { t } = useTranslation();
   return (
     <footer className="bg-white border-t border-gray-200">
       <div className="max-w-7xl mx-auto px-8 py-16">
@@ -7,24 +12,27 @@ export default function Footer() {
           {/* Company Info */}
           <div className="space-y-6">
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">Auklite</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                NannyBooking
+              </h3>
               <p className="text-gray-600 leading-relaxed">
-                Connecting families with trusted childcare professionals across
-                Latvia. Safe, reliable, and professional childcare solutions.
+                {t("footer.description")}
               </p>
             </div>
           </div>
 
           {/* For Parents */}
           <div className="space-y-6">
-            <h4 className="text-lg font-semibold text-gray-900">For Parents</h4>
+            <h4 className="text-lg font-semibold text-gray-900">
+              {t("footer.forParents")}
+            </h4>
             <ul className="space-y-4">
               <li>
                 <a
                   href="#"
                   className="text-gray-600 hover:text-purple-600 transition-colors duration-200"
                 >
-                  Find a Nanny
+                  {t("footer.findNanny")}
                 </a>
               </li>
               <li>
@@ -32,7 +40,7 @@ export default function Footer() {
                   href="#"
                   className="text-gray-600 hover:text-purple-600 transition-colors duration-200"
                 >
-                  Safety Guidelines
+                  {t("footer.safetyGuidelines")}
                 </a>
               </li>
               <li>
@@ -40,7 +48,7 @@ export default function Footer() {
                   href="#"
                   className="text-gray-600 hover:text-purple-600 transition-colors duration-200"
                 >
-                  Background Checks
+                  {t("footer.backgroundChecks")}
                 </a>
               </li>
               <li>
@@ -48,7 +56,7 @@ export default function Footer() {
                   href="#"
                   className="text-gray-600 hover:text-purple-600 transition-colors duration-200"
                 >
-                  Pricing
+                  {t("footer.pricing")}
                 </a>
               </li>
             </ul>
@@ -56,14 +64,16 @@ export default function Footer() {
 
           {/* For Nannies */}
           <div className="space-y-6">
-            <h4 className="text-lg font-semibold text-gray-900">For Nannies</h4>
+            <h4 className="text-lg font-semibold text-gray-900">
+              {t("footer.forNannies")}
+            </h4>
             <ul className="space-y-4">
               <li>
                 <a
                   href="#"
                   className="text-gray-600 hover:text-purple-600 transition-colors duration-200"
                 >
-                  Find Families
+                  {t("footer.findFamilies")}
                 </a>
               </li>
               <li>
@@ -71,7 +81,7 @@ export default function Footer() {
                   href="#"
                   className="text-gray-600 hover:text-purple-600 transition-colors duration-200"
                 >
-                  Set Your Rates
+                  {t("footer.setRates")}
                 </a>
               </li>
               <li>
@@ -79,7 +89,7 @@ export default function Footer() {
                   href="#"
                   className="text-gray-600 hover:text-purple-600 transition-colors duration-200"
                 >
-                  Safety Tips
+                  {t("footer.safetyTips")}
                 </a>
               </li>
               <li>
@@ -87,7 +97,7 @@ export default function Footer() {
                   href="#"
                   className="text-gray-600 hover:text-purple-600 transition-colors duration-200"
                 >
-                  Success Stories
+                  {t("footer.successStories")}
                 </a>
               </li>
             </ul>
@@ -95,14 +105,16 @@ export default function Footer() {
 
           {/* Support */}
           <div className="space-y-6">
-            <h4 className="text-lg font-semibold text-gray-900">Support</h4>
+            <h4 className="text-lg font-semibold text-gray-900">
+              {t("footer.support")}
+            </h4>
             <ul className="space-y-4">
               <li>
                 <a
                   href="#"
                   className="text-gray-600 hover:text-purple-600 transition-colors duration-200"
                 >
-                  Help Center
+                  {t("footer.helpCenter")}
                 </a>
               </li>
               <li>
@@ -110,7 +122,7 @@ export default function Footer() {
                   href="#"
                   className="text-gray-600 hover:text-purple-600 transition-colors duration-200"
                 >
-                  Contact Us
+                  {t("footer.contact")}
                 </a>
               </li>
               <li>
@@ -118,7 +130,7 @@ export default function Footer() {
                   href="#"
                   className="text-gray-600 hover:text-purple-600 transition-colors duration-200"
                 >
-                  Safety Guidelines
+                  {t("footer.safetyGuidelines")}
                 </a>
               </li>
               <li>
@@ -126,7 +138,7 @@ export default function Footer() {
                   href="#"
                   className="text-gray-600 hover:text-purple-600 transition-colors duration-200"
                 >
-                  Background Checks
+                  {t("footer.backgroundChecks")}
                 </a>
               </li>
             </ul>
@@ -141,25 +153,25 @@ export default function Footer() {
                 href="#"
                 className="text-gray-600 hover:text-purple-600 transition-colors duration-200"
               >
-                © 2024 Auklite, Inc.
+                {t("footer.copyright")}
               </a>
               <a
                 href="#"
                 className="text-gray-600 hover:text-purple-600 transition-colors duration-200"
               >
-                Privacy
+                {t("footer.privacy")}
               </a>
               <a
                 href="#"
                 className="text-gray-600 hover:text-purple-600 transition-colors duration-200"
               >
-                Terms
+                {t("footer.terms")}
               </a>
               <a
                 href="#"
                 className="text-gray-600 hover:text-purple-600 transition-colors duration-200"
               >
-                Sitemap
+                {t("footer.sitemap")}
               </a>
             </div>
           </div>

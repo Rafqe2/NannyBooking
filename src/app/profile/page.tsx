@@ -5,7 +5,7 @@ import { UserService, UserProfile } from "../../lib/userService";
 import { AdvertisementService } from "../../lib/advertisementService";
 import LocationAutocomplete from "../../components/LocationAutocomplete";
 import MultiDatePicker from "../../components/MultiDatePicker";
-import { toLocalYYYYMMDD } from "../../lib/date";
+import { toLocalYYYYMMDD, formatDateDDMMYYYY } from "../../lib/date";
 import { NANNY_SKILLS } from "../../lib/constants/skills";
 import Header from "../../components/Header";
 import { supabase } from "../../lib/supabase";
@@ -16,11 +16,15 @@ import AdvertisementPreview from "../../components/AdvertisementPreview";
 import BookingCalendar from "../../components/BookingCalendar";
 import { BookingService } from "../../lib/bookingService";
 import CancelBookingModal from "../../components/CancelBookingModal";
+import ReviewModal from "../../components/ReviewModal";
+import { useTranslation } from "../../components/LanguageProvider";
+import { getTranslatedSkill } from "../../lib/constants/skills";
 
 type Advertisement = Database["public"]["Tables"]["advertisements"]["Row"];
 
 export default function ProfilePage() {
   const { user, isLoading } = useSupabaseUser();
+  const { t, language } = useTranslation();
   const avatarUrl =
     (user?.user_metadata as any)?.avatar_url ||
     (user?.user_metadata as any)?.picture ||
@@ -58,6 +62,7 @@ export default function ProfilePage() {
   );
   const [selectedBooking, setSelectedBooking] = useState<any | null>(null);
   const [cancellingBooking, setCancellingBooking] = useState<any | null>(null);
+  const [reviewingBooking, setReviewingBooking] = useState<any | null>(null);
   const [currentBookingPage, setCurrentBookingPage] = useState(1);
   const bookingsPerPage = 4;
   const [isDeleting, setIsDeleting] = useState(false);
@@ -232,25 +237,67 @@ export default function ProfilePage() {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-    });
+    const monthNames =
+      language === "lv"
+        ? [
+            "Janvāris",
+            "Februāris",
+            "Marts",
+            "Aprīlis",
+            "Maijs",
+            "Jūnijs",
+            "Jūlijs",
+            "Augusts",
+            "Septembris",
+            "Oktobris",
+            "Novembris",
+            "Decembris",
+          ]
+        : language === "ru"
+        ? [
+            "Январь",
+            "Февраль",
+            "Март",
+            "Апрель",
+            "Май",
+            "Июнь",
+            "Июль",
+            "Август",
+            "Сентябрь",
+            "Октябрь",
+            "Ноябрь",
+            "Декабрь",
+          ]
+        : [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December",
+          ];
+    return `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
   };
 
   const tabs = [
     {
       id: "job-ads",
-      label: isParent ? "Your Advertisement" : "Your Advertisement",
+      label: t("profile.yourAdvertisement"),
       icon: isParent ? "📋" : "💼",
     },
     {
       id: "bookings",
-      label: "Bookings",
+      label: t("profile.bookings"),
       icon: pendingBookings > 0 ? "⚠️" : "📅",
     },
-    { id: "messages", label: "Messages", icon: "💬" },
-    { id: "profile", label: "Profile", icon: "👤" },
+    { id: "messages", label: t("profile.messages"), icon: "💬" },
+    { id: "profile", label: t("profile.profile"), icon: "👤" },
   ] as const;
 
   const renderJobAdsTab = () => (
@@ -261,14 +308,14 @@ export default function ProfilePage() {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-semibold text-gray-900">
-                Your Advertisement
+                {t("profile.yourAdvertisement")}
               </h2>
               <p className="text-gray-600 mt-1">
                 {userProfile?.user_type === "parent"
-                  ? "Manage your childcare job postings"
+                  ? t("profile.manageChildcareJob")
                   : userProfile?.user_type === "nanny"
-                  ? "Manage your childcare services and availability"
-                  : "Complete your profile to get started"}
+                  ? t("profile.manageChildcareServices")
+                  : t("profile.completeProfileToStart")}
               </p>
             </div>
             {(() => {
@@ -297,10 +344,10 @@ export default function ProfilePage() {
                   }
                 >
                   {userProfile?.user_type === "parent"
-                    ? "Create New Ad"
+                    ? t("profile.createNewAd")
                     : userProfile?.user_type === "nanny"
-                    ? "Add Service"
-                    : "Get Started"}
+                    ? t("profile.addService")
+                    : t("profile.getStarted")}
                 </button>
               );
             })()}
@@ -336,12 +383,12 @@ export default function ProfilePage() {
                         <span className="flex items-center">
                           <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
                           {ad.type === "short-term"
-                            ? "Short-term"
-                            : "Long-term"}
+                            ? t("profile.shortTerm")
+                            : t("profile.longTerm")}
                         </span>
                         <span className="flex items-center">
                           <span className="mr-1">💰</span>${ad.price_per_hour}
-                          /hour
+                          {t("ad.perHour")}
                         </span>
                         <span className="flex items-center">
                           <span className="mr-1">📍</span>
@@ -353,17 +400,17 @@ export default function ProfilePage() {
                       {ad.is_active ? (
                         <span
                           className="inline-flex items-center px-3 py-1.5 rounded-lg border border-gray-300 bg-gray-100 text-gray-400 text-sm font-medium cursor-not-allowed"
-                          title="Deactivate ad to edit"
+                          title={t("ad.deactivateToEdit")}
                         >
-                          Edit
+                          {t("ad.edit")}
                         </span>
                       ) : (
                         <a
                           className="inline-flex items-center px-3 py-1.5 rounded-lg border border-purple-600 text-purple-600 text-sm font-medium hover:bg-purple-50"
                           href={`/edit-advertisement/${ad.id}`}
-                          title="Edit"
+                          title={t("ad.edit")}
                         >
-                          Edit
+                          {t("ad.edit")}
                         </a>
                       )}
                       {ad.is_active ? (
@@ -385,7 +432,7 @@ export default function ProfilePage() {
                           }}
                           className="inline-flex items-center px-3 py-1.5 rounded-lg border border-gray-300 text-gray-700 text-sm font-medium hover:bg-gray-100"
                         >
-                          Deactivate
+                          {t("ad.deactivate")}
                         </button>
                       ) : (
                         <button
@@ -411,7 +458,7 @@ export default function ProfilePage() {
                           disabled={advertisements.some((a) => a.is_active)}
                           title={
                             advertisements.some((a) => a.is_active)
-                              ? "Another advertisement is already active"
+                              ? t("ad.anotherActive")
                               : ""
                           }
                           className={
@@ -421,17 +468,13 @@ export default function ProfilePage() {
                               : "text-green-700 border-green-600 hover:bg-green-50")
                           }
                         >
-                          Activate
+                          {t("ad.activate")}
                         </button>
                       )}
                       {!ad.is_active && (
                         <button
                           onClick={async () => {
-                            if (
-                              !confirm(
-                                "Delete this advertisement? This cannot be undone."
-                              )
-                            ) {
+                            if (!confirm(t("ad.deleteConfirm"))) {
                               return;
                             }
                             const ok =
@@ -453,7 +496,7 @@ export default function ProfilePage() {
                           }}
                           className="inline-flex items-center px-3 py-1.5 rounded-lg border border-red-600 text-red-700 text-sm font-medium hover:bg-red-50"
                         >
-                          Delete
+                          {t("ad.delete")}
                         </button>
                       )}
                     </div>
@@ -475,12 +518,14 @@ export default function ProfilePage() {
                             key={skill}
                             className="px-3 py-1 bg-purple-100 text-purple-700 text-xs rounded-full"
                           >
-                            {skill}
+                            {getTranslatedSkill(skill, language)}
                           </span>
                         ))}
                         {ad.skills.length > 5 && (
                           <span className="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
-                            +{ad.skills.length - 5} more
+                            {t("ad.moreSkills", {
+                              count: ad.skills.length - 5,
+                            })}
                           </span>
                         )}
                       </div>
@@ -492,7 +537,9 @@ export default function ProfilePage() {
                       ad.is_active ? "text-gray-500" : "text-gray-500"
                     }`}
                   >
-                    <span>Created {formatDate(ad.created_at)}</span>
+                    <span>
+                      {t("ad.created", { date: formatDate(ad.created_at) })}
+                    </span>
                     <span
                       className={
                         ad.is_active
@@ -500,7 +547,7 @@ export default function ProfilePage() {
                           : "text-gray-500"
                       }
                     >
-                      {ad.is_active ? "Active" : "Inactive"}
+                      {ad.is_active ? t("ad.active") : t("ad.inactive")}
                     </span>
                   </div>
                 </div>
@@ -742,15 +789,16 @@ export default function ProfilePage() {
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-2xl font-semibold text-gray-900">
-                    Your bookings
+                    {t("profile.yourBookings")}
                   </h2>
                 </div>
                 {selectedCalendarDate && (
                   <div className="text-sm text-gray-700">
-                    Selected date:{" "}
-                    {new Date(
-                      selectedCalendarDate + "T00:00:00"
-                    ).toLocaleDateString()}
+                    {t("profile.selectedDate", {
+                      date: formatDateDDMMYYYY(
+                        new Date(selectedCalendarDate + "T00:00:00")
+                      ),
+                    })}
                   </div>
                 )}
               </div>
@@ -767,7 +815,7 @@ export default function ProfilePage() {
                       setCurrentBookingPage(1);
                     }}
                   >
-                    Upcoming
+                    {t("bookings.upcoming")}
                   </button>
                   <button
                     className={`px-4 py-2 text-sm font-medium border-l border-gray-200 ${
@@ -780,19 +828,21 @@ export default function ProfilePage() {
                       setCurrentBookingPage(1);
                     }}
                   >
-                    Past bookings
+                    {t("profile.pastBookings")}
                   </button>
                 </div>
                 <div className="text-sm text-gray-600">
                   {pendingBookings > 0
-                    ? `${pendingBookings} pending`
-                    : "No pending requests"}
+                    ? `${pendingBookings} ${t("bookings.pending")}`
+                    : t("profile.noPendingRequests")}
                 </div>
               </div>
             </div>
             <div className="p-6 sm:p-8">
               {bookings.length === 0 ? (
-                <div className="text-gray-600">No bookings yet.</div>
+                <div className="text-gray-600">
+                  {t("profile.noBookingsYet")}
+                </div>
               ) : (
                 <div className="h-[304px] flex flex-col justify-between">
                   <div
@@ -890,9 +940,9 @@ export default function ProfilePage() {
                               <div className="flex items-center gap-5">
                                 <div className="text-gray-900 font-medium text-base">
                                   {b.booking_date
-                                    ? new Date(
-                                        b.booking_date + "T00:00:00"
-                                      ).toLocaleDateString()
+                                    ? formatDateDDMMYYYY(
+                                        new Date(b.booking_date + "T00:00:00")
+                                      )
                                     : "No date"}
                                 </div>
                                 <div className="text-sm text-gray-600">
@@ -902,12 +952,28 @@ export default function ProfilePage() {
                               <div className="flex items-center gap-3">
                                 {b.status === "confirmed" && (
                                   <span className="text-xs px-2.5 py-1 rounded-full bg-green-50 text-green-700 border border-green-200">
-                                    Confirmed
+                                    {t("booking.confirmed")}
                                   </span>
                                 )}
                                 {b.status === "cancelled" && (
                                   <span className="text-xs px-2.5 py-1 rounded-full bg-gray-50 text-gray-700 border border-gray-200">
-                                    Cancelled
+                                    {t("booking.cancelled")}
+                                  </span>
+                                )}
+                                {b.status === "completed" && !b.has_review && (
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setReviewingBooking(b);
+                                    }}
+                                    className="text-xs px-2.5 py-1 rounded-full bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100"
+                                  >
+                                    {t("review.writeReview")}
+                                  </button>
+                                )}
+                                {b.status === "completed" && b.has_review && (
+                                  <span className="text-xs px-2.5 py-1 rounded-full bg-gray-50 text-gray-600 border border-gray-200">
+                                    {t("review.reviewed")}
                                   </span>
                                 )}
                                 {b.status === "pending" &&
@@ -934,7 +1000,7 @@ export default function ProfilePage() {
                                         }}
                                         className="text-xs px-2.5 py-1 rounded-full bg-green-50 text-green-700 border border-green-200 hover:bg-green-100"
                                       >
-                                        Accept
+                                        {t("booking.accept")}
                                       </button>
                                       <button
                                         onClick={async () => {
@@ -954,7 +1020,7 @@ export default function ProfilePage() {
                                         }}
                                         className="text-xs px-2.5 py-1 rounded-full bg-red-50 text-red-700 border border-red-200 hover:bg-red-100"
                                       >
-                                        Decline
+                                        {t("booking.decline")}
                                       </button>
                                     </div>
                                   )}
@@ -965,7 +1031,7 @@ export default function ProfilePage() {
                                       onClick={(e) => e.stopPropagation()}
                                     >
                                       <span className="text-xs px-2.5 py-1 rounded-full bg-yellow-50 text-yellow-700 border border-yellow-200">
-                                        Pending
+                                        {t("booking.pending")}
                                       </span>
                                       <button
                                         onClick={async () => {
@@ -985,7 +1051,7 @@ export default function ProfilePage() {
                                         }}
                                         className="text-xs px-2.5 py-1 rounded-full bg-red-50 text-red-700 border border-red-200 hover:bg-red-100"
                                       >
-                                        Cancel
+                                        {t("booking.cancel")}
                                       </button>
                                     </div>
                                   )}
@@ -1091,43 +1157,132 @@ export default function ProfilePage() {
             className="absolute inset-0 bg-black/40"
             onClick={() => setSelectedBooking(null)}
           />
-          <div className="relative bg-white w-full max-w-md rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
-            <div className="px-5 py-3 border-b border-gray-100 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Booking details
-              </h3>
-              <button
-                onClick={() => setSelectedBooking(null)}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="p-5 space-y-3 text-sm text-gray-800">
+          <div className="relative bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-purple-50 to-blue-50">
               <div className="flex items-center justify-between">
-                <span className="text-gray-600">Date</span>
-                <span className="font-medium">
-                  {selectedBooking.booking_date
-                    ? new Date(
-                        selectedBooking.booking_date + "T00:00:00"
-                      ).toLocaleDateString()
-                    : "—"}
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900">
+                    {t("booking.bookingDetails")}
+                  </h3>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {t("booking.bookingWith")}{" "}
+                    {selectedBooking.counterparty_full_name || t("common.user")}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setSelectedBooking(null)}
+                  className="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div className="p-6 space-y-4">
+              {/* Status Badge */}
+              <div className="flex items-center justify-center">
+                <span
+                  className={`px-4 py-2 rounded-full text-sm font-medium ${
+                    selectedBooking.status === "confirmed"
+                      ? "bg-green-100 text-green-800 border border-green-200"
+                      : selectedBooking.status === "pending"
+                      ? "bg-yellow-100 text-yellow-800 border border-yellow-200"
+                      : selectedBooking.status === "cancelled"
+                      ? "bg-red-100 text-red-800 border border-red-200"
+                      : "bg-gray-100 text-gray-800 border border-gray-200"
+                  }`}
+                >
+                  {selectedBooking.status === "confirmed"
+                    ? t("booking.confirmed")
+                    : selectedBooking.status === "pending"
+                    ? t("booking.pending")
+                    : selectedBooking.status === "cancelled"
+                    ? t("booking.cancelled")
+                    : selectedBooking.status}
                 </span>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-gray-600">Status</span>
-                <span className="font-medium">{selectedBooking.status}</span>
+
+              {/* Booking Details Grid */}
+              <div className="grid grid-cols-1 gap-4">
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <svg
+                      className="w-5 h-5 text-purple-600"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                    <span className="font-medium text-gray-900">
+                      {t("booking.date")}
+                    </span>
+                  </div>
+                  <span className="text-gray-700">
+                    {selectedBooking.booking_date
+                      ? formatDateDDMMYYYY(
+                          new Date(selectedBooking.booking_date + "T00:00:00")
+                        )
+                      : "—"}
+                  </span>
+                </div>
+
+                {selectedBooking.start_time && selectedBooking.end_time && (
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <svg
+                        className="w-5 h-5 text-purple-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                      <span className="font-medium text-gray-900">
+                        {t("booking.time")}
+                      </span>
+                    </div>
+                    <span className="text-gray-700">
+                      {selectedBooking.start_time} - {selectedBooking.end_time}
+                    </span>
+                  </div>
+                )}
               </div>
               {selectedBooking.message && (
                 <div>
-                  <div className="text-gray-600 mb-1">Message</div>
+                  <div className="text-gray-600 mb-1">
+                    {t("booking.message")}
+                  </div>
                   <div className="p-2 rounded-lg bg-gray-50 border border-gray-200">
                     {selectedBooking.message}
                   </div>
                 </div>
               )}
               <div className="flex items-center justify-between">
-                <span className="text-gray-600">Counterparty</span>
+                <span className="text-gray-600">
+                  {t("booking.counterparty")}
+                </span>
                 <span className="font-medium">
                   {selectedBooking.counterparty_full_name || "User"}
                 </span>
@@ -1138,7 +1293,7 @@ export default function ProfilePage() {
                     <div className="space-y-3">
                       <div>
                         <div className="text-gray-600 mb-1">
-                          Cancellation Reason
+                          {t("booking.cancellationReason")}
                         </div>
                         <div className="text-sm font-medium text-red-700 bg-red-50 px-2 py-1 rounded border border-red-200">
                           {selectedBooking.cancellation_reason}
@@ -1147,7 +1302,7 @@ export default function ProfilePage() {
                       {selectedBooking.cancellation_note && (
                         <div>
                           <div className="text-gray-600 mb-1">
-                            Cancellation Note
+                            {t("booking.cancellationNote")}
                           </div>
                           <div className="p-2 rounded-lg bg-red-50 border border-red-200 text-sm text-red-900">
                             {selectedBooking.cancellation_note}
@@ -1156,7 +1311,9 @@ export default function ProfilePage() {
                       )}
                       {selectedBooking.cancelled_at && (
                         <div className="flex items-center justify-between">
-                          <span className="text-gray-600">Cancelled At</span>
+                          <span className="text-gray-600">
+                            {t("booking.cancelledAt")}
+                          </span>
                           <span className="text-sm text-gray-700">
                             {new Date(
                               selectedBooking.cancelled_at
@@ -1168,7 +1325,18 @@ export default function ProfilePage() {
                   </div>
                 )}
             </div>
-            <div className="px-5 py-3 border-t border-gray-100 flex justify-between">
+            <div className="px-5 py-3 border-t border-gray-100 flex justify-between gap-2">
+              {selectedBooking?.status === "completed" && !selectedBooking.has_review && (
+                <button
+                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                  onClick={() => {
+                    setReviewingBooking(selectedBooking);
+                    setSelectedBooking(null);
+                  }}
+                >
+                  {t("review.writeReview")}
+                </button>
+              )}
               {selectedBooking?.status === "confirmed" &&
                 (() => {
                   const bookingDate = selectedBooking.booking_date;
@@ -1185,12 +1353,15 @@ export default function ProfilePage() {
                       setSelectedBooking(null);
                     }}
                   >
-                    Cancel Booking
+                    {t("booking.cancelBooking")}
                   </button>
                 )}
 
               <div
                 className={(() => {
+                  if (selectedBooking?.status === "completed" && !selectedBooking.has_review) {
+                    return ""; // Review button takes space
+                  }
                   if (selectedBooking?.status === "confirmed") {
                     const bookingDate = selectedBooking.booking_date;
                     if (!bookingDate) return "w-full flex justify-end";
@@ -1205,10 +1376,10 @@ export default function ProfilePage() {
                 })()}
               >
                 <button
-                  className="px-4 py-2 border rounded-lg"
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
                   onClick={() => setSelectedBooking(null)}
                 >
-                  Close
+                  {t("common.close")}
                 </button>
               </div>
             </div>
@@ -1227,6 +1398,25 @@ export default function ProfilePage() {
             } catch (error) {
               console.error("Error reloading bookings:", error);
             }
+          }}
+        />
+      )}
+      {reviewingBooking && reviewingBooking.advertisement_id && reviewingBooking.counterparty_id && (
+        <ReviewModal
+          bookingId={reviewingBooking.id}
+          advertisementId={reviewingBooking.advertisement_id}
+          revieweeId={reviewingBooking.counterparty_id}
+          revieweeName={reviewingBooking.counterparty_full_name || "User"}
+          onClose={() => setReviewingBooking(null)}
+          onSuccess={async () => {
+            // Reload bookings after successful review
+            try {
+              const { data: bdata } = await supabase.rpc("get_my_bookings");
+              setBookings((bdata as any[]) || []);
+            } catch (error) {
+              console.error("Error reloading bookings:", error);
+            }
+            setReviewingBooking(null);
           }}
         />
       )}
@@ -1334,9 +1524,9 @@ export default function ProfilePage() {
                 {displayNameFromProfile}
               </h2>
               <p className="text-purple-100 text-lg mb-3">{user?.email}</p>
-              <div className="flex items-center space-x-4">
+              <div className="flex flex-wrap items-center gap-3">
                 <span
-                  className={`px-4 py-2 rounded-full text-sm font-medium border border-white/30 ${
+                  className={`px-3 py-1.5 rounded-full text-sm font-medium border border-white/30 ${
                     userProfile?.user_type === "parent"
                       ? "bg-blue-500/20 text-blue-100"
                       : userProfile?.user_type === "nanny"
@@ -1345,16 +1535,25 @@ export default function ProfilePage() {
                   }`}
                 >
                   {userProfile?.user_type === "parent"
-                    ? "👨‍👩‍👧‍👦 Parent"
+                    ? `👨‍👩‍👧‍👦 ${t("common.parent")}`
                     : userProfile?.user_type === "nanny"
-                    ? "👶 Nanny"
-                    : "⏳ Pending"}
+                    ? `👶 ${t("common.nanny")}`
+                    : `⏳ ${t("userType.pending")}`}
                 </span>
-                <span className="text-purple-100 text-sm">
-                  Member since{" "}
-                  {userProfile?.created_at
-                    ? formatDate(userProfile.created_at)
-                    : "Recently"}
+                <span className="text-purple-100 text-sm flex items-center gap-1">
+                  <span>📅</span>
+                  <span>
+                    {t("profile.memberSince")}{" "}
+                    {userProfile?.created_at
+                      ? formatDate(userProfile.created_at)
+                      : t("profile.recently")}
+                  </span>
+                </span>
+                <span className="text-purple-100 text-sm flex items-center gap-1">
+                  <span>⭐</span>
+                  <span>
+                    {t("profile.rating")}: {t("profile.noReviewsYet")}
+                  </span>
                 </span>
               </div>
             </div>
@@ -1362,62 +1561,8 @@ export default function ProfilePage() {
               onClick={() => setIsEditing(!isEditing)}
               className="bg-white/20 hover:bg-white/30 px-6 py-3 rounded-lg font-medium transition-colors duration-200 border border-white/30 hover:border-white/50"
             >
-              {isEditing ? "Cancel" : "Edit Profile"}
+              {isEditing ? t("common.cancel") : t("profile.editProfile")}
             </button>
-          </div>
-        </div>
-
-        {/* Stats */}
-        <div className="px-6 sm:px-8 py-6 border-b border-gray-100">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            <div className="flex items-center space-x-4">
-              <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  userProfile?.user_type === "parent"
-                    ? "bg-blue-100"
-                    : userProfile?.user_type === "nanny"
-                    ? "bg-green-100"
-                    : "bg-gray-100"
-                }`}
-              >
-                <span className="text-lg">
-                  {userProfile?.user_type === "parent" ? "📋" : "💼"}
-                </span>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Active</p>
-                <p className="text-xl font-semibold text-gray-900">
-                  {userProfile?.user_type === "parent"
-                    ? "Job Ads"
-                    : userProfile?.user_type === "nanny"
-                    ? "Services"
-                    : "Profile"}
-                </p>
-                <p className="text-sm text-gray-500">0 listings</p>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                <span className="text-lg">📅</span>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">This month</p>
-                <p className="text-xl font-semibold text-gray-900">Bookings</p>
-                <p className="text-sm text-gray-500">0 appointments</p>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                <span className="text-lg">⭐</span>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Average</p>
-                <p className="text-xl font-semibold text-gray-900">Rating</p>
-                <p className="text-sm text-gray-500">No reviews yet</p>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -1425,13 +1570,13 @@ export default function ProfilePage() {
         {isEditing ? (
           <div className="p-6 sm:p-8">
             <h3 className="text-2xl font-semibold mb-6 text-gray-900">
-              Edit Profile
+              {t("profile.editProfile")}
             </h3>
             <form onSubmit={handleEditSubmit} className="space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Phone Number
+                    {t("profile.phoneNumber")}
                   </label>
                   <input
                     type="tel"
@@ -1445,7 +1590,7 @@ export default function ProfilePage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Location
+                    {t("profile.location")}
                   </label>
                   <input
                     type="text"
@@ -1457,28 +1602,9 @@ export default function ProfilePage() {
                     placeholder="Rīga"
                   />
                 </div>
-                {/* Removed surname field per request */}
-                <div>
+                <div className="lg:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    User Type
-                  </label>
-                  <select
-                    value={editForm.user_type}
-                    onChange={(e) => {
-                      setEditForm({
-                        ...editForm,
-                        user_type: e.target.value as "parent" | "nanny",
-                      });
-                    }}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  >
-                    <option value="parent">👨‍👩‍👧‍👦 Parent</option>
-                    <option value="nanny">👶 Nanny</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Bio
+                    {t("profile.bio")}
                   </label>
                   <textarea
                     value={editForm.additional_info}
@@ -1492,10 +1618,10 @@ export default function ProfilePage() {
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
                     placeholder={
                       userProfile?.user_type === "parent"
-                        ? "Tell us about your family and what you're looking for..."
+                        ? t("profile.parentBioPlaceholder")
                         : userProfile?.user_type === "nanny"
-                        ? "Tell us about your experience and what makes you a great provider..."
-                        : "Add a short bio"
+                        ? t("profile.nannyBioPlaceholder")
+                        : t("profile.addBio")
                     }
                   />
                 </div>
@@ -1506,9 +1632,7 @@ export default function ProfilePage() {
                   type="button"
                   onClick={async () => {
                     if (!user?.id || isDeleting) return;
-                    const sure = confirm(
-                      "Delete your account? This will remove your profile and ads. This cannot be undone."
-                    );
+                    const sure = confirm(t("profile.deleteAccountConfirm"));
                     if (!sure) return;
                     setIsDeleting(true);
                     try {
@@ -1525,10 +1649,7 @@ export default function ProfilePage() {
                       });
                       if (!resp.ok) {
                         const body = await resp.json().catch(() => ({} as any));
-                        alert(
-                          body?.error ||
-                            "Failed to delete account. Check server env."
-                        );
+                        alert(body?.error || t("profile.deleteAccountFailed"));
                         return;
                       }
                       await supabase.auth.signOut();
@@ -1540,7 +1661,9 @@ export default function ProfilePage() {
                   disabled={isUpdating || isDeleting}
                   className="px-6 py-3 border border-red-300 text-red-700 rounded-lg font-medium hover:bg-red-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isDeleting ? "Deleting..." : "Delete Account"}
+                  {isDeleting
+                    ? t("profile.deleting")
+                    : t("profile.deleteAccount")}
                 </button>
                 <button
                   type="button"
@@ -1548,7 +1671,7 @@ export default function ProfilePage() {
                   disabled={isUpdating}
                   className="px-6 py-3 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Cancel
+                  {t("profile.cancel")}
                 </button>
                 <button
                   type="submit"
@@ -1558,10 +1681,10 @@ export default function ProfilePage() {
                   {isUpdating ? (
                     <>
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      <span>Saving...</span>
+                      <span>{t("profile.saving")}</span>
                     </>
                   ) : (
-                    "Save Changes"
+                    t("profile.saveChanges")
                   )}
                 </button>
               </div>
@@ -1570,57 +1693,31 @@ export default function ProfilePage() {
         ) : (
           <div className="p-8">
             <h3 className="text-2xl font-semibold mb-6 text-gray-900">
-              Profile Information
+              {t("profile.profileInformation")}
             </h3>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-500 mb-1">
-                  Full Name
+                  {t("profile.phoneNumber")}
                 </label>
                 <p className="text-gray-900 font-medium">
-                  {displayNameFromProfile || "Not set"}
+                  {userProfile?.phone || t("profile.notSet")}
                 </p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-500 mb-1">
-                  Email
-                </label>
-                <p className="text-gray-900 font-medium">{user?.email}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-500 mb-1">
-                  Phone Number
+                  {t("profile.location")}
                 </label>
                 <p className="text-gray-900 font-medium">
-                  {userProfile?.phone || "Not set"}
-                </p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-500 mb-1">
-                  Location
-                </label>
-                <p className="text-gray-900 font-medium">
-                  {userProfile?.location || "Not set"}
-                </p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-500 mb-1">
-                  User Type
-                </label>
-                <p className="text-gray-900 font-medium">
-                  {userProfile?.user_type === "parent"
-                    ? "👨‍👩‍👧‍👦 Parent"
-                    : userProfile?.user_type === "nanny"
-                    ? "👶 Nanny"
-                    : "⏳ Pending"}
+                  {userProfile?.location || t("profile.notSet")}
                 </p>
               </div>
               <div className="lg:col-span-2">
                 <label className="block text-sm font-medium text-gray-500 mb-1">
-                  Bio
+                  {t("profile.bio")}
                 </label>
                 <p className="text-gray-900 leading-relaxed">
-                  {editForm.additional_info || "No bio added yet."}
+                  {editForm.additional_info || t("profile.noBioAdded")}
                 </p>
               </div>
             </div>
@@ -1632,7 +1729,7 @@ export default function ProfilePage() {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="px-8 py-6 border-b border-gray-100 bg-gray-50">
           <h3 className="text-2xl font-semibold text-gray-900">
-            Account Settings
+            {t("profile.accountSettings")}
           </h3>
         </div>
         <div className="p-8">
@@ -1640,10 +1737,10 @@ export default function ProfilePage() {
             <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
               <div>
                 <h4 className="font-medium text-gray-900">
-                  Email Notifications
+                  {t("profile.emailNotifications")}
                 </h4>
                 <p className="text-sm text-gray-600 mt-1">
-                  Receive updates about bookings and messages
+                  {t("profile.emailNotificationsDesc")}
                 </p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
@@ -1657,9 +1754,11 @@ export default function ProfilePage() {
             </div>
             <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
               <div>
-                <h4 className="font-medium text-gray-900">SMS Notifications</h4>
+                <h4 className="font-medium text-gray-900">
+                  {t("profile.smsNotifications")}
+                </h4>
                 <p className="text-sm text-gray-600 mt-1">
-                  Get text messages for urgent updates
+                  {t("profile.smsNotificationsDesc")}
                 </p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">

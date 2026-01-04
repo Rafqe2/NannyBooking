@@ -2,6 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { AdvertisementService } from "../lib/advertisementService";
+import { useTranslation } from "./LanguageProvider";
+import { getTranslatedSkill } from "../lib/constants/skills";
+import { formatDateDDMMYYYY } from "../lib/date";
 
 interface Slot {
   available_date: string;
@@ -16,6 +19,7 @@ export default function AdvertisementPreview({
   advertisementId: string;
   onClose: () => void;
 }) {
+  const { t, language } = useTranslation();
   const [ad, setAd] = useState<any | null>(null);
   const [slots, setSlots] = useState<Slot[]>([]);
   const [locations, setLocations] = useState<string[]>([]);
@@ -64,7 +68,9 @@ export default function AdvertisementPreview({
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
       <div className="relative bg-white w-full max-w-3xl rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900">Ad preview</h3>
+          <h3 className="text-lg font-semibold text-gray-900">
+            {t("ad.preview")}
+          </h3>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
@@ -76,11 +82,11 @@ export default function AdvertisementPreview({
           {loading ? (
             <div className="text-center py-8">
               <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-purple-600 mx-auto mb-3" />
-              <p className="text-gray-600">Loading…</p>
+              <p className="text-gray-600">{t("ad.loading")}</p>
             </div>
           ) : error || !ad ? (
             <div className="text-center py-8 text-gray-700">
-              {error || "Not found"}
+              {error || t("ad.notFound")}
             </div>
           ) : (
             <div className="space-y-6">
@@ -88,13 +94,18 @@ export default function AdvertisementPreview({
                 <div className="flex items-center justify-between">
                   <h1 className="text-xl font-bold">{ad.title}</h1>
                   <span className="px-3 py-1 bg-white/20 rounded-full text-xs">
-                    {ad.type === "short-term" ? "Short-term" : "Long-term"}
+                    {ad.type === "short-term"
+                      ? t("profile.shortTerm")
+                      : t("profile.longTerm")}
                   </span>
                 </div>
                 <div className="mt-2 text-purple-100 text-sm flex flex-wrap gap-3">
                   <span>📍 {ad.location_city}</span>
-                  <span>💰 €{Number(ad.price_per_hour)}/hour</span>
-                  {ad.availability_start_time && ad.availability_end_time && (
+                  <span>
+                    💰 €{Number(ad.price_per_hour)}
+                    {t("ad.perHour")}
+                  </span>
+                  {ad.type === "long-term" && ad.availability_start_time && ad.availability_end_time && (
                     <span>
                       ⏰ {ad.availability_start_time} -{" "}
                       {ad.availability_end_time}
@@ -105,14 +116,14 @@ export default function AdvertisementPreview({
                       ad.is_active ? "text-green-100" : "text-gray-200"
                     }
                   >
-                    ● {ad.is_active ? "Active" : "Inactive"}
+                    ● {ad.is_active ? t("ad.active") : t("ad.inactive")}
                   </span>
                 </div>
               </div>
 
               <div>
                 <h2 className="text-sm font-semibold text-gray-900 mb-2">
-                  Description
+                  {t("ad.description")}
                 </h2>
                 <p className="text-gray-700 whitespace-pre-wrap">
                   {ad.description || "—"}
@@ -121,7 +132,7 @@ export default function AdvertisementPreview({
 
               <div>
                 <h2 className="text-sm font-semibold text-gray-900 mb-2">
-                  Skills
+                  {t("ad.skills")}
                 </h2>
                 {ad.skills && ad.skills.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
@@ -130,7 +141,7 @@ export default function AdvertisementPreview({
                         key={s}
                         className="px-3 py-1 bg-purple-100 text-purple-700 text-xs rounded-full"
                       >
-                        {s}
+                        {getTranslatedSkill(s, language)}
                       </span>
                     ))}
                   </div>
@@ -141,20 +152,25 @@ export default function AdvertisementPreview({
 
               <div>
                 <h2 className="text-sm font-semibold text-gray-900 mb-2">
-                  Location
+                  {t("ad.locations")}
                 </h2>
                 <p className="text-gray-700">{ad.location_city}</p>
                 {locations.length > 0 && (
                   <p className="text-sm text-gray-500 mt-1">
-                    Also serves: {locations.slice(0, 5).join(", ")}
-                    {locations.length > 5 ? ` +${locations.length - 5}` : ""}
+                    {t("ad.alsoServes", {
+                      locations:
+                        locations.slice(0, 5).join(", ") +
+                        (locations.length > 5
+                          ? ` +${locations.length - 5}`
+                          : ""),
+                    })}
                   </p>
                 )}
               </div>
 
               <div>
                 <h2 className="text-sm font-semibold text-gray-900 mb-2">
-                  Availability
+                  {t("ad.availability")}
                 </h2>
                 {groupedSlots.length > 0 ? (
                   <div className="space-y-2">
@@ -164,7 +180,7 @@ export default function AdvertisementPreview({
                         className="flex items-center justify-between border border-gray-200 rounded-lg p-3"
                       >
                         <span className="text-gray-900 font-medium">
-                          {new Date(date + "T00:00:00Z").toLocaleDateString()}
+                          {formatDateDDMMYYYY(new Date(date + "T00:00:00Z"))}
                         </span>
                         <div className="flex flex-wrap gap-2">
                           {items.map((s, idx) => (
@@ -180,7 +196,7 @@ export default function AdvertisementPreview({
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-600">No specific dates provided.</p>
+                  <p className="text-gray-600">{t("ad.noAvailability")}</p>
                 )}
               </div>
             </div>

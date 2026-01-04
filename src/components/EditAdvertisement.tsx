@@ -4,14 +4,17 @@ import { useEffect, useMemo, useState } from "react";
 import { AdvertisementService } from "../lib/advertisementService";
 import LocationAutocomplete from "./LocationAutocomplete";
 import MultiDatePicker from "./MultiDatePicker";
-import { toLocalYYYYMMDD } from "../lib/date";
+import { toLocalYYYYMMDD, formatDateDDMMYYYY } from "../lib/date";
 import { NANNY_SKILLS } from "../lib/constants/skills";
+import { useTranslation } from "./LanguageProvider";
+import { getTranslatedSkill } from "../lib/constants/skills";
 
 export default function EditAdvertisement({
   advertisementId,
 }: {
   advertisementId: string;
 }) {
+  const { t, language } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [ad, setAd] = useState<any | null>(null);
@@ -41,7 +44,7 @@ export default function EditAdvertisement({
         const adData = await AdvertisementService.getAdvertisementById(
           advertisementId
         );
-        if (!adData) throw new Error("Advertisement not found");
+        if (!adData) throw new Error(t("ad.notFound"));
         setAd(adData);
         setTitle(adData.title || "");
         setPricePerHour(Number(adData.price_per_hour) || 0);
@@ -68,7 +71,7 @@ export default function EditAdvertisement({
         const locs = await AdvertisementService.getLocations(advertisementId);
         setExtraLocations((locs || []).map((l: any) => l.label));
       } catch (e: any) {
-        setError(e?.message || "Failed to load ad");
+        setError(e?.message || t("ad.errorLoadFailed"));
       } finally {
         setLoading(false);
       }
@@ -145,7 +148,7 @@ export default function EditAdvertisement({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Type
+            {t("adCreate.serviceType")}
           </label>
           <select
             disabled={isActive}
@@ -153,13 +156,13 @@ export default function EditAdvertisement({
             onChange={(e) => setType(e.target.value as any)}
             className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-50"
           >
-            <option value="short-term">Short-term</option>
-            <option value="long-term">Long-term</option>
+            <option value="short-term">{t("profile.shortTerm")}</option>
+            <option value="long-term">{t("profile.longTerm")}</option>
           </select>
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Price per Hour (€)
+            {t("adCreate.pricePerHour")}
           </label>
           <input
             disabled={isActive}
@@ -171,7 +174,7 @@ export default function EditAdvertisement({
         </div>
         <div className="md:col-span-2">
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Title
+            {t("adCreate.adTitle")}
           </label>
           <input
             disabled={isActive}
@@ -183,7 +186,7 @@ export default function EditAdvertisement({
         </div>
         <div className="md:col-span-2">
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Description
+            {t("ad.description")}
           </label>
           <textarea
             disabled={isActive}
@@ -195,17 +198,17 @@ export default function EditAdvertisement({
         </div>
         <div className="md:col-span-2">
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Location
+            {t("adCreate.location")}
           </label>
           <LocationAutocomplete
             value={locationCity}
             onChange={(v) => setLocationCity(v.label)}
-            placeholder="Search city, country or street"
+            placeholder={t("adCreate.placeholderSearch")}
           />
         </div>
         <div className="md:col-span-2">
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Skills
+            {t("ad.skills")}
           </label>
           <div className="flex flex-wrap gap-2">
             {availableSkills.map((s) => (
@@ -222,7 +225,7 @@ export default function EditAdvertisement({
                   (isActive ? " opacity-60 cursor-not-allowed" : "")
                 }
               >
-                {s}
+                {getTranslatedSkill(s, language)}
               </button>
             ))}
           </div>
@@ -387,7 +390,7 @@ export default function EditAdvertisement({
                         key={key}
                         className="flex items-center justify-between"
                       >
-                        <span>{d.toLocaleDateString()}</span>
+                        <span>{formatDateDDMMYYYY(d)}</span>
                         <div className="flex items-center">
                           <span className="text-gray-600">
                             {start} - {end}

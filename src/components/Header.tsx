@@ -5,9 +5,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "../lib/supabase";
 import { useSupabaseUser } from "../lib/useSupabaseUser";
+import { useTranslation } from "./LanguageProvider";
+import { LANGUAGES } from "../lib/i18n";
 
 export default function Header() {
   const { user, isLoading } = useSupabaseUser();
+  const { language, setLanguage, t } = useTranslation();
   const [pendingCount, setPendingCount] = useState<number>(0);
 
   useEffect(() => {
@@ -41,14 +44,8 @@ export default function Header() {
   const router = useRouter();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showLanguageMenu, setShowLanguageMenu] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState("EN");
   const userRef = useRef<HTMLDivElement>(null);
   const languageRef = useRef<HTMLDivElement>(null);
-  const languages = [
-    { code: "EN", name: "English" },
-    { code: "LV", name: "Latviešu" },
-    { code: "RU", name: "Русский" },
-  ];
 
   const handleClickOutside = useCallback((event: MouseEvent) => {
     const target = event.target as Node;
@@ -89,15 +86,15 @@ export default function Header() {
                 if (typeof window !== "undefined") {
                   // Suppress restoring last search when explicitly going Home
                   try {
-                    window.sessionStorage.removeItem("auklite:restoreNext");
-                    window.sessionStorage.removeItem("auklite:lastSearch");
-                    window.sessionStorage.setItem("auklite:forceHome", "1");
+                    window.sessionStorage.removeItem("nannybooking:restoreNext");
+                    window.sessionStorage.removeItem("nannybooking:lastSearch");
+                    window.sessionStorage.setItem("nannybooking:forceHome", "1");
                     window.sessionStorage.setItem(
-                      "auklite:suppressRestore",
+                      "nannybooking:suppressRestore",
                       "1"
                     );
                     // Also clear any persisted search UI state
-                    window.localStorage.removeItem("auklite:lastSearch");
+                    window.localStorage.removeItem("nannybooking:lastSearch");
                   } catch {}
                   window.dispatchEvent(new CustomEvent("resetSearch"));
                 }
@@ -106,7 +103,7 @@ export default function Header() {
             }}
             className="text-2xl font-bold text-purple-600 tracking-wide hover:text-purple-700 transition-colors"
           >
-            auklite.lv
+            NannyBooking.lv
           </button>
         </div>
         {/* Language and Menu Controls - Positioned to the right and lower */}
@@ -117,7 +114,7 @@ export default function Header() {
               onClick={() => setShowLanguageMenu(!showLanguageMenu)}
               className="bg-white w-12 h-12 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors duration-200 shadow-lg hover:shadow-xl text-sm font-medium flex items-center justify-center"
             >
-              {selectedLanguage}
+              {language.toUpperCase()}
             </button>
             {showLanguageMenu && (
               <div className="absolute top-full right-0 mt-2 bg-white rounded-xl shadow-2xl border border-gray-200 w-32 z-50 overflow-hidden">
@@ -126,14 +123,18 @@ export default function Header() {
                     Language
                   </h3>
                 </div>
-                {languages.map((lang, index) => (
+                {LANGUAGES.map((lang, index) => (
                   <button
                     key={lang.code}
                     onClick={() => {
-                      setSelectedLanguage(lang.code);
+                      setLanguage(lang.code);
                       setShowLanguageMenu(false);
                     }}
                     className={`w-full text-center px-3 py-2 hover:bg-gray-50 transition-colors duration-200 border-b border-gray-100 last:border-b-0 text-sm bg-white ${
+                      language === lang.code
+                        ? "bg-purple-50 text-purple-700 font-medium"
+                        : ""
+                    } ${
                       index === 0
                         ? "translate-y-1"
                         : index === 2
@@ -141,7 +142,7 @@ export default function Header() {
                         : ""
                     }`}
                   >
-                    {lang.name}
+                    {lang.nativeName}
                   </button>
                 ))}
               </div>
@@ -193,7 +194,7 @@ export default function Header() {
                       onClick={() => handleNavigation("/profile")}
                       className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors duration-200 border-b border-gray-100 text-sm font-medium bg-white disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Profile
+                      {t("header.profile")}
                     </button>
                     <button
                       onClick={async () => {
@@ -210,12 +211,12 @@ export default function Header() {
                       }}
                       className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors duration-200 text-sm font-medium bg-white block"
                     >
-                      Sign out
+                      {t("header.signOut")}
                     </button>
                   </>
                 ) : isLoading ? (
                   <div className="px-4 py-3 text-sm text-gray-500">
-                    Loading...
+                    {t("common.loading")}
                   </div>
                 ) : (
                   <>
@@ -223,7 +224,7 @@ export default function Header() {
                       onClick={handleSignIn}
                       className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors duration-200 border-b border-gray-100 text-sm font-medium bg-white"
                     >
-                      Sign in
+                      {t("header.signIn")}
                     </button>
                   </>
                 )}

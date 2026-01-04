@@ -5,6 +5,7 @@ import { SEARCH_LOCATIONS } from "../lib/constants/cities";
 import { formatDateRange } from "../lib/date";
 import Calendar from "./Calendar";
 import LocationAutocomplete from "./LocationAutocomplete";
+import { useTranslation } from "./LanguageProvider";
 
 interface SearchBarProps {
   onSearch: (
@@ -15,6 +16,7 @@ interface SearchBarProps {
 }
 
 export default function SearchBar({ onSearch }: SearchBarProps) {
+  const { t, language } = useTranslation();
   const [showLocationPicker, setShowLocationPicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState("Location");
@@ -76,8 +78,8 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
   }, []);
 
   const dateRangeLabel = useMemo(
-    () => formatDateRange(startDate, endDate),
-    [startDate, endDate]
+    () => formatDateRange(startDate, endDate, language),
+    [startDate, endDate, language]
   );
 
   const handleDateSelect = useCallback(
@@ -120,7 +122,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
             {/* Where */}
             <div className="relative flex-1" ref={locationRef}>
               <label className="block text-sm font-medium text-gray-700 mb-2 lg:hidden">
-                Where
+                {t("search.where")}
               </label>
               <div className="w-full">
                 <LocationAutocomplete
@@ -131,7 +133,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
                     setSelectedLocation(next.label);
                     setShowLocationPicker(false);
                   }}
-                  placeholder="Search city, country or street"
+                  placeholder={t("search.locationPlaceholder")}
                   variant="borderless"
                 />
               </div>
@@ -143,7 +145,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
             {/* When */}
             <div className="relative flex-1" ref={dateRef}>
               <label className="block text-sm font-medium text-gray-700 mb-2 lg:hidden">
-                When
+                {t("search.when")}
               </label>
               <button
                 onClick={() => setShowDatePicker((prev) => !prev)}
@@ -171,7 +173,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
               onClick={handleSearch}
               className="w-full lg:w-auto bg-purple-600 text-white px-6 lg:px-8 py-4 rounded-xl lg:rounded-full text-lg font-semibold hover:bg-purple-700 transition-colors duration-200 shadow-lg hover:shadow-xl"
             >
-              Find Match
+              {t("search.findMatch")}
             </button>
           </div>
         </div>

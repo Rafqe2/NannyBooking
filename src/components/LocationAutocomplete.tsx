@@ -75,7 +75,7 @@ export default function LocationAutocomplete({
             headers: {
               "Accept-Language": "en",
               // Respectful User-Agent per Nominatim policy
-              "User-Agent": "Auklite/1.0 (support@auklite.example)",
+              "User-Agent": "NannyBooking/1.0 (support@nannybooking.example)",
             },
             signal,
           });

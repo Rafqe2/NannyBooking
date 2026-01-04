@@ -70,7 +70,7 @@ export default function LoginPage() {
               A
             </div>
             <h1 className="mt-4 text-2xl font-semibold text-gray-900">
-              Welcome to Auklite
+              Welcome to NannyBooking
             </h1>
             <p className="mt-1 text-gray-500 text-sm">Sign in to continue</p>
           </div>
