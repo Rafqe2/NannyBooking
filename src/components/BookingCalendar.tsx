@@ -44,7 +44,9 @@ export default function BookingCalendar({
 
   const firstDay = new Date(current.getFullYear(), current.getMonth(), 1);
   const lastDay = new Date(current.getFullYear(), current.getMonth() + 1, 0);
-  const startWeekday = firstDay.getDay();
+  // Convert Sunday (0) to 6, Monday (1) to 0, etc. to start week on Monday
+  const dayOfWeek = firstDay.getDay();
+  const startWeekday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
   const numDays = lastDay.getDate();
 
   const days: JSX.Element[] = [];
@@ -132,7 +134,7 @@ export default function BookingCalendar({
       </div>
       <div className="p-4">
         <div className="grid grid-cols-7 gap-2 text-xs text-gray-500 mb-2">
-          {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((d) => (
+          {["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"].map((d) => (
             <div key={d} className="text-center py-1">
               {d}
             </div>

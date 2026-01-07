@@ -6,15 +6,11 @@ import { useState } from "react";
 
 const providers = [
   { id: "google", label: "Continue with Google", icon: "🔵" },
-  { id: "apple", label: "Continue with Apple", icon: "" },
-  { id: "twitter", label: "Continue with X (Twitter)", icon: "✖️" },
   { id: "facebook", label: "Continue with Facebook", icon: "📘" },
 ] as const;
 
 export default function LoginPage() {
   const { user } = useSupabaseUser();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -38,23 +34,6 @@ export default function LoginPage() {
     }
   };
 
-  const handleEmailPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setIsLoading(true);
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (error) throw error;
-      window.location.href = "/";
-    } catch (e: any) {
-      setError(e.message || "Failed to sign in");
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   if (user) {
     if (typeof window !== "undefined") window.location.href = "/";
@@ -90,47 +69,7 @@ export default function LoginPage() {
               </button>
             ))}
           </div>
-
-          <div className="my-8 flex items-center">
-            <div className="h-px bg-gray-200 flex-1" />
-            <span className="px-3 text-xs text-gray-400">
-              or continue with email
-            </span>
-            <div className="h-px bg-gray-200 flex-1" />
-          </div>
-
-          <form onSubmit={handleEmailPassword} className="space-y-4">
-            <div>
-              <label className="block text-sm text-gray-700 mb-1">Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-700 mb-1">
-                Password
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                required
-              />
-            </div>
-            {error && <div className="text-sm text-red-600">{error}</div>}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full px-4 py-3 rounded-xl bg-purple-600 text-white font-medium hover:bg-purple-700 transition disabled:opacity-50"
-            >
-              {isLoading ? "Signing in..." : "Sign in"}
-            </button>
-          </form>
+          {error && <div className="mt-4 text-sm text-red-600 text-center">{error}</div>}
 
           <p className="mt-6 text-center text-xs text-gray-500">
             By continuing, you agree to our Terms and Privacy Policy.

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { supabase } from "../lib/supabase";
 import { useSupabaseUser } from "../lib/useSupabaseUser";
 import { useTranslation } from "./LanguageProvider";
@@ -11,7 +11,10 @@ import { LANGUAGES } from "../lib/i18n";
 export default function Header() {
   const { user, isLoading } = useSupabaseUser();
   const { language, setLanguage, t } = useTranslation();
+  const router = useRouter();
+  const pathname = usePathname();
   const [pendingCount, setPendingCount] = useState<number>(0);
+  const isOnProfilePage = pathname === "/profile";
 
   useEffect(() => {
     let active = true;
@@ -41,7 +44,6 @@ export default function Header() {
       clearInterval(id);
     };
   }, [user?.id]);
-  const router = useRouter();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showLanguageMenu, setShowLanguageMenu] = useState(false);
   const userRef = useRef<HTMLDivElement>(null);
@@ -68,16 +70,71 @@ export default function Header() {
     router.push(url);
   };
 
+  const handleTabSwitch = (tab: string) => {
+    setShowUserMenu(false);
+    if (isOnProfilePage) {
+      // If on profile page, update URL without navigation
+      const url = new URL(window.location.href);
+      url.searchParams.set("tab", tab);
+      window.history.pushState({}, "", url.toString());
+      // Trigger a custom event that profile page can listen to
+      window.dispatchEvent(new CustomEvent("profileTabChange", { detail: { tab } }));
+    } else {
+      // If not on profile page, navigate to profile with tab
+      router.push(`/profile?tab=${tab}`);
+    }
+  };
+
   const handleSignIn = (e: React.MouseEvent) => {
     e.preventDefault();
     setShowUserMenu(false);
     router.push("/login");
   };
 
+  const currentLanguage = useMemo(
+    () => LANGUAGES.find((l) => l.code === language),
+    [language]
+  );
+
   return (
     <>
-      <header className="h-16 bg-white flex items-center justify-between px-8 shadow-sm border-b border-gray-100">
-        <div className="flex-1"></div>
+      <header className="h-16 sticky top-0 z-40 bg-white/90 backdrop-blur flex items-center justify-between px-8 shadow-sm border-b border-gray-100">
+        {/* Language Selector (left) */}
+        <div className="flex-1 flex items-center">
+          <div
+            className="relative"
+            ref={languageRef}
+            onMouseEnter={() => setShowLanguageMenu(true)}
+            onMouseLeave={() => setShowLanguageMenu(false)}
+          >
+            <button
+              onFocus={() => setShowLanguageMenu(true)}
+              className="h-10 px-4 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-800 shadow-sm hover:shadow transition-all flex items-center gap-2"
+            >
+              <span>{currentLanguage?.nativeName || language.toUpperCase()}</span>
+              <span className="text-gray-500">▾</span>
+            </button>
+            {showLanguageMenu && (
+              <div className="absolute left-0 top-full bg-white rounded-lg shadow-2xl border border-gray-200 w-44 z-50 overflow-hidden translate-y-[2px]">
+                {LANGUAGES.filter((l) => l.code !== language).map((lang, idx, arr) => (
+                  <button
+                    key={lang.code}
+                    onClick={() => {
+                      setLanguage(lang.code);
+                      setShowLanguageMenu(false);
+                    }}
+                    className={`w-full text-left px-4 py-3 text-sm hover:bg-gray-50 transition-colors ${
+                      idx !== arr.length - 1 ? "border-b border-gray-100" : ""
+                    }`}
+                  >
+                    {lang.nativeName}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Center Title */}
         <div className="flex-1 flex justify-center">
           <button
@@ -106,48 +163,8 @@ export default function Header() {
             NannyBooking.lv
           </button>
         </div>
-        {/* Language and Menu Controls - Positioned to the right and lower */}
-        <div className="flex-1 flex justify-end items-end pt-2 space-x-4">
-          {/* Language Selector - Above Menu */}
-          <div className="relative" ref={languageRef}>
-            <button
-              onClick={() => setShowLanguageMenu(!showLanguageMenu)}
-              className="bg-white w-12 h-12 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors duration-200 shadow-lg hover:shadow-xl text-sm font-medium flex items-center justify-center"
-            >
-              {language.toUpperCase()}
-            </button>
-            {showLanguageMenu && (
-              <div className="absolute top-full right-0 mt-2 bg-white rounded-xl shadow-2xl border border-gray-200 w-32 z-50 overflow-hidden">
-                <div className="p-2 bg-gray-50 border-b border-gray-200">
-                  <h3 className="font-semibold text-gray-700 text-xs">
-                    Language
-                  </h3>
-                </div>
-                {LANGUAGES.map((lang, index) => (
-                  <button
-                    key={lang.code}
-                    onClick={() => {
-                      setLanguage(lang.code);
-                      setShowLanguageMenu(false);
-                    }}
-                    className={`w-full text-center px-3 py-2 hover:bg-gray-50 transition-colors duration-200 border-b border-gray-100 last:border-b-0 text-sm bg-white ${
-                      language === lang.code
-                        ? "bg-purple-50 text-purple-700 font-medium"
-                        : ""
-                    } ${
-                      index === 0
-                        ? "translate-y-1"
-                        : index === 2
-                        ? "-translate-y-1"
-                        : ""
-                    }`}
-                  >
-                    {lang.nativeName}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+        {/* User Menu (right) */}
+        <div className="flex-1 flex justify-end items-center">
           {/* User Menu */}
           <div className="relative" ref={userRef}>
             <button
@@ -183,18 +200,31 @@ export default function Header() {
             </button>
             {showUserMenu && (
               <div className="absolute top-full right-0 mt-2 bg-white rounded-xl shadow-2xl border border-gray-200 w-48 z-50 overflow-hidden">
-                <div className="p-3 bg-gray-50 border-b border-gray-200">
-                  <h3 className="font-semibold text-gray-700 text-sm">
-                    Account
-                  </h3>
-                </div>
                 {user ? (
                   <>
                     <button
-                      onClick={() => handleNavigation("/profile")}
-                      className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors duration-200 border-b border-gray-100 text-sm font-medium bg-white disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={() => handleTabSwitch("job-ads")}
+                      className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors duration-200 border-b border-gray-100 text-sm font-medium bg-white"
                     >
-                      {t("header.profile")}
+                      {t("profile.yourAdvertisement")}
+                    </button>
+                    <button
+                      onClick={() => handleTabSwitch("bookings")}
+                      className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors duration-200 border-b border-gray-100 text-sm font-medium bg-white"
+                    >
+                      {t("profile.bookings")}
+                    </button>
+                    <button
+                      onClick={() => handleTabSwitch("messages")}
+                      className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors duration-200 border-b border-gray-100 text-sm font-medium bg-white"
+                    >
+                      {t("profile.messages")}
+                    </button>
+                    <button
+                      onClick={() => handleTabSwitch("profile")}
+                      className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors duration-200 border-b border-gray-100 text-sm font-medium bg-white"
+                    >
+                      {t("profile.profile")}
                     </button>
                     <button
                       onClick={async () => {
@@ -219,14 +249,12 @@ export default function Header() {
                     {t("common.loading")}
                   </div>
                 ) : (
-                  <>
-                    <button
-                      onClick={handleSignIn}
-                      className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors duration-200 border-b border-gray-100 text-sm font-medium bg-white"
-                    >
-                      {t("header.signIn")}
-                    </button>
-                  </>
+                  <button
+                    onClick={handleSignIn}
+                    className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors duration-200 text-sm font-medium bg-white"
+                  >
+                    {t("header.signIn")}
+                  </button>
                 )}
               </div>
             )}

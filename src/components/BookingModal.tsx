@@ -242,8 +242,10 @@ export default function BookingModal({
                 if (result.success) {
                   successCount++;
                 } else {
+                  // Log the actual error for debugging
+                  console.error("Booking failed for slot:", s, "Error:", result.error);
                   // Check if it's a booking conflict error
-                  if (result.error.includes("BOOKING_CONFLICT")) {
+                  if (result.error && result.error.includes("BOOKING_CONFLICT")) {
                     conflictError = true;
                     break; // Stop trying other bookings
                   }

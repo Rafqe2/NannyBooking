@@ -26,7 +26,8 @@ export default function Calendar({
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
     const daysInMonth = lastDay.getDate();
-    const startingDayOfWeek = firstDay.getDay();
+    // Convert Sunday (0) to 6, Monday (1) to 0, etc. to start week on Monday
+    const startingDayOfWeek = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
 
     return { daysInMonth, startingDayOfWeek };
   };

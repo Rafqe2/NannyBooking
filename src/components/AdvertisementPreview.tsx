@@ -90,25 +90,42 @@ export default function AdvertisementPreview({
             </div>
           ) : (
             <div className="space-y-6">
+              {/* Header matching actual ad page */}
               <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-xl p-5">
                 <div className="flex items-center justify-between">
-                  <h1 className="text-xl font-bold">{ad.title}</h1>
-                  <span className="px-3 py-1 bg-white/20 rounded-full text-xs">
+                  <h1 className="text-2xl sm:text-3xl font-bold">{ad.title}</h1>
+                  <span className="px-4 py-2 bg-white/20 rounded-full text-sm">
                     {ad.type === "short-term"
                       ? t("profile.shortTerm")
                       : t("profile.longTerm")}
                   </span>
                 </div>
-                <div className="mt-2 text-purple-100 text-sm flex flex-wrap gap-3">
-                  <span>📍 {ad.location_city}</span>
-                  <span>
-                    💰 €{Number(ad.price_per_hour)}
-                    {t("ad.perHour")}
+                <div className="mt-3 flex flex-wrap gap-3 text-sm text-purple-100">
+                  <span className="inline-flex items-center gap-1">
+                    <span>📍</span>
+                    <span>{ad.location_city}</span>
                   </span>
-                  {ad.type === "long-term" && ad.availability_start_time && ad.availability_end_time && (
+                  <span className="inline-flex items-center gap-1">
+                    <span>💰</span>
                     <span>
-                      ⏰ {ad.availability_start_time} -{" "}
-                      {ad.availability_end_time}
+                      €{Number(ad.price_per_hour)}
+                      {t("ad.perHour")}
+                    </span>
+                  </span>
+                  {ad.type === "short-term" && slots.length > 0 && (
+                    <span className="inline-flex items-center gap-1">
+                      <span>🗓️</span>
+                      <span>
+                        {slots.length} {t("ad.date", { count: slots.length })}
+                      </span>
+                    </span>
+                  )}
+                  {ad.type === "long-term" && ad.availability_start_time && ad.availability_end_time && (
+                    <span className="inline-flex items-center gap-1">
+                      <span>⏰</span>
+                      <span>
+                        {ad.availability_start_time} - {ad.availability_end_time}
+                      </span>
                     </span>
                   )}
                   <span
@@ -121,72 +138,69 @@ export default function AdvertisementPreview({
                 </div>
               </div>
 
-              <div>
-                <h2 className="text-sm font-semibold text-gray-900 mb-2">
+              {/* Description */}
+              <div className="mb-8">
+                <h2 className="text-xl font-semibold text-gray-900 mb-3">
                   {t("ad.description")}
                 </h2>
-                <p className="text-gray-700 whitespace-pre-wrap">
+                <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
                   {ad.description || "—"}
                 </p>
               </div>
 
-              <div>
-                <h2 className="text-sm font-semibold text-gray-900 mb-2">
-                  {t("ad.skills")}
-                </h2>
-                {ad.skills && ad.skills.length > 0 ? (
-                  <div className="flex flex-wrap gap-2">
-                    {ad.skills.map((s: string) => (
-                      <span
-                        key={s}
-                        className="px-3 py-1 bg-purple-100 text-purple-700 text-xs rounded-full"
-                      >
-                        {getTranslatedSkill(s, language)}
-                      </span>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-gray-500">—</p>
-                )}
-              </div>
-
-              <div>
-                <h2 className="text-sm font-semibold text-gray-900 mb-2">
-                  {t("ad.locations")}
-                </h2>
-                <p className="text-gray-700">{ad.location_city}</p>
-                {locations.length > 0 && (
-                  <p className="text-sm text-gray-500 mt-1">
-                    {t("ad.alsoServes", {
-                      locations:
-                        locations.slice(0, 5).join(", ") +
-                        (locations.length > 5
-                          ? ` +${locations.length - 5}`
-                          : ""),
-                    })}
+              {/* Experience / Skills */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                  <h3 className="font-semibold text-gray-900 mb-2">
+                    {ad.type === "short-term"
+                      ? t("ad.requirements")
+                      : t("ad.experience")}
+                  </h3>
+                  <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                    {ad.experience || "—"}
                   </p>
-                )}
+                </div>
+                <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                  <h3 className="font-semibold text-gray-900 mb-2">
+                    {t("ad.skills")}
+                  </h3>
+                  {ad.skills && ad.skills.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {ad.skills.map((s: string) => (
+                        <span
+                          key={s}
+                          className="px-3 py-1 bg-purple-100 text-purple-700 text-xs rounded-full"
+                        >
+                          {getTranslatedSkill(s, language)}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500">—</p>
+                  )}
+                </div>
               </div>
 
-              <div>
-                <h2 className="text-sm font-semibold text-gray-900 mb-2">
-                  {t("ad.availability")}
-                </h2>
+              {/* Availability */}
+              <div className="mb-8">
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                  {t("search.availability")}
+                </h3>
                 {groupedSlots.length > 0 ? (
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {groupedSlots.map(({ date, items }) => (
                       <div
                         key={date}
-                        className="flex items-center justify-between border border-gray-200 rounded-lg p-3"
+                        className="flex items-start justify-between bg-white rounded-xl border border-gray-200 p-4"
                       >
-                        <span className="text-gray-900 font-medium">
+                        <div className="text-gray-900 font-medium">
                           {formatDateDDMMYYYY(new Date(date + "T00:00:00Z"))}
-                        </span>
+                        </div>
                         <div className="flex flex-wrap gap-2">
                           {items.map((s, idx) => (
                             <span
                               key={idx}
-                              className="px-2 py-1 rounded-full bg-green-50 text-green-700 text-xs border border-green-200"
+                              className="px-3 py-1 rounded-full bg-green-50 text-green-700 text-xs border border-green-200"
                             >
                               {s.start_time} - {s.end_time}
                             </span>
@@ -197,6 +211,34 @@ export default function AdvertisementPreview({
                   </div>
                 ) : (
                   <p className="text-gray-600">{t("ad.noAvailability")}</p>
+                )}
+              </div>
+
+              {/* Location & extra */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-white rounded-xl border border-gray-200 p-5">
+                  <h3 className="font-semibold text-gray-900 mb-2">
+                    {t("adCreate.location")}
+                  </h3>
+                  <p className="text-gray-700">{ad.location_city}</p>
+                  {locations.length > 0 && (
+                    <p className="text-sm text-gray-500 mt-2">
+                      {t("ad.alsoServes", {
+                        locations: locations.slice(0, 5).join(", "),
+                      })}
+                      {locations.length > 5 ? ` +${locations.length - 5}` : ""}
+                    </p>
+                  )}
+                </div>
+                {ad.additional_info && (
+                  <div className="bg-white rounded-xl border border-gray-200 p-5">
+                    <h3 className="font-semibold text-gray-900 mb-2">
+                      {t("ad.notes")}
+                    </h3>
+                    <p className="text-gray-700 whitespace-pre-wrap">
+                      {ad.additional_info}
+                    </p>
+                  </div>
                 )}
               </div>
             </div>

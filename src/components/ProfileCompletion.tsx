@@ -14,13 +14,28 @@ export default function ProfileCompletion() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [bio, setBio] = useState("");
 
   // Pre-fill name and surname from user metadata when available
   useEffect(() => {
     if (auth0User) {
       const meta: any = auth0User.user_metadata || {};
-      setFirstName(meta.given_name || meta.name || "");
-      setLastName(meta.family_name || "");
+      // Split full name if only name is provided
+      const fullName = meta.name || "";
+      if (fullName && !meta.given_name && !meta.family_name) {
+        // Try to split name into first and last
+        const parts = fullName.trim().split(/\s+/);
+        if (parts.length >= 2) {
+          setFirstName(parts[0]);
+          setLastName(parts.slice(1).join(" "));
+        } else {
+          setFirstName(parts[0] || "");
+          setLastName("");
+        }
+      } else {
+        setFirstName(meta.given_name || "");
+        setLastName(meta.family_name || "");
+      }
     }
   }, [auth0User]);
 
@@ -32,6 +47,15 @@ export default function ProfileCompletion() {
 
     if (!firstName.trim() || !lastName.trim()) {
       setSubmitError("Please enter both your name and surname");
+      return;
+    }
+
+    if (!bio.trim()) {
+      setSubmitError(
+        userType === "parent"
+          ? "Please write a bio about yourself"
+          : "Please write about your experience and yourself"
+      );
       return;
     }
 
@@ -75,6 +99,20 @@ export default function ProfileCompletion() {
       if (!completedUser) {
         setSubmitError("Failed to complete profile");
         return;
+      }
+
+      // Update bio separately (save to both bio and additional_info for compatibility)
+      const { error: bioError } = await supabase
+        .from("users")
+        .update({ 
+          bio: bio.trim(),
+          additional_info: bio.trim() // Also save to additional_info for profile page compatibility
+        })
+        .eq("id", auth0User.id);
+
+      if (bioError) {
+        console.error("Error saving bio:", bioError);
+        // Don't fail the whole process if bio fails
       }
 
       // Redirect to main app
@@ -178,10 +216,19 @@ export default function ProfileCompletion() {
                     <input
                       type="text"
                       value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value.length <= 50) {
+                          setFirstName(value);
+                        }
+                      }}
+                      maxLength={50}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       placeholder="Enter your name"
                     />
+                    <p className="text-xs text-gray-500 mt-1">
+                      {firstName.length}/50 characters
+                    </p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -190,10 +237,19 @@ export default function ProfileCompletion() {
                     <input
                       type="text"
                       value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value.length <= 50) {
+                          setLastName(value);
+                        }
+                      }}
+                      maxLength={50}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       placeholder="Enter your surname"
                     />
+                    <p className="text-xs text-gray-500 mt-1">
+                      {lastName.length}/50 characters
+                    </p>
                   </div>
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -217,10 +273,10 @@ export default function ProfileCompletion() {
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">
                   I am a...
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex gap-4 mb-6">
                   <button
                     onClick={() => setUserType("parent")}
-                    className={`p-6 rounded-xl border-2 transition-all duration-200 ${
+                    className={`flex-1 p-4 rounded-xl border-2 transition-all duration-200 ${
                       userType === "parent"
                         ? "border-purple-600 bg-purple-50 text-purple-900"
                         : "border-gray-200 bg-white text-gray-700 hover:border-gray-300"
@@ -228,7 +284,7 @@ export default function ProfileCompletion() {
                   >
                     <div className="text-center">
                       <svg
-                        className="w-12 h-12 mx-auto mb-3 text-purple-600"
+                        className="w-8 h-8 mx-auto mb-2 text-purple-600"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -240,16 +296,13 @@ export default function ProfileCompletion() {
                           d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
                         />
                       </svg>
-                      <h3 className="font-semibold text-lg">Parent</h3>
-                      <p className="text-sm mt-2">
-                        Looking for childcare services
-                      </p>
+                      <h3 className="font-semibold">Parent</h3>
                     </div>
                   </button>
 
                   <button
                     onClick={() => setUserType("nanny")}
-                    className={`p-6 rounded-xl border-2 transition-all duration-200 ${
+                    className={`flex-1 p-4 rounded-xl border-2 transition-all duration-200 ${
                       userType === "nanny"
                         ? "border-purple-600 bg-purple-50 text-purple-900"
                         : "border-gray-200 bg-white text-gray-700 hover:border-gray-300"
@@ -257,7 +310,7 @@ export default function ProfileCompletion() {
                   >
                     <div className="text-center">
                       <svg
-                        className="w-12 h-12 mx-auto mb-3 text-purple-600"
+                        className="w-8 h-8 mx-auto mb-2 text-purple-600"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -269,13 +322,42 @@ export default function ProfileCompletion() {
                           d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                         />
                       </svg>
-                      <h3 className="font-semibold text-lg">Nanny</h3>
-                      <p className="text-sm mt-2">
-                        Providing childcare services
-                      </p>
+                      <h3 className="font-semibold">Nanny</h3>
                     </div>
                   </button>
                 </div>
+              </div>
+
+              {/* Bio textarea */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {userType === "parent"
+                    ? "Bio about yourself"
+                    : "Short text about your experience and yourself"}
+                </label>
+                <textarea
+                  value={bio}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value.length <= 1000) {
+                      setBio(value);
+                    }
+                  }}
+                  rows={5}
+                  maxLength={1000}
+                  minLength={10}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                  placeholder={
+                    userType === "parent"
+                      ? "Tell us about yourself..."
+                      : "Tell us about your experience and yourself..."
+                  }
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  {bio.length}/1000 characters {bio.length > 0 && bio.length < 10 && (
+                    <span className="text-red-500">(min. 10 characters)</span>
+                  )}
+                </p>
               </div>
 
               {/* Error message */}
@@ -290,7 +372,7 @@ export default function ProfileCompletion() {
                 <button
                   onClick={handleCompleteProfile}
                   disabled={
-                    isSubmitting || !firstName.trim() || !lastName.trim()
+                    isSubmitting || !firstName.trim() || !lastName.trim() || !bio.trim()
                   }
                   className="bg-purple-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-purple-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >

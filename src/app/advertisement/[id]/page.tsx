@@ -211,12 +211,14 @@ export default function AdvertisementDetails({
                       ? t("profile.shortTerm")
                       : t("profile.longTerm")}
                   </span>
-                  <Link
-                    href={`/user/${ad.user_id}`}
-                    className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-full text-sm font-medium border border-white/30 hover:border-white/50"
-                  >
-                    {t("ad.viewProfile")}
-                  </Link>
+                  {user && (
+                    <Link
+                      href={`/user/${ad.user_id}`}
+                      className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-full text-sm font-medium border border-white/30 hover:border-white/50"
+                    >
+                      {t("ad.viewProfile")}
+                    </Link>
+                  )}
                 </div>
               </div>
               <div className="mt-3 flex flex-wrap gap-3 text-sm text-purple-100">
@@ -231,14 +233,17 @@ export default function AdvertisementDetails({
                     {t("ad.perHour")}
                   </span>
                 </span>
-                {ad.type === "long-term" && ad.availability_start_time && ad.availability_end_time && (
-                  <span className="inline-flex items-center gap-1">
-                    <span>⏰</span>
-                    <span>
-                      {ad.availability_start_time} - {ad.availability_end_time}
+                {ad.type === "long-term" &&
+                  ad.availability_start_time &&
+                  ad.availability_end_time && (
+                    <span className="inline-flex items-center gap-1">
+                      <span>⏰</span>
+                      <span>
+                        {ad.availability_start_time} -{" "}
+                        {ad.availability_end_time}
+                      </span>
                     </span>
-                  </span>
-                )}
+                  )}
                 {user?.id === ad.user_id && (
                   <span
                     className={
@@ -377,16 +382,25 @@ export default function AdvertisementDetails({
               {/* Call to action */}
               <div className="mt-8 bg-white rounded-2xl border border-gray-200 p-6">
                 <div className="mb-3 text-gray-800">
-                  {t("ad.lookingGood", {
-                    providerType: owner
-                      ? owner.fullName ||
-                        (ad.type === "short-term"
+                  {owner?.userType === "parent"
+                    ? t("ad.lookingGoodParent")
+                    : user
+                    ? t("ad.lookingGood", {
+                        providerType: owner
+                          ? owner.fullName ||
+                            (ad.type === "short-term"
+                              ? t("common.nanny")
+                              : t("common.parent"))
+                          : ad.type === "short-term"
                           ? t("common.nanny")
-                          : t("common.parent"))
-                      : ad.type === "short-term"
-                      ? t("common.nanny")
-                      : t("common.parent"),
-                  })}
+                          : t("common.parent"),
+                      })
+                    : t("ad.lookingGood", {
+                        providerType:
+                          ad.type === "short-term"
+                            ? t("common.nanny")
+                            : t("common.parent"),
+                      })}
                 </div>
                 <div className="flex flex-wrap gap-3">
                   {(() => {

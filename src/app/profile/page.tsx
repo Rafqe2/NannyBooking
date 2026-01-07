@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { UserService, UserProfile } from "../../lib/userService";
 import { AdvertisementService } from "../../lib/advertisementService";
 import LocationAutocomplete from "../../components/LocationAutocomplete";
@@ -24,6 +25,7 @@ type Advertisement = Database["public"]["Tables"]["advertisements"]["Row"];
 
 export default function ProfilePage() {
   const { user, isLoading } = useSupabaseUser();
+  const router = useRouter();
   const { t, language } = useTranslation();
   const avatarUrl =
     (user?.user_metadata as any)?.avatar_url ||
@@ -84,6 +86,59 @@ export default function ProfilePage() {
   const isParent = userProfile?.user_type === "parent";
   const isNanny = userProfile?.user_type === "nanny";
 
+  // Read tab from URL query parameter - must be before any early returns
+  useEffect(() => {
+    // Read tab from URL query parameter
+    const updateTabFromUrl = () => {
+      if (typeof window !== "undefined") {
+        const params = new URLSearchParams(window.location.search);
+        const tab = params.get("tab");
+        if (
+          tab === "job-ads" ||
+          tab === "bookings" ||
+          tab === "messages" ||
+          tab === "profile"
+        ) {
+          setActiveTab(tab);
+        }
+      }
+    };
+
+    updateTabFromUrl();
+
+    // Listen for popstate events (back/forward navigation)
+    const handlePopState = () => updateTabFromUrl();
+
+    // Listen for custom tab change events from header dropdown
+    const handleTabChange = (e: CustomEvent) => {
+      const tab = e.detail?.tab;
+      if (
+        tab === "job-ads" ||
+        tab === "bookings" ||
+        tab === "messages" ||
+        tab === "profile"
+      ) {
+        setActiveTab(tab);
+      }
+    };
+
+    if (typeof window !== "undefined") {
+      window.addEventListener("popstate", handlePopState);
+      window.addEventListener(
+        "profileTabChange",
+        handleTabChange as EventListener
+      );
+
+      return () => {
+        window.removeEventListener("popstate", handlePopState);
+        window.removeEventListener(
+          "profileTabChange",
+          handleTabChange as EventListener
+        );
+      };
+    }
+  }, []);
+
   useEffect(() => {
     const loadProfile = async () => {
       if (!user?.email) return;
@@ -95,7 +150,7 @@ export default function ProfilePage() {
           setEditForm({
             name: profile.name || "",
             user_type: profile.user_type || "pending",
-            additional_info: profile.additional_info || "",
+            additional_info: profile.additional_info || profile.bio || "",
             phone: profile.phone || "",
             location: profile.location || "",
           });
@@ -1269,23 +1324,46 @@ export default function ProfilePage() {
                   </div>
                 )}
               </div>
-              {selectedBooking.message && (
-                <div>
-                  <div className="text-gray-600 mb-1">
-                    {t("booking.message")}
-                  </div>
-                  <div className="p-2 rounded-lg bg-gray-50 border border-gray-200">
-                    {selectedBooking.message}
-                  </div>
+              {/* Message from parent */}
+              <div>
+                <div className="text-gray-600 mb-1">{t("booking.message")}</div>
+                <div className="p-2 rounded-lg bg-gray-50 border border-gray-200 min-h-[60px]">
+                  {selectedBooking.message ? (
+                    <p className="text-gray-700 whitespace-pre-wrap">
+                      {selectedBooking.message}
+                    </p>
+                  ) : (
+                    <p className="text-gray-400 italic">
+                      {t("booking.noMessage")}
+                    </p>
+                  )}
                 </div>
-              )}
+              </div>
               <div className="flex items-center justify-between">
                 <span className="text-gray-600">
                   {t("booking.counterparty")}
                 </span>
-                <span className="font-medium">
-                  {selectedBooking.counterparty_full_name || "User"}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">
+                    {selectedBooking.counterparty_full_name || "User"}
+                  </span>
+                  {/* Show "View Profile" button for nannies viewing pending bookings from parents */}
+                  {isNanny &&
+                    selectedBooking.status === "pending" &&
+                    selectedBooking.counterparty_id && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(
+                            `/user/${selectedBooking.counterparty_id}`
+                          );
+                        }}
+                        className="px-3 py-1 text-xs bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors border border-purple-200"
+                      >
+                        {t("ad.viewProfile")}
+                      </button>
+                    )}
+                </div>
               </div>
               {selectedBooking.status === "cancelled" &&
                 selectedBooking.cancellation_reason && (
@@ -1326,17 +1404,18 @@ export default function ProfilePage() {
                 )}
             </div>
             <div className="px-5 py-3 border-t border-gray-100 flex justify-between gap-2">
-              {selectedBooking?.status === "completed" && !selectedBooking.has_review && (
-                <button
-                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
-                  onClick={() => {
-                    setReviewingBooking(selectedBooking);
-                    setSelectedBooking(null);
-                  }}
-                >
-                  {t("review.writeReview")}
-                </button>
-              )}
+              {selectedBooking?.status === "completed" &&
+                !selectedBooking.has_review && (
+                  <button
+                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                    onClick={() => {
+                      setReviewingBooking(selectedBooking);
+                      setSelectedBooking(null);
+                    }}
+                  >
+                    {t("review.writeReview")}
+                  </button>
+                )}
               {selectedBooking?.status === "confirmed" &&
                 (() => {
                   const bookingDate = selectedBooking.booking_date;
@@ -1359,7 +1438,10 @@ export default function ProfilePage() {
 
               <div
                 className={(() => {
-                  if (selectedBooking?.status === "completed" && !selectedBooking.has_review) {
+                  if (
+                    selectedBooking?.status === "completed" &&
+                    !selectedBooking.has_review
+                  ) {
                     return ""; // Review button takes space
                   }
                   if (selectedBooking?.status === "confirmed") {
@@ -1401,25 +1483,27 @@ export default function ProfilePage() {
           }}
         />
       )}
-      {reviewingBooking && reviewingBooking.advertisement_id && reviewingBooking.counterparty_id && (
-        <ReviewModal
-          bookingId={reviewingBooking.id}
-          advertisementId={reviewingBooking.advertisement_id}
-          revieweeId={reviewingBooking.counterparty_id}
-          revieweeName={reviewingBooking.counterparty_full_name || "User"}
-          onClose={() => setReviewingBooking(null)}
-          onSuccess={async () => {
-            // Reload bookings after successful review
-            try {
-              const { data: bdata } = await supabase.rpc("get_my_bookings");
-              setBookings((bdata as any[]) || []);
-            } catch (error) {
-              console.error("Error reloading bookings:", error);
-            }
-            setReviewingBooking(null);
-          }}
-        />
-      )}
+      {reviewingBooking &&
+        reviewingBooking.advertisement_id &&
+        reviewingBooking.counterparty_id && (
+          <ReviewModal
+            bookingId={reviewingBooking.id}
+            advertisementId={reviewingBooking.advertisement_id}
+            revieweeId={reviewingBooking.counterparty_id}
+            revieweeName={reviewingBooking.counterparty_full_name || "User"}
+            onClose={() => setReviewingBooking(null)}
+            onSuccess={async () => {
+              // Reload bookings after successful review
+              try {
+                const { data: bdata } = await supabase.rpc("get_my_bookings");
+                setBookings((bdata as any[]) || []);
+              } catch (error) {
+                console.error("Error reloading bookings:", error);
+              }
+              setReviewingBooking(null);
+            }}
+          />
+        )}
     </div>
   );
 
@@ -1581,24 +1665,33 @@ export default function ProfilePage() {
                   <input
                     type="tel"
                     value={editForm.phone}
-                    onChange={(e) =>
-                      setEditForm({ ...editForm, phone: e.target.value })
-                    }
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      // Only allow numbers, spaces, +, -, and parentheses
+                      if (
+                        /^[\d\s\+\-\(\)]*$/.test(value) &&
+                        value.length <= 20
+                      ) {
+                        setEditForm({ ...editForm, phone: value });
+                      }
+                    }}
+                    maxLength={20}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     placeholder="+371 2000 0000"
                   />
+                  <p className="text-xs text-gray-500 mt-1">
+                    {editForm.phone.length}/20 characters
+                  </p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     {t("profile.location")}
                   </label>
-                  <input
-                    type="text"
+                  <LocationAutocomplete
                     value={editForm.location}
-                    onChange={(e) =>
-                      setEditForm({ ...editForm, location: e.target.value })
+                    onChange={(next) =>
+                      setEditForm({ ...editForm, location: next.label })
                     }
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     placeholder="Rīga"
                   />
                 </div>
@@ -1608,13 +1701,17 @@ export default function ProfilePage() {
                   </label>
                   <textarea
                     value={editForm.additional_info}
-                    onChange={(e) =>
-                      setEditForm({
-                        ...editForm,
-                        additional_info: e.target.value,
-                      })
-                    }
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value.length <= 1000) {
+                        setEditForm({
+                          ...editForm,
+                          additional_info: value,
+                        });
+                      }
+                    }}
                     rows={4}
+                    maxLength={1000}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
                     placeholder={
                       userProfile?.user_type === "parent"
@@ -1624,6 +1721,9 @@ export default function ProfilePage() {
                         : t("profile.addBio")
                     }
                   />
+                  <p className="text-xs text-gray-500 mt-1">
+                    {editForm.additional_info.length}/1000 characters
+                  </p>
                 </div>
               </div>
               {/* Removed duplicate Bio section */}
@@ -1799,7 +1899,13 @@ export default function ProfilePage() {
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
+                  onClick={() => {
+                    setActiveTab(tab.id);
+                    // Update URL without page reload
+                    const url = new URL(window.location.href);
+                    url.searchParams.set("tab", tab.id);
+                    window.history.pushState({}, "", url.toString());
+                  }}
                   className={`flex-1 flex items-center justify-center space-x-3 px-4 sm:px-6 py-3 sm:py-4 rounded-xl font-medium transition-all duration-200 text-sm sm:text-base ${
                     activeTab === tab.id
                       ? "bg-purple-600 text-white shadow-md"

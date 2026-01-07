@@ -4,6 +4,7 @@ import { useTranslation } from "./LanguageProvider";
 
 export default function Footer() {
   const { t } = useTranslation();
+
   return (
     <footer className="bg-white border-t border-gray-200">
       <div className="max-w-7xl mx-auto px-8 py-16">

@@ -24,8 +24,6 @@ export default function EditAdvertisement({
   const [locationCity, setLocationCity] = useState("");
   const [skills, setSkills] = useState<string[]>([]);
   const [type, setType] = useState<"short-term" | "long-term">("short-term");
-  const [defaultStart, setDefaultStart] = useState("09:00");
-  const [defaultEnd, setDefaultEnd] = useState("17:00");
   const [extraLocations, setExtraLocations] = useState<string[]>([]);
   const [showLocationsEditor, setShowLocationsEditor] = useState(false);
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
@@ -52,8 +50,6 @@ export default function EditAdvertisement({
         setLocationCity(adData.location_city || "");
         setSkills((adData.skills as any) || []);
         setType((adData.type as any) || "short-term");
-        setDefaultStart(adData.availability_start_time || "09:00");
-        setDefaultEnd(adData.availability_end_time || "17:00");
         // load dates
         const slots = await AdvertisementService.getAvailabilitySlots(
           advertisementId
@@ -115,7 +111,7 @@ export default function EditAdvertisement({
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4" />
-          <p className="text-gray-600">Loading advertisement…</p>
+          <p className="text-gray-600">{t("adEdit.loading")}</p>
         </div>
       </div>
     );
@@ -124,7 +120,7 @@ export default function EditAdvertisement({
   if (error || !ad) {
     return (
       <div className="text-center py-20">
-        <p className="text-gray-700">{error || "Advertisement not found"}</p>
+        <p className="text-gray-700">{error || t("ad.notFound")}</p>
       </div>
     );
   }
@@ -135,12 +131,11 @@ export default function EditAdvertisement({
     <div className="max-w-3xl mx-auto bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-semibold text-gray-900">
-          Edit Advertisement
+          {t("createAd.editTitle")}
         </h1>
         {isActive && (
           <span className="text-sm text-gray-500">
-            Title, type, price, description and skills are locked while active.
-            Availability and locations can be edited.
+            {t("adEdit.lockedWhileActive")}
           </span>
         )}
       </div>
@@ -166,11 +161,23 @@ export default function EditAdvertisement({
           </label>
           <input
             disabled={isActive}
-            type="number"
-            value={pricePerHour}
-            onChange={(e) => setPricePerHour(Number(e.target.value))}
+            type="text"
+            inputMode="decimal"
+            value={pricePerHour === 0 ? "" : pricePerHour}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value === "" || /^\d*\.?\d*$/.test(value)) {
+                const numValue = value === "" ? 0 : parseFloat(value);
+                if (value === "" || (numValue >= 0 && numValue <= 1000)) {
+                  setPricePerHour(numValue);
+                }
+              }
+            }}
             className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-50"
           />
+          <p className="text-xs text-gray-500 mt-1">
+            {pricePerHour > 0 ? `€${pricePerHour.toFixed(2)}` : "Enter price"} (max: €1000)
+          </p>
         </div>
         <div className="md:col-span-2">
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -180,9 +187,20 @@ export default function EditAdvertisement({
             disabled={isActive}
             type="text"
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value.length <= 100) {
+                setTitle(value);
+              }
+            }}
+            maxLength={100}
             className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-50"
           />
+          <p className="text-xs text-gray-500 mt-1">
+            {title.length}/100 {title.length < 6 && (
+              <span className="text-red-500">(min. 6 characters)</span>
+            )}
+          </p>
         </div>
         <div className="md:col-span-2">
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -192,9 +210,18 @@ export default function EditAdvertisement({
             disabled={isActive}
             rows={3}
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value.length <= 2000) {
+                setDescription(value);
+              }
+            }}
+            maxLength={2000}
             className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-50"
           />
+          <p className="text-xs text-gray-500 mt-1">
+            {description.length}/2000 characters
+          </p>
         </div>
         <div className="md:col-span-2">
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -236,16 +263,15 @@ export default function EditAdvertisement({
       <div className="mt-6">
         <div className="flex items-center justify-between">
           <label className="block text-sm font-medium text-gray-700">
-            Additional locations
+            {t("adEdit.additionalLocations")}
           </label>
           <div className="text-sm text-gray-500">
             {extraLocations.filter((x) => (x || "").trim().length > 0).length >
             0
-              ? `${
-                  extraLocations.filter((x) => (x || "").trim().length > 0)
-                    .length
-                } added`
-              : "None"}
+              ? t("adEdit.locationsAdded", {
+                  count: extraLocations.filter((x) => (x || "").trim().length > 0).length,
+                })
+              : t("adEdit.none")}
           </div>
         </div>
         {!showLocationsEditor ? (
@@ -259,7 +285,7 @@ export default function EditAdvertisement({
               }}
               className="px-4 py-2 border rounded-lg text-sm hover:bg-gray-50 disabled:opacity-60"
             >
-              Add location
+              {t("adEdit.addLocation")}
             </button>
           </div>
         ) : (
@@ -275,7 +301,7 @@ export default function EditAdvertisement({
                     next[idx] = e.target.value;
                     setExtraLocations(next);
                   }}
-                  placeholder="City, country or street"
+                  placeholder={t("adEdit.locationPlaceholder")}
                   className="flex-1 px-3 py-2 border rounded-lg disabled:bg-gray-50"
                 />
                 <button
@@ -287,7 +313,7 @@ export default function EditAdvertisement({
                   }}
                   className="px-3 py-2 border rounded-lg text-sm hover:bg-gray-50 disabled:opacity-60"
                 >
-                  Remove
+                  {t("adEdit.remove")}
                 </button>
               </div>
             ))}
@@ -298,7 +324,7 @@ export default function EditAdvertisement({
                 onClick={() => setExtraLocations([...extraLocations, ""])}
                 className="px-4 py-2 border rounded-lg text-sm hover:bg-gray-50 disabled:opacity-60"
               >
-                Add another location
+                {t("adEdit.addAnotherLocation")}
               </button>
             )}
             <div>
@@ -307,7 +333,7 @@ export default function EditAdvertisement({
                 onClick={() => setShowLocationsEditor(false)}
                 className="mt-2 px-4 py-2 bg-gray-100 rounded-lg text-sm hover:bg-gray-200"
               >
-                Done
+                {t("adEdit.done")}
               </button>
             </div>
           </div>
@@ -317,36 +343,35 @@ export default function EditAdvertisement({
       {/* Availability */}
       {type === "short-term" && (
         <div className="mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Default start
-              </label>
-              <input
-                disabled={false}
-                type="time"
-                value={defaultStart}
-                onChange={(e) => setDefaultStart(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-50"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Default end
-              </label>
-              <input
-                disabled={false}
-                type="time"
-                value={defaultEnd}
-                onChange={(e) => setDefaultEnd(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-50"
-              />
-            </div>
-          </div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+            {t("adCreate.availabilitySchedule")}
+          </h2>
+          <p className="text-sm text-gray-600 mb-4">
+            {t("adCreate.selectDatesAndTimes")} ({t("adCreate.max5Dates")})
+          </p>
           <div className={"mt-4"}>
             <MultiDatePicker
               selectedDates={selectedDates}
-              onChange={setSelectedDates}
+              onChange={(dates) => {
+                // Limit to 5 dates
+                const limitedDates = dates.slice(0, 5);
+                setSelectedDates(limitedDates);
+                // Remove times for dates that were removed
+                if (limitedDates.length < dates.length) {
+                  const limitedKeys = new Set(
+                    limitedDates.map((d) => toLocalYYYYMMDD(d))
+                  );
+                  setPerDateTimes((prev) => {
+                    const n = { ...prev };
+                    Object.keys(n).forEach((key) => {
+                      if (!limitedKeys.has(key)) {
+                        delete n[key];
+                      }
+                    });
+                    return n;
+                  });
+                }
+              }}
               minDate={(() => {
                 const d = new Date();
                 d.setHours(0, 0, 0, 0);
@@ -354,18 +379,19 @@ export default function EditAdvertisement({
               })()}
               onSelectedDateClick={() => {}}
               perDateTimes={perDateTimes}
-              defaultStartTime={defaultStart}
-              defaultEndTime={defaultEnd}
+              defaultStartTime="09:00"
+              defaultEndTime="17:00"
               onUpdateDateTime={onUpdateDateTime}
               onRemoveDate={onRemoveDate}
               initialMonthDate={selectedDates[0] || new Date()}
+              autoOpenTimeEditor={true}
             />
           </div>
           {selectedDates.length > 0 && (
             <div className="mt-4 p-4 border border-gray-200 rounded-xl bg-white">
               <div className="flex items-center justify-between mb-2">
                 <div className="text-sm font-medium text-gray-900">
-                  Selected dates
+                  {t("adCreate.selectedDates")} ({selectedDates.length}/5)
                 </div>
                 <button
                   type="button"
@@ -373,43 +399,65 @@ export default function EditAdvertisement({
                   onClick={clearAllDates}
                   className="text-red-600 hover:text-red-700 text-sm disabled:opacity-50"
                 >
-                  Clear all
+                  {t("adEdit.clearAll")}
                 </button>
               </div>
-              <ul className="space-y-1 text-sm text-gray-700">
+              <ul className="space-y-1.5">
                 {selectedDates
                   .slice()
                   .sort((a, b) => a.getTime() - b.getTime())
                   .map((d) => {
                     const key = toLocalYYYYMMDD(d);
                     const ov = perDateTimes[key];
-                    const start = ov?.start || defaultStart;
-                    const end = ov?.end || defaultEnd;
+                    const start = ov?.start || "09:00";
+                    const end = ov?.end || "17:00";
                     return (
                       <li
                         key={key}
-                        className="flex items-center justify-between"
+                        className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 hover:bg-gray-100 transition-colors"
                       >
-                        <span>{formatDateDDMMYYYY(d)}</span>
-                        <div className="flex items-center">
-                          <span className="text-gray-600">
-                            {start} - {end}
-                          </span>
-                          <button
-                            type="button"
-                            disabled={false}
-                            onClick={() => removeDateCompletely(d)}
-                            title="Remove this date"
-                            aria-label="Remove date"
-                            className="ml-3 inline-flex items-center justify-center w-6 h-6 rounded-full border border-red-300 text-red-600 hover:bg-red-50 hover:text-red-700 disabled:opacity-50"
-                          >
-                            ✕
-                          </button>
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          <div className="text-sm font-medium text-gray-900 whitespace-nowrap">
+                            {formatDateDDMMYYYY(d)}
+                          </div>
+                          <div className="text-xs text-gray-600 flex items-center gap-1">
+                            <span>🕐</span>
+                            <span className="font-mono">
+                              {start} - {end}
+                            </span>
+                          </div>
                         </div>
+                        <button
+                          type="button"
+                          disabled={false}
+                          onClick={() => removeDateCompletely(d)}
+                          title={t("adCreate.removeDate")}
+                          aria-label={t("adCreate.removeDate")}
+                          className="ml-2 text-gray-400 hover:text-red-600 transition-colors p-1 rounded"
+                        >
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </button>
                       </li>
                     );
                   })}
               </ul>
+              {selectedDates.length >= 5 && (
+                <div className="text-xs text-amber-600 mt-2">
+                  {t("adCreate.maxReached")}
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -424,7 +472,7 @@ export default function EditAdvertisement({
           }}
           className="px-5 py-2 border rounded-lg"
         >
-          Cancel
+          {t("adEdit.cancel")}
         </button>
         <button
           type="button"
@@ -439,8 +487,8 @@ export default function EditAdvertisement({
                 description: description as any,
                 location_city: locationCity as any,
                 skills: skills as any,
-                availability_start_time: defaultStart as any,
-                availability_end_time: defaultEnd as any,
+                availability_start_time: "09:00" as any,
+                availability_end_time: "17:00" as any,
                 type: type as any,
               } as any);
               // replace locations
@@ -459,8 +507,8 @@ export default function EditAdvertisement({
                   const ov = perDateTimes[key];
                   return {
                     available_date: key,
-                    start_time: (ov?.start || defaultStart) as any,
-                    end_time: (ov?.end || defaultEnd) as any,
+                    start_time: (ov?.start || "09:00") as any,
+                    end_time: (ov?.end || "17:00") as any,
                   };
                 });
                 await AdvertisementService.replaceAvailabilitySlots(
@@ -483,7 +531,7 @@ export default function EditAdvertisement({
           }}
           className="px-5 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50"
         >
-          {saving ? "Saving…" : "Save"}
+          {saving ? t("adEdit.saving") : t("adEdit.save")}
         </button>
       </div>
     </div>

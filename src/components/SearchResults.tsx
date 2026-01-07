@@ -379,37 +379,70 @@ export default function SearchResults({
                   } catch {}
                 }}
               >
-                <div className="p-6 h-full flex flex-col">
-                  {/* Header - Price and Rating */}
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                      <span className="text-2xl font-bold text-purple-600">
-                        €{ad.hourlyRate}
-                      </span>
-                      <span className="text-sm text-gray-500 mt-1">
-                        {t("ad.perHour")}
-                      </span>
-                    </div>
-                    {ad.ownerRating !== undefined && (
-                      <div className="flex items-center gap-1 bg-yellow-50 px-2 py-1 rounded-lg">
-                        <span className="text-yellow-500">⭐</span>
-                        <span className="text-sm font-medium text-gray-700">
-                          {Number(ad.ownerRating).toFixed(1)}
-                        </span>
-                        <span className="text-xs text-gray-500">
-                          ({ad.ownerReviewsCount || 0})
-                        </span>
+                <div className="h-full flex flex-col">
+                  {/* Header - Title, Pricing, Location, and Rating */}
+                  <div className="bg-gray-50 px-6 pt-5 pb-4 border-b border-gray-200">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        {/* Title */}
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-purple-600 transition-colors">
+                          {ad.title}
+                        </h3>
+                        {/* Pricing */}
+                        <div className="flex items-baseline gap-2 mb-2">
+                          <span className="text-2xl font-bold text-purple-600">
+                            €{ad.hourlyRate}
+                          </span>
+                          <span className="text-sm text-gray-500">
+                            {t("ad.perHour")}
+                          </span>
+                        </div>
+                        {/* Location */}
+                        <div className="flex items-center gap-1 text-sm text-gray-600">
+                          <span>📍</span>
+                          <span className="truncate">
+                            {ad.location}
+                            {ad.locations && ad.locations.length > 0 && (
+                              <span className="ml-1">+{ad.locations.length}</span>
+                            )}
+                          </span>
+                        </div>
                       </div>
-                    )}
+                      {/* Rating Stars - Right Side */}
+                      {ad.ownerRating !== undefined && (
+                        <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                          <div className="flex items-center gap-1">
+                            {[...Array(5)].map((_, i) => (
+                              <span
+                                key={i}
+                                className={`text-lg ${
+                                  i < Math.round(Number(ad.ownerRating))
+                                    ? "text-yellow-400"
+                                    : "text-gray-300"
+                                }`}
+                              >
+                                ★
+                              </span>
+                            ))}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <span className="text-sm font-semibold text-gray-900">
+                              {Number(ad.ownerRating).toFixed(1)}
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              ({ad.ownerReviewsCount || 0})
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
-
-                  {/* Title */}
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3 line-clamp-2 group-hover:text-purple-600 transition-colors">
-                    {ad.title}
-                  </h3>
+                  
+                  {/* Content */}
+                  <div className="p-6 flex-1 flex flex-col">
 
                   {/* Owner Profile */}
-                  {(ad.ownerFullName || ad.ownerRating !== undefined) && (
+                  {user && (ad.ownerFullName || ad.ownerRating !== undefined) && (
                     <div className="flex items-center gap-3 mb-4">
                       <div className="w-12 h-12 rounded-full overflow-hidden bg-gradient-to-br from-purple-100 to-purple-200 flex items-center justify-center text-purple-700 font-semibold flex-shrink-0">
                         {ad.ownerPicture ? (
@@ -428,12 +461,6 @@ export default function SearchResults({
                       <div className="flex-1 min-w-0">
                         <div className="font-medium text-gray-900 truncate">
                           {ad.ownerFullName || "—"}
-                        </div>
-                        <div className="text-sm text-gray-500 truncate">
-                          📍 {ad.location}
-                          {ad.locations && ad.locations.length > 0 && (
-                            <span className="ml-1">+{ad.locations.length}</span>
-                          )}
                         </div>
                         {ad.ownerMemberSince && (
                           <div className="text-xs text-gray-400">
@@ -549,23 +576,24 @@ export default function SearchResults({
                     </div>
                   )}
 
-                  {/* Action Button */}
-                  <div className="mt-auto pt-4">
-                    <div className="w-full bg-purple-600 text-white py-3 px-4 rounded-xl font-medium text-center group-hover:bg-purple-700 transition-colors duration-200 flex items-center justify-center gap-2">
-                      <span>{t("ad.viewDetails")}</span>
-                      <svg
-                        className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 5l7 7-7 7"
-                        />
-                      </svg>
+                    {/* Action Button */}
+                    <div className="mt-auto pt-4">
+                      <div className="w-full bg-purple-600 text-white py-3 px-4 rounded-xl font-medium text-center group-hover:bg-purple-700 transition-colors duration-200 flex items-center justify-center gap-2">
+                        <span>{t("ad.viewDetails")}</span>
+                        <svg
+                          className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
+                      </div>
                     </div>
                   </div>
                 </div>

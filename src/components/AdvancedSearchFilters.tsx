@@ -162,17 +162,20 @@ export default function AdvancedSearchFilters({
                       {t("search.min")}
                     </label>
                     <input
-                      type="number"
+                      type="text"
+                      inputMode="decimal"
                       value={localFilters.priceMin ?? ""}
-                      onChange={(e) =>
-                        handleLocalChange(
-                          "priceMin",
-                          e.target.value ? Number(e.target.value) : null
-                        )
-                      }
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === "" || /^\d*\.?\d*$/.test(value)) {
+                          const numValue = value === "" ? null : parseFloat(value);
+                          if (value === "" || (numValue !== null && numValue >= 0 && numValue <= 1000)) {
+                            handleLocalChange("priceMin", numValue);
+                          }
+                        }
+                      }}
                       placeholder="0"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                      min="0"
                     />
                   </div>
                   <div>
@@ -180,17 +183,20 @@ export default function AdvancedSearchFilters({
                       {t("search.max")}
                     </label>
                     <input
-                      type="number"
+                      type="text"
+                      inputMode="decimal"
                       value={localFilters.priceMax ?? ""}
-                      onChange={(e) =>
-                        handleLocalChange(
-                          "priceMax",
-                          e.target.value ? Number(e.target.value) : null
-                        )
-                      }
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === "" || /^\d*\.?\d*$/.test(value)) {
+                          const numValue = value === "" ? null : parseFloat(value);
+                          if (value === "" || (numValue !== null && numValue >= 0 && numValue <= 1000)) {
+                            handleLocalChange("priceMax", numValue);
+                          }
+                        }
+                      }}
                       placeholder="100"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                      min="0"
                     />
                   </div>
                 </div>

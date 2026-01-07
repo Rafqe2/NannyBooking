@@ -84,6 +84,18 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
 
   const handleDateSelect = useCallback(
     (date: Date) => {
+      // Check if clicking the same date as startDate - deselect it
+      if (startDate && !endDate) {
+        const clickedDateStr = date.toDateString();
+        const startDateStr = startDate.toDateString();
+        if (clickedDateStr === startDateStr) {
+          // Deselect the date
+          setStartDate(null);
+          setEndDate(null);
+          return;
+        }
+      }
+      
       // Allow selecting today (no past date restriction)
       if (!startDate || (startDate && endDate)) {
         setStartDate(date);

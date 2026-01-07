@@ -288,6 +288,113 @@ export const translations = {
     lv: 'Atjaunināt Sludinājumu',
     ru: 'Обновить Объявление'
   },
+  'createAd.errorTitleTooShort': {
+    en: 'Title must be at least 6 characters long',
+    lv: 'Nosaukumam jābūt vismaz 6 rakstzīmēm garam',
+    ru: 'Название должно содержать не менее 6 символов'
+  },
+  'createAd.errorSelectLocation': {
+    en: 'Please select a location',
+    lv: 'Lūdzu, izvēlieties atrašanās vietu',
+    ru: 'Пожалуйста, выберите местоположение'
+  },
+  'createAd.errorPriceGreaterThanZero': {
+    en: 'Price per hour must be greater than 0',
+    lv: 'Cena stundā jābūt lielākai par 0',
+    ru: 'Цена за час должна быть больше 0'
+  },
+  'createAd.errorStartTimeBeforeEnd': {
+    en: 'Start time must be earlier than end time',
+    lv: 'Sākuma laikam jābūt agrākam nekā beigu laikam',
+    ru: 'Время начала должно быть раньше времени окончания'
+  },
+  'createAd.requiredSkills': {
+    en: 'Required Skills',
+    lv: 'Nepieciešamās Prasmes',
+    ru: 'Требуемые Навыки'
+  },
+  'createAd.selectRequiredSkills': {
+    en: 'Select the skills that are necessary for this position',
+    lv: 'Izvēlieties prasmes, kas nepieciešamas šai pozīcijai',
+    ru: 'Выберите навыки, необходимые для этой позиции'
+  },
+  'createAd.selectYourSkills': {
+    en: 'Select the skills you offer',
+    lv: 'Izvēlieties prasmes, ko piedāvājat',
+    ru: 'Выберите навыки, которые вы предлагаете'
+  },
+
+  // Edit Advertisement
+  'adEdit.loading': {
+    en: 'Loading advertisement…',
+    lv: 'Ielādē sludinājumu…',
+    ru: 'Загрузка объявления…'
+  },
+  'adEdit.lockedWhileActive': {
+    en: 'Title, type, price, description and skills are locked while active. Availability and locations can be edited.',
+    lv: 'Nosaukums, veids, cena, apraksts un prasmes ir bloķēti, kamēr aktīvs. Pieejamību un atrašanās vietas var rediģēt.',
+    ru: 'Название, тип, цена, описание и навыки заблокированы, пока активно. Доступность и местоположения можно редактировать.'
+  },
+  'adEdit.additionalLocations': {
+    en: 'Additional locations',
+    lv: 'Papildu atrašanās vietas',
+    ru: 'Дополнительные местоположения'
+  },
+  'adEdit.locationsAdded': {
+    en: '{{count}} added',
+    lv: 'Pievienoti {{count}}',
+    ru: 'Добавлено {{count}}'
+  },
+  'adEdit.none': {
+    en: 'None',
+    lv: 'Nav',
+    ru: 'Нет'
+  },
+  'adEdit.addLocation': {
+    en: 'Add location',
+    lv: 'Pievienot atrašanās vietu',
+    ru: 'Добавить местоположение'
+  },
+  'adEdit.locationPlaceholder': {
+    en: 'City, country or street',
+    lv: 'Pilsēta, valsts vai iela',
+    ru: 'Город, страна или улица'
+  },
+  'adEdit.remove': {
+    en: 'Remove',
+    lv: 'Noņemt',
+    ru: 'Удалить'
+  },
+  'adEdit.addAnotherLocation': {
+    en: 'Add another location',
+    lv: 'Pievienot vēl vienu atrašanās vietu',
+    ru: 'Добавить еще одно местоположение'
+  },
+  'adEdit.done': {
+    en: 'Done',
+    lv: 'Gatavs',
+    ru: 'Готово'
+  },
+  'adEdit.clearAll': {
+    en: 'Clear all',
+    lv: 'Notīrīt visu',
+    ru: 'Очистить все'
+  },
+  'adEdit.cancel': {
+    en: 'Cancel',
+    lv: 'Atcelt',
+    ru: 'Отмена'
+  },
+  'adEdit.saving': {
+    en: 'Saving…',
+    lv: 'Saglabā…',
+    ru: 'Сохранение…'
+  },
+  'adEdit.save': {
+    en: 'Save',
+    lv: 'Saglabāt',
+    ru: 'Сохранить'
+  },
 
   // Booking Modal
   'bookingModal.title': {
@@ -703,9 +810,9 @@ export const translations = {
     ru: 'Совет: Нажмите для выбора/отмены дат, двойной клик для редактирования времени.'
   },
   'calendar.dayNames': {
-    en: 'Su,Mo,Tu,We,Th,Fr,Sa',
-    lv: 'Sv,Pr,Ot,Tr,Ce,Pk,Se',
-    ru: 'Вс,Пн,Вт,Ср,Чт,Пт,Сб'
+    en: 'Mo,Tu,We,Th,Fr,Sa,Su',
+    lv: 'Pr,Ot,Tr,Ce,Pk,Se,Sv',
+    ru: 'Пн,Вт,Ср,Чт,Пт,Сб,Вс'
   },
 
   // Profile Page
@@ -1146,9 +1253,14 @@ export const translations = {
     ru: 'Выбранные даты'
   },
   'booking.message': {
-    en: 'Message (optional)',
-    lv: 'Ziņojums (nav obligāts)',
-    ru: 'Сообщение (по желанию)'
+    en: 'Message',
+    lv: 'Ziņojums',
+    ru: 'Сообщение'
+  },
+  'booking.noMessage': {
+    en: 'No message provided',
+    lv: 'Nav pievienots ziņojums',
+    ru: 'Сообщение не предоставлено'
   },
   'booking.messagePlaceholder': {
     en: 'Add a message to introduce yourself or explain your needs...',
@@ -1471,6 +1583,11 @@ export const translations = {
     en: 'Looking good? You should book and contact the {{providerType}}.',
     lv: 'Izskatās labi? Jums vajadzētu rezervēt un sazināties ar {{providerType}}.',
     ru: 'Выглядит хорошо? Вам стоит забронировать и связаться с {{providerType}}.'
+  },
+  'ad.lookingGoodParent': {
+    en: 'Looking good? You should Offer Your services.',
+    lv: 'Izskatās labi? Jums vajadzētu piedāvāt savus pakalpojumus.',
+    ru: 'Выглядит хорошо? Вам стоит предложить свои услуги.'
   },
   'ad.book': {
     en: 'Book',

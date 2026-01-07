@@ -106,17 +106,17 @@ export default function CreateAdvertisement() {
 
     // Client-side validation with user-facing messages
     if (formData.title.trim().length < 6) {
-      setError("Title must be at least 6 characters long");
+      setError(t("adCreate.errorTitleTooShort"));
       setIsSubmitting(false);
       return;
     }
     if (!formData.location.city || formData.location.city.trim().length < 2) {
-      setError("Please select a location");
+      setError(t("adCreate.errorSelectLocation"));
       setIsSubmitting(false);
       return;
     }
     if (formData.pricePerHour <= 0) {
-      setError("Price per hour must be greater than 0");
+      setError(t("adCreate.errorPriceGreaterThanZero"));
       setIsSubmitting(false);
       return;
     }
@@ -126,7 +126,7 @@ export default function CreateAdvertisement() {
       formData.availability.endTime &&
       formData.availability.startTime >= formData.availability.endTime
     ) {
-      setError("Start time must be earlier than end time");
+      setError(t("adCreate.errorStartTimeBeforeEnd"));
       setIsSubmitting(false);
       return;
     }
@@ -312,33 +312,54 @@ export default function CreateAdvertisement() {
               <input
                 type="text"
                 value={formData.title}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, title: e.target.value }))
-                }
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value.length <= 100) {
+                    setFormData((prev) => ({ ...prev, title: value }));
+                  }
+                }}
                 placeholder={titlePlaceholder}
+                minLength={6}
+                maxLength={100}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 required
               />
+              <p className="text-xs text-gray-500 mt-1">
+                {formData.title.length}/100 {formData.title.length < 6 && (
+                  <span className="text-red-500">
+                    (min. 6 characters)
+                  </span>
+                )}
+              </p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 {priceLabel}
               </label>
               <input
-                type="number"
-                value={formData.pricePerHour}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    pricePerHour: Number(e.target.value),
-                  }))
-                }
+                type="text"
+                inputMode="decimal"
+                value={formData.pricePerHour === 0 ? "" : formData.pricePerHour}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  // Only allow numbers and one decimal point
+                  if (value === "" || /^\d*\.?\d*$/.test(value)) {
+                    const numValue = value === "" ? 0 : parseFloat(value);
+                    if (value === "" || (numValue >= 0 && numValue <= 1000)) {
+                      setFormData((prev) => ({
+                        ...prev,
+                        pricePerHour: numValue,
+                      }));
+                    }
+                  }
+                }}
                 placeholder="25"
-                min="0"
-                step="0.50"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 required
               />
+              <p className="text-xs text-gray-500 mt-1">
+                {formData.pricePerHour > 0 ? `€${formData.pricePerHour.toFixed(2)}` : "Enter price"} (max: €1000)
+              </p>
             </div>
           </div>
 
@@ -574,31 +595,32 @@ export default function CreateAdvertisement() {
 
           {/* Skills */}
           <div>
-            {!isParent && (
-              <>
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                  {t("adCreate.skills")}
-                </h2>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  {availableSkills.map((skill) => (
-                    <label
-                      key={skill}
-                      className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={formData.skills.includes(skill)}
-                        onChange={() => handleSkillToggle(skill)}
-                        className="mr-2"
-                      />
-                      <span className="text-sm">
-                        {getTranslatedSkill(skill, language)}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </>
-            )}
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              {isParent ? t("adCreate.requiredSkills") : t("adCreate.skills")}
+            </h2>
+            <p className="text-sm text-gray-600 mb-4">
+              {isParent
+                ? t("adCreate.selectRequiredSkills")
+                : t("adCreate.selectYourSkills")}
+            </p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {availableSkills.map((skill) => (
+                <label
+                  key={skill}
+                  className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                >
+                  <input
+                    type="checkbox"
+                    checked={formData.skills.includes(skill)}
+                    onChange={() => handleSkillToggle(skill)}
+                    className="mr-2"
+                  />
+                  <span className="text-sm">
+                    {getTranslatedSkill(skill, language)}
+                  </span>
+                </label>
+              ))}
+            </div>
           </div>
 
           {/* Experience */}
@@ -608,10 +630,14 @@ export default function CreateAdvertisement() {
             </label>
             <textarea
               value={formData.experience}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, experience: e.target.value }))
-              }
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value.length <= 1000) {
+                  setFormData((prev) => ({ ...prev, experience: value }));
+                }
+              }}
               rows={4}
+              maxLength={1000}
               placeholder={
                 isParent
                   ? "List key requirements (e.g., experience with infants, Latvian/Russian speaking, driving license)."
@@ -620,6 +646,9 @@ export default function CreateAdvertisement() {
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
               required
             />
+            <p className="text-xs text-gray-500 mt-1">
+              {formData.experience.length}/1000 characters
+            </p>
           </div>
 
           {/* Description */}
@@ -629,13 +658,17 @@ export default function CreateAdvertisement() {
             </label>
             <textarea
               value={formData.description}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  description: e.target.value,
-                }))
-              }
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value.length <= 2000) {
+                  setFormData((prev) => ({
+                    ...prev,
+                    description: value,
+                  }));
+                }
+              }}
               rows={4}
+              maxLength={2000}
               placeholder={
                 isParent
                   ? "Describe your family, schedule, duties, and expectations."
@@ -644,6 +677,9 @@ export default function CreateAdvertisement() {
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
               required
             />
+            <p className="text-xs text-gray-500 mt-1">
+              {formData.description.length}/2000 characters
+            </p>
           </div>
 
           {/* Additional Information */}
@@ -653,16 +689,23 @@ export default function CreateAdvertisement() {
             </label>
             <textarea
               value={formData.additionalInfo}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  additionalInfo: e.target.value,
-                }))
-              }
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value.length <= 500) {
+                  setFormData((prev) => ({
+                    ...prev,
+                    additionalInfo: value,
+                  }));
+                }
+              }}
               rows={3}
+              maxLength={500}
               placeholder={t("adCreate.additionalInfoPlaceholder")}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
             />
+            <p className="text-xs text-gray-500 mt-1">
+              {formData.additionalInfo.length}/500 characters
+            </p>
           </div>
 
           {/* Error Message */}

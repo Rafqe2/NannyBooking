@@ -10,19 +10,56 @@ export interface CreateBookingInput {
 
 export class BookingService {
   static async createBooking(input: CreateBookingInput): Promise<{success: true, id: string} | {success: false, error: string}> {
-    const { data, error } = await supabase.rpc("create_booking_from_ad", {
-      p_ad_id: input.adId,
-      p_date: input.date,
-      p_start: input.start,
-      p_end: input.end,
-      p_message: input.message ?? null,
-    });
-    if (error) {
+    try {
+      const { data, error } = await supabase.rpc("create_booking_from_ad", {
+        p_ad_id: input.adId,
+        p_date: input.date,
+        p_start: input.start,
+        p_end: input.end,
+        p_message: input.message ?? null,
+      });
+      if (error) {
+        // eslint-disable-next-line no-console
+        console.error("createBooking error - full error object:", JSON.stringify(error, null, 2));
+        console.error("createBooking error - error.message:", error.message);
+        console.error("createBooking error - error.details:", error.details);
+        console.error("createBooking error - error.hint:", error.hint);
+        console.error("createBooking error - error.code:", error.code);
+        
+        // Handle different error formats - Supabase errors have a message property
+        let errorMessage = 'Failed to create booking. Please try again.';
+        
+        if (error.message) {
+          errorMessage = error.message;
+        } else if (error.details) {
+          errorMessage = error.details;
+        } else if (error.hint) {
+          errorMessage = error.hint;
+        } else if (typeof error === 'string') {
+          errorMessage = error;
+        } else {
+          // Try to extract message from error object
+          const errorStr = JSON.stringify(error);
+          if (errorStr && errorStr !== '{}') {
+            errorMessage = errorStr;
+          }
+        }
+        
+        return { success: false, error: errorMessage };
+      }
+      if (!data) {
+        return { success: false, error: 'No booking ID returned from server' };
+      }
+      return { success: true, id: data as string };
+    } catch (e: any) {
       // eslint-disable-next-line no-console
-      console.error("createBooking error", error);
-      return { success: false, error: error.message || 'Unknown error' };
+      console.error("createBooking exception", e);
+      const errorMsg = e?.message || e?.toString() || JSON.stringify(e) || 'Failed to create booking. Please try again.';
+      return { 
+        success: false, 
+        error: errorMsg
+      };
     }
-    return { success: true, id: data as string };
   }
 
   static async respond(bookingId: string, action: "confirm" | "cancel"): Promise<boolean> {
