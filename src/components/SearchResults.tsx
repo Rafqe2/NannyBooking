@@ -421,19 +421,25 @@ export default function SearchResults({
                       {/* Rating Stars - Right Side */}
                       {ad.ownerRating !== undefined && (
                         <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                          <div className="flex items-center gap-1">
-                            {[...Array(5)].map((_, i) => (
-                              <span
-                                key={i}
-                                className={`text-lg ${
-                                  i < Math.round(Number(ad.ownerRating))
-                                    ? "text-yellow-400"
-                                    : "text-gray-300"
-                                }`}
-                              >
-                                ★
-                              </span>
-                            ))}
+                          <div className="flex items-center gap-0.5">
+                            {[1, 2, 3, 4, 5].map((star) => {
+                              const rounded = Math.round(Number(ad.ownerRating) * 2) / 2;
+                              const isFull = rounded >= star;
+                              const isHalf = !isFull && rounded >= star - 0.5;
+                              return (
+                                <span key={star} className="relative inline-block text-lg leading-none">
+                                  <span className="text-gray-300">★</span>
+                                  {(isFull || isHalf) && (
+                                    <span
+                                      className="absolute inset-0 overflow-hidden text-yellow-400"
+                                      style={{ width: isHalf ? '50%' : '100%' }}
+                                    >
+                                      ★
+                                    </span>
+                                  )}
+                                </span>
+                              );
+                            })}
                           </div>
                           <div className="flex items-center gap-1">
                             <span className="text-sm font-semibold text-gray-900">

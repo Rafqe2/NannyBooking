@@ -98,10 +98,29 @@ export default function UserProfile({
                         ))}
                       </span>
                     )}
-                    {typeof profile.rating === "number" && (
-                      <span>
-                        ⭐ {Number(profile.rating).toFixed(1)} (
-                        {profile.reviews_count || 0})
+                    {typeof profile.rating === "number" && Number(profile.rating) > 0 && (
+                      <span className="flex items-center gap-1.5">
+                        <span className="flex items-center gap-0.5">
+                          {[1, 2, 3, 4, 5].map((star) => {
+                            const rounded = Math.round(Number(profile.rating) * 2) / 2;
+                            const isFull = rounded >= star;
+                            const isHalf = !isFull && rounded >= star - 0.5;
+                            return (
+                              <span key={star} className="relative inline-block text-sm leading-none">
+                                <span className="text-gray-300">★</span>
+                                {(isFull || isHalf) && (
+                                  <span
+                                    className="absolute inset-0 overflow-hidden text-yellow-400"
+                                    style={{ width: isHalf ? '50%' : '100%' }}
+                                  >
+                                    ★
+                                  </span>
+                                )}
+                              </span>
+                            );
+                          })}
+                        </span>
+                        <span>{Number(profile.rating).toFixed(1)} ({profile.reviews_count || 0})</span>
                       </span>
                     )}
                   </div>

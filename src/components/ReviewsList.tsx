@@ -97,29 +97,30 @@ export default function ReviewsList({
     }));
   };
 
+  const starPath = "M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z";
+
   const renderStars = (rating: number) => {
+    const rounded = Math.round(rating * 2) / 2;
     return (
       <div className="flex items-center gap-0.5">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <svg
-            key={star}
-            className={`w-5 h-5 ${
-              star <= rating
-                ? "text-yellow-400 fill-yellow-400"
-                : "text-gray-300"
-            }`}
-            fill={star <= rating ? "currentColor" : "none"}
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
-            />
-          </svg>
-        ))}
+        {[1, 2, 3, 4, 5].map((star) => {
+          const isFull = rounded >= star;
+          const isHalf = !isFull && rounded >= star - 0.5;
+          return (
+            <div key={star} className="relative w-5 h-5">
+              <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={starPath} />
+              </svg>
+              {(isFull || isHalf) && (
+                <div className="absolute inset-0 overflow-hidden" style={{ width: isHalf ? '50%' : '100%' }}>
+                  <svg className="w-5 h-5 text-yellow-400 fill-yellow-400" fill="currentColor" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={starPath} />
+                  </svg>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
     );
   };
@@ -145,7 +146,7 @@ export default function ReviewsList({
                   {stats.average_rating.toFixed(1)}
                 </span>
                 <div>
-                  {renderStars(Math.round(stats.average_rating))}
+                  {renderStars(stats.average_rating)}
                   <p className="text-sm text-purple-700 mt-1">
                     {t("review.basedOn", { count: stats.total_reviews })}
                   </p>

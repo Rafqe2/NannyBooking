@@ -648,6 +648,11 @@ export const translations = {
     lv: 'Tālāk',
     ru: 'Далее'
   },
+  'common.page': {
+    en: 'Page',
+    lv: 'Lapa',
+    ru: 'Страница'
+  },
   'common.previous': {
     en: 'Previous',
     lv: 'Iepriekšējais',
@@ -2270,6 +2275,16 @@ export const translations = {
     en: 'Was this helpful?',
     lv: 'Vai tas bija noderīgi?',
     ru: 'Было ли это полезно?'
+  },
+  'review.reviewed': {
+    en: 'Reviewed',
+    lv: 'Novērtēts',
+    ru: 'Отзыв оставлен'
+  },
+  'review.reviews': {
+    en: 'Reviews',
+    lv: 'Atsauksmes',
+    ru: 'Отзывы'
   },
 
   // ===== ADVANCED SEARCH FILTERS =====

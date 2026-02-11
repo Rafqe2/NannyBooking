@@ -739,7 +739,7 @@ export default function ProfilePage() {
                     );
                     const noSlots = ad.type === "short-term" && slots.length === 0;
                     return (allExpired || noSlots) ? (
-                      <div className="text-xs text-amber-600 mt-1">
+                      <div className="text-xs text-amber-600 mt-1 text-right">
                         {t("ad.expiredDates")}
                       </div>
                     ) : null;
@@ -1575,7 +1575,6 @@ export default function ProfilePage() {
         />
       )}
       {reviewingBooking &&
-        reviewingBooking.advertisement_id &&
         reviewingBooking.counterparty_id && (
           <ReviewModal
             bookingId={reviewingBooking.id}

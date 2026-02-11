@@ -26,6 +26,8 @@ interface Owner {
   memberSince: string | null;
   picture: string | null;
   userType: "parent" | "nanny" | "pending" | null;
+  rating: number;
+  reviewsCount: number;
 }
 
 export default function AdvertisementDetails({
@@ -71,6 +73,8 @@ export default function AdvertisementDetails({
             memberSince: ownerData.member_since || null,
             picture: ownerData.picture || null,
             userType: (ownerData.user_type as any) ?? null,
+            rating: Number(ownerData.rating || 0),
+            reviewsCount: Number(ownerData.reviews_count || 0),
           });
         } else {
           setOwner({
@@ -78,6 +82,8 @@ export default function AdvertisementDetails({
             memberSince: null,
             picture: null,
             userType: null,
+            rating: 0,
+            reviewsCount: 0,
           });
         }
 
@@ -244,6 +250,31 @@ export default function AdvertisementDetails({
                       </span>
                     </span>
                   )}
+                {owner && owner.rating > 0 && (
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="flex items-center gap-0.5">
+                      {[1, 2, 3, 4, 5].map((star) => {
+                        const rounded = Math.round(owner.rating * 2) / 2;
+                        const isFull = rounded >= star;
+                        const isHalf = !isFull && rounded >= star - 0.5;
+                        return (
+                          <span key={star} className="relative inline-block text-sm leading-none">
+                            <span className="text-purple-300/50">★</span>
+                            {(isFull || isHalf) && (
+                              <span
+                                className="absolute inset-0 overflow-hidden text-yellow-300"
+                                style={{ width: isHalf ? '50%' : '100%' }}
+                              >
+                                ★
+                              </span>
+                            )}
+                          </span>
+                        );
+                      })}
+                    </span>
+                    <span className="text-white">{owner.rating.toFixed(1)} ({owner.reviewsCount})</span>
+                  </span>
+                )}
                 {user?.id === ad.user_id && (
                   <span
                     className={
@@ -448,6 +479,8 @@ export default function AdvertisementDetails({
               </div>
             </div>
           </div>
+
+          {/* Reviews Section removed - stars shown in header only */}
         </div>
         {showBooking && user && (
           <BookingModal

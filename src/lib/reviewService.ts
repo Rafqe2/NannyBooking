@@ -2,7 +2,7 @@ import { supabase } from "./supabase";
 
 export interface Review {
   id: string;
-  advertisement_id: string;
+  advertisement_id: string | null;
   reviewer_id: string;
   reviewee_id: string;
   booking_id: string | null;
@@ -36,7 +36,7 @@ export interface RatingStats {
 
 export interface CreateReviewInput {
   bookingId: string;
-  advertisementId: string;
+  advertisementId: string | null;
   revieweeId: string;
   rating: number;
   title?: string;
@@ -62,18 +62,22 @@ export class ReviewService {
         return { success: false, error: "Not authenticated" };
       }
 
-      const { data, error } = await supabase
-        .from("reviews")
-        .insert({
+      const insertData: Record<string, unknown> = {
           booking_id: input.bookingId,
-          advertisement_id: input.advertisementId,
           reviewer_id: userData.user.id,
           reviewee_id: input.revieweeId,
           rating: input.rating,
           title: input.title || null,
           comment: input.comment,
-          is_verified: true, // Since it's from a booking
-        })
+          is_verified: true,
+      };
+      if (input.advertisementId) {
+        insertData.advertisement_id = input.advertisementId;
+      }
+
+      const { data, error } = await supabase
+        .from("reviews")
+        .insert(insertData)
         .select()
         .single();
 

@@ -6,7 +6,7 @@ import { useTranslation } from "./LanguageProvider";
 
 interface ReviewModalProps {
   bookingId: string;
-  advertisementId: string;
+  advertisementId: string | null;
   revieweeId: string;
   revieweeName: string;
   onClose: () => void;
