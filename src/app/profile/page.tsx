@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { UserService, UserProfile } from "../../lib/userService";
 import { AdvertisementService } from "../../lib/advertisementService";
@@ -20,8 +20,27 @@ import CancelBookingModal from "../../components/CancelBookingModal";
 import ReviewModal from "../../components/ReviewModal";
 import { useTranslation } from "../../components/LanguageProvider";
 import { getTranslatedSkill } from "../../lib/constants/skills";
+import { MessageService, Conversation, Message as ChatMessage } from "../../lib/messageService";
 
 type Advertisement = Database["public"]["Tables"]["advertisements"]["Row"];
+
+interface BookingItem {
+  id: string;
+  booking_date: string | null;
+  start_time: string | null;
+  end_time: string | null;
+  status: "pending" | "confirmed" | "completed" | "cancelled";
+  message: string | null;
+  has_review: boolean;
+  counterparty_full_name: string | null;
+  counterparty_id: string | null;
+  advertisement_id: string | null;
+  cancellation_reason: string | null;
+  cancellation_note: string | null;
+  cancelled_at: string | null;
+  parent_id: string;
+  nanny_id: string;
+}
 
 export default function ProfilePage() {
   const { user, isLoading } = useSupabaseUser();
@@ -33,9 +52,11 @@ export default function ProfilePage() {
     null;
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [advertisements, setAdvertisements] = useState<Advertisement[]>([]);
+  const [adSlotsMap, setAdSlotsMap] = useState<Record<string, { available_date: string }[]>>({});
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: "error" | "success" } | null>(null);
   const [activeTab, setActiveTab] = useState<
     "job-ads" | "bookings" | "messages" | "profile"
   >("job-ads");
@@ -51,7 +72,7 @@ export default function ProfilePage() {
   );
   const [isSavingAd, setIsSavingAd] = useState(false);
   const [previewAdId, setPreviewAdId] = useState<string | null>(null);
-  const [bookings, setBookings] = useState<any[]>([]);
+  const [bookings, setBookings] = useState<BookingItem[]>([]);
   const [pendingBookings, setPendingBookings] = useState<number>(0);
   const [selectedCalendarDate, setSelectedCalendarDate] = useState<
     string | null
@@ -62,11 +83,57 @@ export default function ProfilePage() {
   const [bookingView, setBookingView] = useState<"upcoming" | "past">(
     "upcoming"
   );
-  const [selectedBooking, setSelectedBooking] = useState<any | null>(null);
-  const [cancellingBooking, setCancellingBooking] = useState<any | null>(null);
-  const [reviewingBooking, setReviewingBooking] = useState<any | null>(null);
+  const [selectedBooking, setSelectedBooking] = useState<BookingItem | null>(null);
+  const [cancellingBooking, setCancellingBooking] = useState<BookingItem | null>(null);
+  const [reviewingBooking, setReviewingBooking] = useState<BookingItem | null>(null);
+  const [respondingBookingId, setRespondingBookingId] = useState<string | null>(null);
   const [currentBookingPage, setCurrentBookingPage] = useState(1);
   const bookingsPerPage = 4;
+
+  // Messaging state
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [activeConversation, setActiveConversation] = useState<string | null>(null);
+  const [conversationMessages, setConversationMessages] = useState<ChatMessage[]>([]);
+  const [messageInput, setMessageInput] = useState("");
+  const [sendingMessage, setSendingMessage] = useState(false);
+  const [unreadMessageCount, setUnreadMessageCount] = useState(0);
+  const [loadingMessages, setLoadingMessages] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Auto-dismiss toast after 4 seconds
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 4000);
+    return () => clearTimeout(t);
+  }, [toast]);
+
+  const filteredBookings = useMemo(() => {
+    const todayKey = new Date();
+    todayKey.setHours(0, 0, 0, 0);
+    const toKey = (s?: string | null) =>
+      s ? new Date(s + "T00:00:00") : null;
+    const base = selectedCalendarDate ? selectedDateBookings : bookings;
+    return base.filter((b) => {
+      const d = toKey(b.booking_date);
+      if (!d) return bookingView === "upcoming";
+      const isPast = d < todayKey;
+      const isUpcoming = d >= todayKey;
+      if (bookingView === "past") {
+        if (b.status === "cancelled") return isPast;
+        return isPast;
+      } else {
+        if (b.status === "cancelled") return false;
+        return isUpcoming;
+      }
+    });
+  }, [bookings, selectedCalendarDate, selectedDateBookings, bookingView]);
+
+  const totalBookingPages = Math.ceil(filteredBookings.length / bookingsPerPage);
+  const paginatedBookings = filteredBookings.slice(
+    (currentBookingPage - 1) * bookingsPerPage,
+    currentBookingPage * bookingsPerPage
+  );
+
   const [isDeleting, setIsDeleting] = useState(false);
   const [adEditForm, setAdEditForm] = useState({
     title: "",
@@ -173,8 +240,24 @@ export default function ProfilePage() {
               profile.id
             );
             setAdvertisements(userAds);
+            // Load availability slots for short-term ads to check expiration
+            const slotsMap: Record<string, { available_date: string }[]> = {};
+            for (const ad of userAds) {
+              if (ad.type === "short-term") {
+                const slots = await AdvertisementService.getAvailabilitySlots(ad.id);
+                slotsMap[ad.id] = slots;
+              }
+            }
+            setAdSlotsMap(slotsMap);
           } catch {
             setAdvertisements(userAds);
+          }
+
+          // Auto-complete confirmed bookings with past dates
+          try {
+            await supabase.rpc("auto_complete_past_bookings");
+          } catch (err) {
+            console.error("Error auto-completing bookings:", err);
           }
 
           // Load bookings + pending count
@@ -182,12 +265,10 @@ export default function ProfilePage() {
             const { data: bdata, error: berror } = await supabase.rpc(
               "get_my_bookings"
             );
-            console.log("Bookings data:", bdata); // Debug log
-            console.log("Bookings error:", berror); // Debug log
             if (berror) {
               console.error("Error loading bookings:", berror);
             }
-            setBookings((bdata as any[]) || []);
+            setBookings((bdata as BookingItem[]) || []);
           } catch (error) {
             console.error("Exception loading bookings:", error);
           }
@@ -215,6 +296,89 @@ export default function ProfilePage() {
       loadProfile();
     }
   }, [user, isLoading]);
+
+  // Messaging: load conversations when messages tab is active
+  useEffect(() => {
+    if (activeTab !== "messages" || !userProfile?.id) return;
+    let active = true;
+    const loadConversations = async () => {
+      const convs = await MessageService.getConversations(userProfile.id);
+      if (active) setConversations(convs);
+    };
+    loadConversations();
+    const interval = setInterval(loadConversations, 15000);
+    return () => { active = false; clearInterval(interval); };
+  }, [activeTab, userProfile?.id]);
+
+  // Messaging: load messages for active conversation
+  useEffect(() => {
+    if (!activeConversation) return;
+    let active = true;
+    const loadMessages = async () => {
+      setLoadingMessages(true);
+      const msgs = await MessageService.getMessages(activeConversation);
+      if (active) {
+        setConversationMessages(msgs);
+        setLoadingMessages(false);
+        await MessageService.markAsRead(activeConversation);
+      }
+    };
+    loadMessages();
+    const interval = setInterval(loadMessages, 10000);
+    return () => { active = false; clearInterval(interval); };
+  }, [activeConversation]);
+
+  // Messaging: auto-scroll to bottom
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [conversationMessages]);
+
+  // Messaging: poll unread count
+  useEffect(() => {
+    if (!user?.id) return;
+    let active = true;
+    const loadUnread = async () => {
+      const count = await MessageService.getUnreadCount();
+      if (active) setUnreadMessageCount(count);
+    };
+    loadUnread();
+    const interval = setInterval(loadUnread, 30000);
+    return () => { active = false; clearInterval(interval); };
+  }, [user?.id]);
+
+  const handleSendMessage = useCallback(async () => {
+    if (!activeConversation || !messageInput.trim() || sendingMessage) return;
+    setSendingMessage(true);
+    const msg = await MessageService.sendMessage(activeConversation, messageInput.trim());
+    if (msg) {
+      setConversationMessages((prev) => [...prev, msg]);
+      setMessageInput("");
+    }
+    setSendingMessage(false);
+  }, [activeConversation, messageInput, sendingMessage]);
+
+  const handleSendTemplate = useCallback(async (text: string) => {
+    if (!activeConversation || sendingMessage) return;
+    setSendingMessage(true);
+    const msg = await MessageService.sendMessage(activeConversation, text, true);
+    if (msg) {
+      setConversationMessages((prev) => [...prev, msg]);
+    }
+    setSendingMessage(false);
+  }, [activeConversation, sendingMessage]);
+
+  const formatMessageTime = useCallback((dateStr: string) => {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const yesterday = new Date(today.getTime() - 86400000);
+    const msgDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+    const time = date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    if (msgDate.getTime() === today.getTime()) return time;
+    if (msgDate.getTime() === yesterday.getTime()) return `${t("messages.yesterday")} ${time}`;
+    return `${formatDateDDMMYYYY(date)} ${time}`;
+  }, [t, language]);
 
   // Redirect to login if not authenticated
   if (isLoading) {
@@ -351,7 +515,7 @@ export default function ProfilePage() {
       label: t("profile.bookings"),
       icon: pendingBookings > 0 ? "⚠️" : "📅",
     },
-    { id: "messages", label: t("profile.messages"), icon: "💬" },
+    { id: "messages", label: t("profile.messages") + (unreadMessageCount > 0 ? ` (${unreadMessageCount})` : ""), icon: "💬" },
     { id: "profile", label: t("profile.profile"), icon: "👤" },
   ] as const;
 
@@ -476,7 +640,7 @@ export default function ProfilePage() {
                               p_active: false,
                             });
                             if (error) {
-                              console.error("RPC deactivate error:", error);
+                              setToast({ message: t("common.error"), type: "error" });
                               return;
                             }
                             const userAds =
@@ -489,43 +653,53 @@ export default function ProfilePage() {
                         >
                           {t("ad.deactivate")}
                         </button>
-                      ) : (
-                        <button
-                          onClick={async () => {
-                            const anotherActive = advertisements.some(
-                              (a) => a.is_active
-                            );
-                            if (anotherActive) return;
-                            const { error } = await supabase.rpc("ad_toggle", {
-                              p_ad_id: ad.id,
-                              p_active: true,
-                            });
-                            if (error) {
-                              console.error("RPC activate error:", error);
-                              return;
-                            }
-                            const userAds =
-                              await AdvertisementService.getUserAdvertisements(
-                                userProfile!.id
-                              );
-                            setAdvertisements(userAds);
-                          }}
-                          disabled={advertisements.some((a) => a.is_active)}
-                          title={
-                            advertisements.some((a) => a.is_active)
-                              ? t("ad.anotherActive")
-                              : ""
-                          }
-                          className={
-                            `inline-flex items-center px-3 py-1.5 rounded-lg border text-sm font-medium ` +
-                            (advertisements.some((a) => a.is_active)
-                              ? "text-gray-400 border-gray-300 cursor-not-allowed"
-                              : "text-green-700 border-green-600 hover:bg-green-50")
-                          }
-                        >
-                          {t("ad.activate")}
-                        </button>
-                      )}
+                      ) : (() => {
+                        const anotherActive = advertisements.some((a) => a.is_active);
+                        const slots = adSlotsMap[ad.id] || [];
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        const allExpired = ad.type === "short-term" && slots.length > 0 && slots.every(
+                          (s) => new Date(s.available_date + "T00:00:00") < today
+                        );
+                        const noSlots = ad.type === "short-term" && slots.length === 0;
+                        const blocked = anotherActive || allExpired || noSlots;
+                        return (
+                            <button
+                              onClick={async () => {
+                                if (blocked) return;
+                                const { error } = await supabase.rpc("ad_toggle", {
+                                  p_ad_id: ad.id,
+                                  p_active: true,
+                                });
+                                if (error) {
+                                  setToast({ message: t("common.error"), type: "error" });
+                                  return;
+                                }
+                                const userAds =
+                                  await AdvertisementService.getUserAdvertisements(
+                                    userProfile!.id
+                                  );
+                                setAdvertisements(userAds);
+                              }}
+                              disabled={blocked}
+                              title={
+                                anotherActive
+                                  ? t("ad.anotherActive")
+                                  : allExpired || noSlots
+                                  ? t("ad.expiredDates")
+                                  : ""
+                              }
+                              className={
+                                `inline-flex items-center px-3 py-1.5 rounded-lg border text-sm font-medium ` +
+                                (blocked
+                                  ? "text-gray-400 border-gray-300 cursor-not-allowed"
+                                  : "text-green-700 border-green-600 hover:bg-green-50")
+                              }
+                            >
+                              {t("ad.activate")}
+                            </button>
+                        );
+                      })()}
                       {!ad.is_active && (
                         <button
                           onClick={async () => {
@@ -556,6 +730,20 @@ export default function ProfilePage() {
                       )}
                     </div>
                   </div>
+                  {!ad.is_active && (() => {
+                    const slots = adSlotsMap[ad.id] || [];
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    const allExpired = ad.type === "short-term" && slots.length > 0 && slots.every(
+                      (s) => new Date(s.available_date + "T00:00:00") < today
+                    );
+                    const noSlots = ad.type === "short-term" && slots.length === 0;
+                    return (allExpired || noSlots) ? (
+                      <div className="text-xs text-amber-600 mt-1">
+                        {t("ad.expiredDates")}
+                      </div>
+                    ) : null;
+                  })()}
 
                   <p
                     className={`mb-4 line-clamp-3 ${
@@ -900,97 +1088,14 @@ export default function ProfilePage() {
                 </div>
               ) : (
                 <div className="h-[304px] flex flex-col justify-between">
-                  <div
-                    className={(() => {
-                      const todayKey = new Date();
-                      todayKey.setHours(0, 0, 0, 0);
-                      const toKey = (s?: string | null) =>
-                        s ? new Date(s + "T00:00:00") : null;
-                      const base = selectedCalendarDate
-                        ? selectedDateBookings
-                        : bookings;
-                      const filtered = base.filter((b) => {
-                        // Always exclude declined bookings
-                        if (b.status === "declined") return false;
-
-                        const d = toKey(b.booking_date);
-                        if (!d) return bookingView === "upcoming";
-
-                        const isPast = d < todayKey;
-                        const isUpcoming = d >= todayKey;
-
-                        if (bookingView === "past") {
-                          // Always show cancelled bookings in past view, regardless of original date
-                          if (b.status === "cancelled") return true;
-                          // Show other past bookings
-                          return isPast;
-                        } else {
-                          // Upcoming view: exclude cancelled bookings, show others
-                          if (b.status === "cancelled") return false;
-                          return isUpcoming;
-                        }
-                      });
-                      const split = filtered;
-                      const totalPages = Math.ceil(
-                        split.length / bookingsPerPage
-                      );
-
-                      return totalPages > 1 ? "space-y-2" : "space-y-3";
-                    })()}
-                  >
-                    {(() => {
-                      const todayKey = new Date();
-                      todayKey.setHours(0, 0, 0, 0);
-                      const toKey = (s?: string | null) =>
-                        s ? new Date(s + "T00:00:00") : null;
-                      const base = selectedCalendarDate
-                        ? selectedDateBookings
-                        : bookings;
-                      const filtered = base.filter((b) => {
-                        // Always exclude declined bookings
-                        if (b.status === "declined") return false;
-
-                        const d = toKey(b.booking_date);
-                        if (!d) return bookingView === "upcoming";
-
-                        const isPast = d < todayKey;
-                        const isUpcoming = d >= todayKey;
-
-                        if (bookingView === "past") {
-                          // Always show cancelled bookings in past view, regardless of original date
-                          if (b.status === "cancelled") return true;
-                          // Show other past bookings
-                          return isPast;
-                        } else {
-                          // Upcoming view: exclude cancelled bookings, show others
-                          if (b.status === "cancelled") return false;
-                          return isUpcoming;
-                        }
-                      });
-                      const split = filtered;
-
-                      // Pagination logic
-                      const totalPages = Math.ceil(
-                        split.length / bookingsPerPage
-                      );
-                      const startIndex =
-                        (currentBookingPage - 1) * bookingsPerPage;
-                      const endIndex = startIndex + bookingsPerPage;
-                      const paginatedBookings = split.slice(
-                        startIndex,
-                        endIndex
-                      );
-
-                      return (
-                        <>
-                          {paginatedBookings.map((b) => (
+                  <div className={totalBookingPages > 1 ? "space-y-2" : "space-y-3"}>
+                          {paginatedBookings.map((b: any) => (
                             <div
                               key={b.id}
                               onClick={() => setSelectedBooking(b)}
                               className={`w-full text-left flex items-center justify-between border border-gray-200 rounded-2xl bg-white hover:shadow-sm transition-shadow cursor-pointer ${
-                                totalPages > 1 ? "p-3" : "p-5"
+                                totalBookingPages > 1 ? "p-3" : "p-5"
                               }`}
-                              title="View details"
                             >
                               <div className="flex items-center gap-5">
                                 <div className="text-gray-900 font-medium text-base">
@@ -1001,7 +1106,7 @@ export default function ProfilePage() {
                                     : "No date"}
                                 </div>
                                 <div className="text-sm text-gray-600">
-                                  with {b.counterparty_full_name || "User"}
+                                  {t("booking.bookingWith")} {b.counterparty_full_name || t("common.user")}
                                 </div>
                               </div>
                               <div className="flex items-center gap-3">
@@ -1038,42 +1143,61 @@ export default function ProfilePage() {
                                       onClick={(e) => e.stopPropagation()}
                                     >
                                       <button
+                                        disabled={respondingBookingId === b.id}
                                         onClick={async () => {
-                                          const success =
-                                            await BookingService.respond(
-                                              b.id,
-                                              "confirm"
-                                            );
-                                          if (success) {
-                                            // Reload bookings
-                                            const { data: bdata } =
-                                              await supabase.rpc(
-                                                "get_my_bookings"
+                                          setRespondingBookingId(b.id);
+                                          try {
+                                            const success =
+                                              await BookingService.respond(
+                                                b.id,
+                                                "confirm"
                                               );
-                                            setBookings((bdata as any[]) || []);
+                                            if (success) {
+                                              try {
+                                                await MessageService.getOrCreateConversation(b.id);
+                                                if (userProfile?.id) {
+                                                  const convs = await MessageService.getConversations(userProfile.id);
+                                                  setConversations(convs);
+                                                }
+                                              } catch (err) {
+                                                console.error("Error creating conversation:", err);
+                                              }
+                                              const { data: bdata } =
+                                                await supabase.rpc(
+                                                  "get_my_bookings"
+                                                );
+                                              setBookings((bdata as BookingItem[]) || []);
+                                            }
+                                          } finally {
+                                            setRespondingBookingId(null);
                                           }
                                         }}
-                                        className="text-xs px-2.5 py-1 rounded-full bg-green-50 text-green-700 border border-green-200 hover:bg-green-100"
+                                        className="text-xs px-2.5 py-1 rounded-full bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 disabled:opacity-50"
                                       >
-                                        {t("booking.accept")}
+                                        {respondingBookingId === b.id ? "..." : t("booking.accept")}
                                       </button>
                                       <button
+                                        disabled={respondingBookingId === b.id}
                                         onClick={async () => {
-                                          const success =
-                                            await BookingService.respond(
-                                              b.id,
-                                              "cancel"
-                                            );
-                                          if (success) {
-                                            // Reload bookings
-                                            const { data: bdata } =
-                                              await supabase.rpc(
-                                                "get_my_bookings"
+                                          setRespondingBookingId(b.id);
+                                          try {
+                                            const success =
+                                              await BookingService.respond(
+                                                b.id,
+                                                "cancel"
                                               );
-                                            setBookings((bdata as any[]) || []);
+                                            if (success) {
+                                              const { data: bdata } =
+                                                await supabase.rpc(
+                                                  "get_my_bookings"
+                                                );
+                                              setBookings((bdata as BookingItem[]) || []);
+                                            }
+                                          } finally {
+                                            setRespondingBookingId(null);
                                           }
                                         }}
-                                        className="text-xs px-2.5 py-1 rounded-full bg-red-50 text-red-700 border border-red-200 hover:bg-red-100"
+                                        className="text-xs px-2.5 py-1 rounded-full bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 disabled:opacity-50"
                                       >
                                         {t("booking.decline")}
                                       </button>
@@ -1089,117 +1213,84 @@ export default function ProfilePage() {
                                         {t("booking.pending")}
                                       </span>
                                       <button
+                                        disabled={respondingBookingId === b.id}
                                         onClick={async () => {
-                                          const success =
-                                            await BookingService.respond(
-                                              b.id,
-                                              "cancel"
-                                            );
-                                          if (success) {
-                                            // Reload bookings
-                                            const { data: bdata } =
-                                              await supabase.rpc(
-                                                "get_my_bookings"
+                                          setRespondingBookingId(b.id);
+                                          try {
+                                            const success =
+                                              await BookingService.respond(
+                                                b.id,
+                                                "cancel"
                                               );
-                                            setBookings((bdata as any[]) || []);
+                                            if (success) {
+                                              const { data: bdata } =
+                                                await supabase.rpc(
+                                                  "get_my_bookings"
+                                                );
+                                              setBookings((bdata as BookingItem[]) || []);
+                                            }
+                                          } finally {
+                                            setRespondingBookingId(null);
                                           }
                                         }}
-                                        className="text-xs px-2.5 py-1 rounded-full bg-red-50 text-red-700 border border-red-200 hover:bg-red-100"
+                                        className="text-xs px-2.5 py-1 rounded-full bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 disabled:opacity-50"
                                       >
-                                        {t("booking.cancel")}
+                                        {respondingBookingId === b.id ? "..." : t("booking.cancel")}
                                       </button>
                                     </div>
                                   )}
                               </div>
                             </div>
                           ))}
-                        </>
-                      );
-                    })()}
                   </div>
 
                   {/* Pagination always at bottom */}
-                  {(() => {
-                    const todayKey = new Date();
-                    todayKey.setHours(0, 0, 0, 0);
-                    const toKey = (s?: string | null) =>
-                      s ? new Date(s + "T00:00:00") : null;
-                    const base = selectedCalendarDate
-                      ? selectedDateBookings
-                      : bookings;
-                    const filtered = base.filter((b) => {
-                      // Always exclude declined bookings
-                      if (b.status === "declined") return false;
+                  {totalBookingPages > 1 ? (
+                    <div className="flex items-center justify-center gap-1 mt-2">
+                      <button
+                        onClick={() =>
+                          setCurrentBookingPage((prev) =>
+                            Math.max(prev - 1, 1)
+                          )
+                        }
+                        disabled={currentBookingPage === 1}
+                        className="px-2 py-1 text-xs border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {t("common.back")}
+                      </button>
 
-                      const d = toKey(b.booking_date);
-                      if (!d) return bookingView === "upcoming";
+                      <div className="flex gap-1">
+                        {Array.from(
+                          { length: totalBookingPages },
+                          (_, i) => i + 1
+                        ).map((page) => (
+                          <button
+                            key={page}
+                            onClick={() => setCurrentBookingPage(page)}
+                            className={`px-2 py-1 text-xs rounded-md ${
+                              currentBookingPage === page
+                                ? "bg-purple-600 text-white"
+                                : "border hover:bg-gray-50"
+                            }`}
+                          >
+                            {page}
+                          </button>
+                        ))}
+                      </div>
 
-                      const isPast = d < todayKey;
-                      const isUpcoming = d >= todayKey;
-
-                      if (bookingView === "past") {
-                        // Show cancelled bookings in past if they're actually past dates
-                        if (b.status === "cancelled") return isPast;
-                        // Show other past bookings
-                        return isPast;
-                      } else {
-                        // Upcoming view: exclude cancelled bookings, show others
-                        if (b.status === "cancelled") return false;
-                        return isUpcoming;
-                      }
-                    });
-                    const split = filtered;
-                    const totalPages = Math.ceil(
-                      split.length / bookingsPerPage
-                    );
-
-                    return totalPages > 1 ? (
-                      <div className="flex items-center justify-center gap-1 mt-2">
-                        <button
-                          onClick={() =>
-                            setCurrentBookingPage((prev) =>
-                              Math.max(prev - 1, 1)
-                            )
-                          }
-                          disabled={currentBookingPage === 1}
-                          className="px-2 py-1 text-xs border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          Previous
-                        </button>
-
-                        <div className="flex gap-1">
-                          {Array.from(
-                            { length: totalPages },
-                            (_, i) => i + 1
-                          ).map((page) => (
-                            <button
-                              key={page}
-                              onClick={() => setCurrentBookingPage(page)}
-                              className={`px-2 py-1 text-xs rounded-md ${
-                                currentBookingPage === page
-                                  ? "bg-purple-600 text-white"
-                                  : "border hover:bg-gray-50"
-                              }`}
-                            >
-                              {page}
-                            </button>
-                          ))}
-                        </div>
-
-                        <button
-                          onClick={() =>
-                            setCurrentBookingPage((prev) =>
-                              Math.min(prev + 1, totalPages)
-                            )
-                          }
-                          disabled={currentBookingPage === totalPages}
-                          className="px-2 py-1 text-xs border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          Next
+                      <button
+                        onClick={() =>
+                          setCurrentBookingPage((prev) =>
+                            Math.min(prev + 1, totalBookingPages)
+                          )
+                        }
+                        disabled={currentBookingPage === totalBookingPages}
+                        className="px-2 py-1 text-xs border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                          {t("common.next")}
                         </button>
                       </div>
-                    ) : null;
-                  })()}
+                    ) : null}
                 </div>
               )}
             </div>
@@ -1476,7 +1567,7 @@ export default function ProfilePage() {
             // Reload bookings after successful cancellation
             try {
               const { data: bdata } = await supabase.rpc("get_my_bookings");
-              setBookings((bdata as any[]) || []);
+              setBookings((bdata as BookingItem[]) || []);
             } catch (error) {
               console.error("Error reloading bookings:", error);
             }
@@ -1496,7 +1587,7 @@ export default function ProfilePage() {
               // Reload bookings after successful review
               try {
                 const { data: bdata } = await supabase.rpc("get_my_bookings");
-                setBookings((bdata as any[]) || []);
+                setBookings((bdata as BookingItem[]) || []);
               } catch (error) {
                 console.error("Error reloading bookings:", error);
               }
@@ -1507,65 +1598,201 @@ export default function ProfilePage() {
     </div>
   );
 
-  const renderMessagesTab = () => (
-    <div className="space-y-6">
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-        {/* Header */}
-        <div className="px-8 py-6 border-b border-gray-100 bg-gray-50">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-semibold text-gray-900">Messages</h2>
-              <p className="text-gray-600 mt-1">
-                {userProfile?.user_type === "parent"
-                  ? "Communicate with your childcare providers"
-                  : userProfile?.user_type === "nanny"
-                  ? "Communicate with families and clients"
-                  : "Complete your profile to get started"}
+  const renderMessagesTab = () => {
+    const activeConvData = conversations.find((c) => c.id === activeConversation);
+    const templates = [
+      t("messages.template1"),
+      t("messages.template2"),
+      t("messages.template3"),
+    ];
+
+    return (
+      <div className="space-y-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+          {conversations.length === 0 ? (
+            /* Empty State */
+            <div className="text-center py-16 px-8">
+              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                {t("messages.noConversations")}
+              </h3>
+              <p className="text-gray-600 max-w-md mx-auto">
+                {t("messages.noConversationsDesc")}
               </p>
             </div>
-            <button className="bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 transition-colors duration-200 shadow-sm">
-              New Message
-            </button>
-          </div>
-        </div>
+          ) : (
+            /* Conversation Layout */
+            <div className="flex flex-col md:flex-row h-auto md:h-[600px]">
+              {/* Left sidebar - conversation list */}
+              <div className="w-full md:w-80 border-b md:border-b-0 md:border-r border-gray-200 overflow-y-auto flex-shrink-0 max-h-60 md:max-h-none">
+                {conversations.map((conv) => (
+                  <button
+                    key={conv.id}
+                    onClick={() => setActiveConversation(conv.id)}
+                    className={`w-full text-left px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition-colors ${
+                      activeConversation === conv.id ? "bg-purple-50 border-l-4 border-l-purple-600" : ""
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      {/* Avatar */}
+                      {conv.counterparty_picture ? (
+                        <img
+                          src={conv.counterparty_picture}
+                          alt=""
+                          className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
+                          <span className="text-purple-600 font-semibold text-sm">
+                            {(conv.counterparty_name || "?")[0].toUpperCase()}
+                          </span>
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium text-gray-900 text-sm truncate">
+                            {conv.counterparty_name}
+                          </span>
+                          {conv.unread_count > 0 && (
+                            <span className="bg-purple-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0">
+                              {conv.unread_count}
+                            </span>
+                          )}
+                        </div>
+                        {conv.last_message && (
+                          <p className="text-xs text-gray-500 truncate mt-0.5">
+                            {conv.last_message}
+                          </p>
+                        )}
+                        {conv.booking_date && (
+                          <p className="text-xs text-gray-400 mt-0.5">
+                            {t("messages.bookingOn")} {formatDateDDMMYYYY(new Date(conv.booking_date + "T00:00:00"))}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
 
-        {/* Content */}
-        <div className="p-6 sm:p-8">
-          {/* Empty State */}
-          <div className="text-center py-12">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg
-                className="w-8 h-8 text-blue-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                />
-              </svg>
+              {/* Right panel - messages */}
+              <div className="flex-1 flex flex-col min-w-0">
+                {!activeConversation ? (
+                  <div className="flex-1 flex items-center justify-center text-gray-400 text-sm">
+                    {t("messages.selectConversation")}
+                  </div>
+                ) : (
+                  <>
+                    {/* Conversation header */}
+                    {activeConvData && (
+                      <div className="px-4 py-3 border-b border-gray-200 bg-gray-50 flex items-center gap-3">
+                        {activeConvData.counterparty_picture ? (
+                          <img
+                            src={activeConvData.counterparty_picture}
+                            alt=""
+                            className="w-8 h-8 rounded-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
+                            <span className="text-purple-600 font-semibold text-xs">
+                              {(activeConvData.counterparty_name || "?")[0].toUpperCase()}
+                            </span>
+                          </div>
+                        )}
+                        <span className="font-medium text-gray-900 text-sm">
+                          {activeConvData.counterparty_name}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Message history */}
+                    <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                      {loadingMessages && conversationMessages.length === 0 && (
+                        <div className="text-center text-gray-400 text-sm py-8">
+                          Loading...
+                        </div>
+                      )}
+                      {conversationMessages.map((msg) => {
+                        const isOwn = msg.sender_id === user?.id;
+                        return (
+                          <div
+                            key={msg.id}
+                            className={`flex ${isOwn ? "justify-end" : "justify-start"}`}
+                          >
+                            <div
+                              className={`max-w-[70%] px-4 py-2 rounded-2xl ${
+                                isOwn
+                                  ? "bg-purple-600 text-white rounded-br-md"
+                                  : "bg-gray-100 text-gray-900 rounded-bl-md"
+                              }`}
+                            >
+                              <p className="text-sm whitespace-pre-wrap break-words">{msg.content}</p>
+                              <p className={`text-xs mt-1 ${isOwn ? "text-purple-200" : "text-gray-400"}`}>
+                                {formatMessageTime(msg.created_at)}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                      <div ref={messagesEndRef} />
+                    </div>
+
+                    {/* Quick reply templates - show when no messages */}
+                    {conversationMessages.length === 0 && !loadingMessages && (
+                      <div className="px-4 py-3 border-t border-gray-100">
+                        <p className="text-xs text-gray-500 mb-2">{t("messages.quickReplies")}</p>
+                        <div className="flex flex-wrap gap-2">
+                          {templates.map((tmpl, i) => (
+                            <button
+                              key={i}
+                              onClick={() => handleSendTemplate(tmpl)}
+                              disabled={sendingMessage}
+                              className="text-xs px-3 py-1.5 bg-purple-50 text-purple-700 rounded-full hover:bg-purple-100 transition-colors disabled:opacity-50"
+                            >
+                              {tmpl}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Input area */}
+                    <div className="p-3 border-t border-gray-200 flex gap-2">
+                      <input
+                        type="text"
+                        value={messageInput}
+                        onChange={(e) => setMessageInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && !e.shiftKey) {
+                            e.preventDefault();
+                            handleSendMessage();
+                          }
+                        }}
+                        placeholder={t("messages.typeMessage")}
+                        maxLength={1000}
+                        className="flex-1 px-4 py-2 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      />
+                      <button
+                        onClick={handleSendMessage}
+                        disabled={!messageInput.trim() || sendingMessage}
+                        className="px-5 py-2 bg-purple-600 text-white rounded-full text-sm font-medium hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {t("messages.send")}
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              No Messages Yet
-            </h3>
-            <p className="text-gray-600 mb-6 max-w-md mx-auto">
-              {userProfile?.user_type === "parent"
-                ? "Your conversations with childcare providers will appear here once you start messaging."
-                : userProfile?.user_type === "nanny"
-                ? "Your conversations with families will appear here once you start messaging."
-                : "Complete your profile to get started"}
-            </p>
-            <button className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors duration-200 shadow-sm">
-              Start Messaging
-            </button>
-          </div>
+          )}
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const displayNameFromProfile =
     [userProfile?.name, (userProfile as any)?.surname]
@@ -1636,7 +1863,10 @@ export default function ProfilePage() {
                 <span className="text-purple-100 text-sm flex items-center gap-1">
                   <span>⭐</span>
                   <span>
-                    {t("profile.rating")}: {t("profile.noReviewsYet")}
+                    {t("profile.rating")}:{" "}
+                    {(userProfile as any)?.average_rating && Number((userProfile as any).average_rating) > 0
+                      ? `${Number((userProfile as any).average_rating).toFixed(1)} (${(userProfile as any).total_reviews || 0})`
+                      : t("profile.noReviewsYet")}
                   </span>
                 </span>
               </div>
@@ -1890,6 +2120,16 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-gray-100">
       <Header />
+
+      {/* Toast notification */}
+      {toast && (
+        <div className={`fixed top-20 right-4 z-50 px-4 py-3 rounded-xl shadow-lg border text-sm font-medium animate-fade-in flex items-center gap-2 ${
+          toast.type === "error" ? "bg-red-50 text-red-800 border-red-200" : "bg-green-50 text-green-800 border-green-200"
+        }`}>
+          {toast.message}
+          <button onClick={() => setToast(null)} className="ml-2 text-gray-400 hover:text-gray-600">&times;</button>
+        </div>
+      )}
 
       <main className="flex-1 px-4 sm:px-6 py-8 sm:py-12">
         <div className="max-w-7xl mx-auto">

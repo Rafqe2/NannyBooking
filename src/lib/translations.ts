@@ -36,9 +36,9 @@ export const translations = {
     ru: 'Свяжитесь с проверенными нянями и семьями в Латвии, Литве, Эстонии и Швеции'
   },
   'home.searchPlaceholder': {
-    en: 'Enter location (e.g., Riga, Tallinn, Stockholm)',
-    lv: 'Ievadiet atrašanās vietu (piemēram, Rīga, Tallina, Stokholma)',
-    ru: 'Введите местоположение (например, Рига, Таллинн, Стокгольм)'
+    en: 'Enter location (e.g., Rīga, Jūrmala, Liepāja)',
+    lv: 'Ievadiet atrašanās vietu (piemēram, Rīga, Jūrmala, Liepāja)',
+    ru: 'Введите местоположение (например, Рига, Юрмала, Лиепая)'
   },
   'home.searchButton': {
     en: 'Search',
@@ -785,14 +785,14 @@ export const translations = {
 
   // Calendar
   'calendar.selectArrival': {
-    en: 'Click a date to select your arrival',
-    lv: 'Noklikšķiniet uz datuma, lai izvēlētos ierašanās laiku',
-    ru: 'Нажмите на дату, чтобы выбрать время прибытия'
+    en: 'Select the start date for your booking',
+    lv: 'Izvēlieties rezervācijas sākuma datumu',
+    ru: 'Выберите дату начала бронирования'
   },
   'calendar.selectDeparture': {
-    en: 'Click another date to select your departure, or click the same date for a single day',
-    lv: 'Noklikšķiniet uz cita datuma, lai izvēlētos izbraukšanas laiku, vai noklikšķiniet uz tā paša datuma vienai dienai',
-    ru: 'Нажмите на другую дату, чтобы выбрать время отъезда, или нажмите на ту же дату для одного дня'
+    en: 'Select the end date, or click the same date for a single day',
+    lv: 'Izvēlieties beigu datumu vai noklikšķiniet uz tā paša datuma vienai dienai',
+    ru: 'Выберите дату окончания или нажмите на ту же дату для одного дня'
   },
   'calendar.selected': {
     en: 'Selected: {{startDate}} - {{endDate}}',
@@ -1055,6 +1055,11 @@ export const translations = {
     lv: 'Cena par Stundu (€) *',
     ru: 'Цена в Час (€) *'
   },
+  'adCreate.enterPrice': {
+    en: 'Enter price',
+    lv: 'Ievadiet cenu',
+    ru: 'Введите цену'
+  },
   'adCreate.requirementsPreferences': {
     en: 'Requirements & Preferences *',
     lv: 'Prasības un Preferences *',
@@ -1089,6 +1094,56 @@ export const translations = {
     en: 'Skills & Specializations',
     lv: 'Prasmes un Specializācijas',
     ru: 'Навыки и Специализации'
+  },
+  'adCreate.requiredSkills': {
+    en: 'Required Skills',
+    lv: 'Nepieciešamās Prasmes',
+    ru: 'Требуемые Навыки'
+  },
+  'adCreate.selectRequiredSkills': {
+    en: 'Select the skills you require from a caregiver',
+    lv: 'Izvēlieties prasmes, ko sagaidāt no aprūpētāja',
+    ru: 'Выберите навыки, которые вы ожидаете от няни'
+  },
+  'adCreate.selectYourSkills': {
+    en: 'Select the skills that best describe your expertise',
+    lv: 'Izvēlieties prasmes, kas vislabāk raksturo jūsu pieredzi',
+    ru: 'Выберите навыки, которые лучше всего описывают вашу квалификацию'
+  },
+  'adCreate.experiencePlaceholderParent': {
+    en: 'List key requirements (e.g., experience with infants, Latvian/Russian speaking, driving license).',
+    lv: 'Norādiet galvenās prasības (piemēram, pieredze ar zīdaiņiem, latviešu/krievu valoda, autovadītāja apliecība).',
+    ru: 'Укажите основные требования (например, опыт работы с младенцами, латышский/русский язык, водительские права).'
+  },
+  'adCreate.experiencePlaceholderNanny': {
+    en: 'Tell families about your childcare experience, education, and background.',
+    lv: 'Pastāstiet ģimenēm par savu bērnu aprūpes pieredzi, izglītību un pieredzi.',
+    ru: 'Расскажите семьям о вашем опыте ухода за детьми, образовании и квалификации.'
+  },
+  'adCreate.descriptionPlaceholderParent': {
+    en: 'Describe your family, schedule, duties, and expectations.',
+    lv: 'Aprakstiet savu ģimeni, grafiku, pienākumus un gaidas.',
+    ru: 'Опишите свою семью, график, обязанности и ожидания.'
+  },
+  'adCreate.descriptionPlaceholderNanny': {
+    en: 'Describe what services you offer (meal prep, homework help, etc.).',
+    lv: 'Aprakstiet, kādus pakalpojumus piedāvājat (ēdiena gatavošana, palīdzība ar mājasdarbu u.c.).',
+    ru: 'Опишите, какие услуги вы предлагаете (приготовление еды, помощь с домашним заданием и т.д.).'
+  },
+  'adCreate.characters': {
+    en: 'characters',
+    lv: 'rakstzīmes',
+    ru: 'символов'
+  },
+  'adCreate.minCharacters': {
+    en: 'min. 6 characters',
+    lv: 'min. 6 rakstzīmes',
+    ru: 'мин. 6 символов'
+  },
+  'ad.expiredDates': {
+    en: 'Please select new dates',
+    lv: 'Lūdzu, izvēlieties jaunus datumus',
+    ru: 'Пожалуйста, выберите новые даты'
   },
   'adCreate.availabilitySchedule': {
     en: 'Availability & Schedule',
@@ -1341,6 +1396,11 @@ export const translations = {
     en: 'Decline',
     lv: 'Noraidīt',
     ru: 'Отклонить'
+  },
+  'booking.declined': {
+    en: 'Declined',
+    lv: 'Noraidīts',
+    ru: 'Отклонено'
   },
   'booking.pending': {
     en: 'Pending',
@@ -1685,15 +1745,70 @@ export const translations = {
     lv: 'Ziņojumi',
     ru: 'Сообщения'
   },
-  'messages.noMessages': {
-    en: 'No messages yet',
-    lv: 'Vēl nav ziņojumu',
-    ru: 'Пока нет сообщений'
+  'messages.noConversations': {
+    en: 'No conversations yet',
+    lv: 'Vēl nav sarunu',
+    ru: 'Пока нет разговоров'
   },
-  'messages.startConversation': {
-    en: 'Start a conversation by booking a service or responding to inquiries.',
-    lv: 'Sāciet sarunu, rezervējot pakalpojumu vai atbildot uz pieprasījumiem.',
-    ru: 'Начните разговор, забронировав услугу или ответив на запросы.'
+  'messages.noConversationsDesc': {
+    en: 'Your conversations will appear here after a booking is confirmed.',
+    lv: 'Jūsu sarunas parādīsies šeit pēc rezervācijas apstiprināšanas.',
+    ru: 'Ваши разговоры появятся здесь после подтверждения бронирования.'
+  },
+  'messages.typeMessage': {
+    en: 'Type a message...',
+    lv: 'Ierakstiet ziņojumu...',
+    ru: 'Введите сообщение...'
+  },
+  'messages.send': {
+    en: 'Send',
+    lv: 'Sūtīt',
+    ru: 'Отправить'
+  },
+  'messages.template1': {
+    en: 'Hello! Looking forward to our booking!',
+    lv: 'Sveiki! Ar nepacietību gaidu mūsu rezervāciju!',
+    ru: 'Здравствуйте! С нетерпением жду нашу встречу!'
+  },
+  'messages.template2': {
+    en: 'Hi! Could we discuss the booking details?',
+    lv: 'Sveiki! Vai mēs varētu apspriest rezervācijas detaļas?',
+    ru: 'Привет! Можем ли мы обсудить детали бронирования?'
+  },
+  'messages.template3': {
+    en: 'Hello! Let me know if you need anything before our booking.',
+    lv: 'Sveiki! Informējiet mani, ja jums kaut kas nepieciešams pirms rezervācijas.',
+    ru: 'Здравствуйте! Дайте знать, если вам что-нибудь нужно перед встречей.'
+  },
+  'messages.today': {
+    en: 'Today',
+    lv: 'Šodien',
+    ru: 'Сегодня'
+  },
+  'messages.yesterday': {
+    en: 'Yesterday',
+    lv: 'Vakar',
+    ru: 'Вчера'
+  },
+  'messages.bookingOn': {
+    en: 'Booking on',
+    lv: 'Rezervācija',
+    ru: 'Бронирование на'
+  },
+  'messages.selectConversation': {
+    en: 'Select a conversation to start messaging',
+    lv: 'Izvēlieties sarunu, lai sāktu ziņojumapmaiņu',
+    ru: 'Выберите разговор, чтобы начать обмен сообщениями'
+  },
+  'messages.quickReplies': {
+    en: 'Quick replies',
+    lv: 'Ātrās atbildes',
+    ru: 'Быстрые ответы'
+  },
+  'messages.messageSent': {
+    en: 'Message sent',
+    lv: 'Ziņojums nosūtīts',
+    ru: 'Сообщение отправлено'
   },
 
   // User Types
@@ -2168,37 +2283,12 @@ export const translations = {
     lv: 'Paplašināti Filtri',
     ru: 'Расширенные Фильтры'
   },
-  'search.priceRange': {
-    en: 'Price Range',
-    lv: 'Cenu Diapazons',
-    ru: 'Ценовой Диапазон'
-  },
-  'search.min': {
-    en: 'Min',
-    lv: 'Min',
-    ru: 'Мин'
-  },
-  'search.max': {
-    en: 'Max',
-    lv: 'Maks',
-    ru: 'Макс'
-  },
-  'search.perHour': {
-    en: '€ per hour',
-    lv: '€ stundā',
-    ru: '€ в час'
-  },
-  'search.minimumRating': {
-    en: 'Minimum Rating',
-    lv: 'Minimālais Vērtējums',
-    ru: 'Минимальный Рейтинг'
-  },
   'search.any': {
     en: 'Any',
     lv: 'Jebkurš',
     ru: 'Любой'
   },
-  'search.skills': {
+  'search.skillsFilter': {
     en: 'Skills & Qualifications',
     lv: 'Prasmes & Kvalifikācija',
     ru: 'Навыки и Квалификация'
@@ -2238,10 +2328,65 @@ export const translations = {
     lv: 'Lietot Filtrus',
     ru: 'Применить Фильтры'
   },
-  'search.results': {
-    en: 'Search Results',
-    lv: 'Meklēšanas Rezultāti',
-    ru: 'Результаты Поиска'
+  'cookie.title': {
+    en: 'We use cookies',
+    lv: 'Mēs izmantojam sīkdatnes',
+    ru: 'Мы используем файлы cookie'
+  },
+  'cookie.description': {
+    en: 'We use cookies to improve your experience. You can choose which cookies to allow.',
+    lv: 'Mēs izmantojam sīkdatnes, lai uzlabotu jūsu pieredzi. Jūs varat izvēlēties, kuras sīkdatnes atļaut.',
+    ru: 'Мы используем файлы cookie для улучшения вашего опыта. Вы можете выбрать, какие файлы cookie разрешить.'
+  },
+  'cookie.allowAll': {
+    en: 'Allow All',
+    lv: 'Atļaut Visas',
+    ru: 'Разрешить Все'
+  },
+  'cookie.necessaryOnly': {
+    en: 'Necessary Only',
+    lv: 'Tikai Nepieciešamās',
+    ru: 'Только Необходимые'
+  },
+  'cookie.customize': {
+    en: 'Customize',
+    lv: 'Pielāgot',
+    ru: 'Настроить'
+  },
+  'cookie.savePreferences': {
+    en: 'Save Preferences',
+    lv: 'Saglabāt Izvēli',
+    ru: 'Сохранить Настройки'
+  },
+  'cookie.necessary': {
+    en: 'Necessary',
+    lv: 'Nepieciešamās',
+    ru: 'Необходимые'
+  },
+  'cookie.necessaryDesc': {
+    en: 'Required for the website to function properly. Cannot be disabled.',
+    lv: 'Nepieciešamas tīmekļa vietnes pareizai darbībai. Nevar atspējot.',
+    ru: 'Необходимы для правильной работы сайта. Нельзя отключить.'
+  },
+  'cookie.analytics': {
+    en: 'Analytics',
+    lv: 'Analītiskās',
+    ru: 'Аналитические'
+  },
+  'cookie.analyticsDesc': {
+    en: 'Help us understand how visitors use our website.',
+    lv: 'Palīdz mums saprast, kā apmeklētāji izmanto mūsu vietni.',
+    ru: 'Помогают понять, как посетители используют наш сайт.'
+  },
+  'cookie.marketing': {
+    en: 'Marketing',
+    lv: 'Mārketinga',
+    ru: 'Маркетинговые'
+  },
+  'cookie.marketingDesc': {
+    en: 'Used to deliver relevant advertisements.',
+    lv: 'Tiek izmantotas, lai rādītu atbilstošas reklāmas.',
+    ru: 'Используются для показа релевантной рекламы.'
   }
 } as const;
 

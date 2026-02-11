@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import ErrorBoundary from "../components/ErrorBoundary";
 import { LanguageProvider } from "../components/LanguageProvider";
+import CookieConsent from "../components/CookieConsent";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -67,6 +68,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <LanguageProvider>
           <ErrorBoundary>{children}</ErrorBoundary>
+          <CookieConsent />
         </LanguageProvider>
       </body>
     </html>

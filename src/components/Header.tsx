@@ -7,6 +7,7 @@ import { supabase } from "../lib/supabase";
 import { useSupabaseUser } from "../lib/useSupabaseUser";
 import { useTranslation } from "./LanguageProvider";
 import { LANGUAGES } from "../lib/i18n";
+import { MessageService } from "../lib/messageService";
 
 export default function Header() {
   const { user, isLoading } = useSupabaseUser();
@@ -14,6 +15,7 @@ export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const [pendingCount, setPendingCount] = useState<number>(0);
+  const [unreadMessages, setUnreadMessages] = useState<number>(0);
   const isOnProfilePage = pathname === "/profile";
 
   useEffect(() => {
@@ -21,20 +23,18 @@ export default function Header() {
     const load = async () => {
       try {
         if (!user?.id) {
-          if (active) setPendingCount(0);
+          if (active) { setPendingCount(0); setUnreadMessages(0); }
           return;
         }
-        const { data, error } = await supabase.rpc(
-          "get_pending_booking_count_for_me"
-        );
+        const [bookingRes, msgCount] = await Promise.all([
+          supabase.rpc("get_pending_booking_count_for_me"),
+          MessageService.getUnreadCount(),
+        ]);
         if (!active) return;
-        if (error) {
-          setPendingCount(0);
-        } else {
-          setPendingCount(Number(data || 0));
-        }
+        setPendingCount(bookingRes.error ? 0 : Number(bookingRes.data || 0));
+        setUnreadMessages(msgCount);
       } catch {
-        if (active) setPendingCount(0);
+        if (active) { setPendingCount(0); setUnreadMessages(0); }
       }
     };
     load();
@@ -46,6 +46,7 @@ export default function Header() {
   }, [user?.id]);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showLanguageMenu, setShowLanguageMenu] = useState(false);
+  const langCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const userRef = useRef<HTMLDivElement>(null);
   const languageRef = useRef<HTMLDivElement>(null);
 
@@ -104,8 +105,13 @@ export default function Header() {
           <div
             className="relative"
             ref={languageRef}
-            onMouseEnter={() => setShowLanguageMenu(true)}
-            onMouseLeave={() => setShowLanguageMenu(false)}
+            onMouseEnter={() => {
+              if (langCloseTimer.current) { clearTimeout(langCloseTimer.current); langCloseTimer.current = null; }
+              setShowLanguageMenu(true);
+            }}
+            onMouseLeave={() => {
+              langCloseTimer.current = setTimeout(() => setShowLanguageMenu(false), 150);
+            }}
           >
             <button
               onFocus={() => setShowLanguageMenu(true)}
@@ -182,9 +188,9 @@ export default function Header() {
                       .charAt(0)
                       .toUpperCase() || user.email?.charAt(0).toUpperCase()}
                   </div>
-                  {pendingCount > 0 && (
-                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-600 text-white text-[10px] rounded-full flex items-center justify-center">
-                      !
+                  {(pendingCount > 0 || unreadMessages > 0) && (
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-600 rounded-full flex items-center justify-center">
+                      <span className="w-2 h-2 bg-white rounded-full" />
                     </span>
                   )}
                 </div>
@@ -216,9 +222,14 @@ export default function Header() {
                     </button>
                     <button
                       onClick={() => handleTabSwitch("messages")}
-                      className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors duration-200 border-b border-gray-100 text-sm font-medium bg-white"
+                      className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors duration-200 border-b border-gray-100 text-sm font-medium bg-white flex items-center justify-between"
                     >
                       {t("profile.messages")}
+                      {unreadMessages > 0 && (
+                        <span className="bg-red-600 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                          {unreadMessages}
+                        </span>
+                      )}
                     </button>
                     <button
                       onClick={() => handleTabSwitch("profile")}

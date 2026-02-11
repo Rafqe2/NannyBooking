@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useTranslation } from "./LanguageProvider";
+import { stripLatvianGada } from "../lib/date";
 
 type BookingItem = {
   id: string;
@@ -29,6 +31,8 @@ export default function BookingCalendar({
   onSelectDate,
   selectedDate,
 }: BookingCalendarProps) {
+  const { t, language } = useTranslation();
+  const locale = language === "lv" ? "lv-LV" : language === "ru" ? "ru-RU" : "en-US";
   const [current, setCurrent] = useState<Date>(new Date());
 
   const mapByDate = useMemo(() => {
@@ -100,10 +104,10 @@ export default function BookingCalendar({
     );
   }
 
-  const monthLabel = current.toLocaleDateString("en-US", {
+  const monthLabel = stripLatvianGada(current.toLocaleDateString(locale, {
     month: "long",
     year: "numeric",
-  });
+  }));
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
@@ -143,13 +147,13 @@ export default function BookingCalendar({
         <div className="grid grid-cols-7 gap-2">{days}</div>
         <div className="mt-4 flex items-center gap-4 text-xs text-gray-600">
           <div className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-yellow-500" /> Pending
+            <span className="w-2 h-2 rounded-full bg-yellow-500" /> {t("booking.pending")}
           </div>
           <div className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-green-600" /> Confirmed
+            <span className="w-2 h-2 rounded-full bg-green-600" /> {t("booking.confirmed")}
           </div>
           <div className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-gray-400" /> Other
+            <span className="w-2 h-2 rounded-full bg-gray-400" /> {t("booking.declined")}
           </div>
         </div>
       </div>

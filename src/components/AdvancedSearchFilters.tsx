@@ -5,10 +5,7 @@ import { NANNY_SKILLS, getTranslatedSkill } from "../lib/constants/skills";
 import { useTranslation } from "./LanguageProvider";
 
 export interface AdvancedFilters {
-  priceMin: number | null;
-  priceMax: number | null;
   skills: string[];
-  minRating: number | null;
   experienceYears: number | null;
   hasReviews: boolean;
   verifiedOnly: boolean;
@@ -22,10 +19,7 @@ interface AdvancedSearchFiltersProps {
 }
 
 export const DEFAULT_FILTERS: AdvancedFilters = {
-  priceMin: null,
-  priceMax: null,
   skills: [],
-  minRating: null,
   experienceYears: null,
   hasReviews: false,
   verifiedOnly: false,
@@ -72,9 +66,7 @@ export default function AdvancedSearchFilters({
 
   const activeFiltersCount = () => {
     let count = 0;
-    if (filters.priceMin !== null || filters.priceMax !== null) count++;
     if (filters.skills.length > 0) count++;
-    if (filters.minRating !== null) count++;
     if (filters.experienceYears !== null) count++;
     if (filters.hasReviews) count++;
     if (filters.verifiedOnly) count++;
@@ -151,91 +143,10 @@ export default function AdvancedSearchFilters({
 
             {/* Content */}
             <div className="flex-1 overflow-y-auto px-6 py-4 space-y-5">
-              {/* Price Range - Stacked */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-3">
-                  💰 {t("search.priceRange")}
-                </label>
-                <div className="space-y-2">
-                  <div>
-                    <label className="block text-xs text-gray-600 mb-1">
-                      {t("search.min")}
-                    </label>
-                    <input
-                      type="text"
-                      inputMode="decimal"
-                      value={localFilters.priceMin ?? ""}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        if (value === "" || /^\d*\.?\d*$/.test(value)) {
-                          const numValue = value === "" ? null : parseFloat(value);
-                          if (value === "" || (numValue !== null && numValue >= 0 && numValue <= 1000)) {
-                            handleLocalChange("priceMin", numValue);
-                          }
-                        }
-                      }}
-                      placeholder="0"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-600 mb-1">
-                      {t("search.max")}
-                    </label>
-                    <input
-                      type="text"
-                      inputMode="decimal"
-                      value={localFilters.priceMax ?? ""}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        if (value === "" || /^\d*\.?\d*$/.test(value)) {
-                          const numValue = value === "" ? null : parseFloat(value);
-                          if (value === "" || (numValue !== null && numValue >= 0 && numValue <= 1000)) {
-                            handleLocalChange("priceMax", numValue);
-                          }
-                        }
-                      }}
-                      placeholder="100"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    />
-                  </div>
-                </div>
-                <p className="text-xs text-gray-500 mt-2">
-                  {t("search.perHour")}
-                </p>
-              </div>
-
-              {/* Minimum Rating */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-3">
-                  ⭐ {t("search.minimumRating")}
-                </label>
-                <div className="grid grid-cols-4 gap-2">
-                  {[0, 3, 4, 5].map((rating) => (
-                    <button
-                      key={rating}
-                      onClick={() =>
-                        handleLocalChange(
-                          "minRating",
-                          localFilters.minRating === rating ? null : rating
-                        )
-                      }
-                      className={`px-3 py-2 rounded-lg border-2 transition-all text-sm whitespace-nowrap ${
-                        localFilters.minRating === rating
-                          ? "border-purple-600 bg-purple-50 text-purple-700 font-semibold"
-                          : "border-gray-200 hover:border-gray-300"
-                      }`}
-                    >
-                      {rating === 0 ? t("search.any") : `${rating}+★`}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
               {/* Skills */}
               <div>
                 <label className="block text-sm font-semibold text-gray-900 mb-3">
-                  🎯 {t("search.skills")}
+                  🎯 {t("search.skillsFilter")}
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {NANNY_SKILLS.map((skill) => (

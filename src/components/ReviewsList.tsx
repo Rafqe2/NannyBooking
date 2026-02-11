@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Review, ReviewService, RatingStats } from "../lib/reviewService";
+import { stripLatvianGada } from "../lib/date";
 import { useTranslation } from "./LanguageProvider";
 import { useSupabaseUser } from "../lib/useSupabaseUser";
 
@@ -89,11 +90,11 @@ export default function ReviewsList({
     const date = new Date(dateString);
     const locale =
       language === "lv" ? "lv-LV" : language === "ru" ? "ru-RU" : "en-US";
-    return date.toLocaleDateString(locale, {
+    return stripLatvianGada(date.toLocaleDateString(locale, {
       year: "numeric",
       month: "long",
       day: "numeric",
-    });
+    }));
   };
 
   const renderStars = (rating: number) => {

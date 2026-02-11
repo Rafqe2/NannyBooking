@@ -36,16 +36,16 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
   };
 
   const t = (
-    key: TranslationKey,
+    key: string,
     variables?: Record<string, string | number>
   ): string => {
-    const translation = translations[key];
+    const translation = translations[key as TranslationKey];
     if (!translation) {
       console.warn(`Translation key "${key}" not found`);
       return key;
     }
 
-    let text = translation[language] || translation.en;
+    let text: string = translation[language] || translation.en;
 
     if (variables) {
       Object.entries(variables).forEach(([varKey, value]) => {

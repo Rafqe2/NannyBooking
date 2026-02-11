@@ -1,20 +1,25 @@
 import { Language } from './i18n';
 
+// Strip Latvian ". g." (gada) suffix from locale-formatted date strings
+export function stripLatvianGada(formatted: string): string {
+  return formatted.replace(/\.\s*g\.\s*/g, ". ");
+}
+
 export function formatDateRange(start: Date | null, end: Date | null, language: Language = 'en'): string {
   if (!start) {
     const dateTranslations = {
       en: "Date",
-      lv: "Datums", 
+      lv: "Datums",
       ru: "Дата"
     };
     return dateTranslations[language];
   }
-  
+
   const locale = language === 'lv' ? 'lv-LV' : language === 'ru' ? 'ru-RU' : 'en-US';
-  
+
   if (!end)
-    return start.toLocaleDateString(locale, { month: "short", day: "numeric" });
-  return `${start.toLocaleDateString(locale, { month: "short", day: "numeric" })} - ${end.toLocaleDateString(locale, { month: "short", day: "numeric" })}`;
+    return stripLatvianGada(start.toLocaleDateString(locale, { month: "short", day: "numeric" }));
+  return `${stripLatvianGada(start.toLocaleDateString(locale, { month: "short", day: "numeric" }))} - ${stripLatvianGada(end.toLocaleDateString(locale, { month: "short", day: "numeric" }))}`;
 }
 
 export function toISODate(d: Date): string {
@@ -38,5 +43,3 @@ export function formatDateDDMMYYYY(d: Date): string {
   const year = d.getFullYear();
   return `${day}/${month}/${year}`;
 }
-
-

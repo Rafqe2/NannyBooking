@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSupabaseUser } from "../lib/useSupabaseUser";
 import { LV_CITIES } from "../lib/constants/cities";
-import { NANNY_SKILLS } from "../lib/constants/skills";
+import { NANNY_SKILLS, PARENT_SKILLS } from "../lib/constants/skills";
 import { AdvertisementService } from "../lib/advertisementService";
 import { UserService } from "../lib/userService";
 import LocationAutocomplete from "./LocationAutocomplete";
@@ -60,14 +60,10 @@ export default function CreateAdvertisement() {
     additionalInfo: "",
   });
   const [extraLocations, setExtraLocations] = useState<string[]>([]);
-  const [editingDate, setEditingDate] = useState<Date | null>(null);
-  const [editStart, setEditStart] = useState<string>("09:00");
-  const [editEnd, setEditEnd] = useState<string>("17:00");
   const [perDateTimes, setPerDateTimes] = useState<
     Record<string, { start: string; end: string }>
   >({});
-
-  const availableSkills = NANNY_SKILLS;
+  const [showAdditionalInfo, setShowAdditionalInfo] = useState(false);
 
   const cities = LV_CITIES;
 
@@ -83,6 +79,7 @@ export default function CreateAdvertisement() {
 
   const isParent = userType === "parent";
   const isNanny = userType === "nanny";
+  const availableSkills = isParent ? PARENT_SKILLS : NANNY_SKILLS;
 
   const handleSkillToggle = (skill: string) => {
     setFormData((prev) => ({
@@ -327,7 +324,7 @@ export default function CreateAdvertisement() {
               <p className="text-xs text-gray-500 mt-1">
                 {formData.title.length}/100 {formData.title.length < 6 && (
                   <span className="text-red-500">
-                    (min. 6 characters)
+                    ({t("adCreate.minCharacters")})
                   </span>
                 )}
               </p>
@@ -345,7 +342,7 @@ export default function CreateAdvertisement() {
                   // Only allow numbers and one decimal point
                   if (value === "" || /^\d*\.?\d*$/.test(value)) {
                     const numValue = value === "" ? 0 : parseFloat(value);
-                    if (value === "" || (numValue >= 0 && numValue <= 1000)) {
+                    if (value === "" || (numValue >= 0 && numValue <= 10000)) {
                       setFormData((prev) => ({
                         ...prev,
                         pricePerHour: numValue,
@@ -358,7 +355,7 @@ export default function CreateAdvertisement() {
                 required
               />
               <p className="text-xs text-gray-500 mt-1">
-                {formData.pricePerHour > 0 ? `€${formData.pricePerHour.toFixed(2)}` : "Enter price"} (max: €1000)
+                {formData.pricePerHour > 0 ? `€${formData.pricePerHour.toFixed(2)}` : t("adCreate.enterPrice")}
               </p>
             </div>
           </div>
@@ -436,10 +433,10 @@ export default function CreateAdvertisement() {
                       return n;
                     });
                   }}
-                  autoOpenTimeEditor={true}
+                  hideTip
                 />
-                
-                {/* Selected Dates with Times - Compact List */}
+
+                {/* Selected Dates with Editable Times */}
                 {formData.availability.dates.length > 0 && (
                   <div className="mt-4 space-y-1.5">
                     <div className="text-xs font-medium text-gray-700 mb-2">
@@ -464,11 +461,30 @@ export default function CreateAdvertisement() {
                               <div className="text-sm font-medium text-gray-900 whitespace-nowrap">
                                 {formatDateDDMMYYYY(date)}
                               </div>
-                              <div className="text-xs text-gray-600 flex items-center gap-1">
-                                <span>🕐</span>
-                                <span className="font-mono">
-                                  {times.start} - {times.end}
-                                </span>
+                              <div className="flex items-center gap-1">
+                                <input
+                                  type="time"
+                                  value={times.start}
+                                  onChange={(e) => {
+                                    setPerDateTimes((prev) => ({
+                                      ...prev,
+                                      [key]: { ...times, start: e.target.value },
+                                    }));
+                                  }}
+                                  className="px-1.5 py-0.5 border border-gray-300 rounded text-xs font-mono bg-white focus:ring-1 focus:ring-purple-500 focus:border-purple-500"
+                                />
+                                <span className="text-xs text-gray-400">-</span>
+                                <input
+                                  type="time"
+                                  value={times.end}
+                                  onChange={(e) => {
+                                    setPerDateTimes((prev) => ({
+                                      ...prev,
+                                      [key]: { ...times, end: e.target.value },
+                                    }));
+                                  }}
+                                  className="px-1.5 py-0.5 border border-gray-300 rounded text-xs font-mono bg-white focus:ring-1 focus:ring-purple-500 focus:border-purple-500"
+                                />
                               </div>
                             </div>
                             <button
@@ -640,14 +656,14 @@ export default function CreateAdvertisement() {
               maxLength={1000}
               placeholder={
                 isParent
-                  ? "List key requirements (e.g., experience with infants, Latvian/Russian speaking, driving license)."
-                  : "Tell families about your childcare experience, education, and background."
+                  ? t("adCreate.experiencePlaceholderParent")
+                  : t("adCreate.experiencePlaceholderNanny")
               }
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
               required
             />
             <p className="text-xs text-gray-500 mt-1">
-              {formData.experience.length}/1000 characters
+              {formData.experience.length}/1000 {t("adCreate.characters")}
             </p>
           </div>
 
@@ -671,41 +687,55 @@ export default function CreateAdvertisement() {
               maxLength={2000}
               placeholder={
                 isParent
-                  ? "Describe your family, schedule, duties, and expectations."
-                  : "Describe what services you offer (meal prep, homework help, etc.)."
+                  ? t("adCreate.descriptionPlaceholderParent")
+                  : t("adCreate.descriptionPlaceholderNanny")
               }
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
               required
             />
             <p className="text-xs text-gray-500 mt-1">
-              {formData.description.length}/2000 characters
+              {formData.description.length}/2000 {t("adCreate.characters")}
             </p>
           </div>
 
           {/* Additional Information */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t("adCreate.additionalInfo")}
-            </label>
-            <textarea
-              value={formData.additionalInfo}
-              onChange={(e) => {
-                const value = e.target.value;
-                if (value.length <= 500) {
-                  setFormData((prev) => ({
-                    ...prev,
-                    additionalInfo: value,
-                  }));
-                }
-              }}
-              rows={3}
-              maxLength={500}
-              placeholder={t("adCreate.additionalInfoPlaceholder")}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              {formData.additionalInfo.length}/500 characters
-            </p>
+            {!showAdditionalInfo ? (
+              <button
+                type="button"
+                onClick={() => setShowAdditionalInfo(true)}
+                className="flex items-center gap-2 px-4 py-2 border border-dashed border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50 hover:border-gray-400 transition-colors"
+              >
+                <span className="text-lg leading-none">+</span>
+                {t("adCreate.additionalInfo")}
+              </button>
+            ) : (
+              <>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {t("adCreate.additionalInfo")}
+                </label>
+                <textarea
+                  value={formData.additionalInfo}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value.length <= 500) {
+                      setFormData((prev) => ({
+                        ...prev,
+                        additionalInfo: value,
+                      }));
+                    }
+                  }}
+                  rows={3}
+                  maxLength={500}
+                  placeholder={t("adCreate.additionalInfoPlaceholder")}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                  autoFocus
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  {formData.additionalInfo.length}/500 {t("adCreate.characters")}
+                </p>
+              </>
+            )}
           </div>
 
           {/* Error Message */}

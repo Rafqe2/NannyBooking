@@ -1,10 +1,13 @@
 -- Enhanced Search with Advanced Filters
--- Extends the existing search_ads function with price, rating, skills, and experience filters
+-- Extends the existing search_ads function with price, rating, skills, experience filters
+-- and nearby location support
 
--- Drop existing function to recreate with new parameters
+-- Drop existing function overloads to recreate with new parameters
 DROP FUNCTION IF EXISTS public.search_ads(text, date, date, text);
+DROP FUNCTION IF EXISTS public.search_ads(text, date, date, text, numeric, numeric, text[], numeric, boolean, boolean);
+DROP FUNCTION IF EXISTS public.search_ads(text, date, date, text, numeric, numeric, text[], numeric, boolean, boolean, text[]);
 
--- Create enhanced search function with advanced filters
+-- Create enhanced search function with advanced filters + nearby locations
 CREATE OR REPLACE FUNCTION public.search_ads(
   p_location text DEFAULT NULL,
   p_start_date date DEFAULT NULL,
@@ -15,7 +18,8 @@ CREATE OR REPLACE FUNCTION public.search_ads(
   p_skills text[] DEFAULT NULL,
   p_min_rating numeric DEFAULT NULL,
   p_has_reviews boolean DEFAULT FALSE,
-  p_verified_only boolean DEFAULT FALSE
+  p_verified_only boolean DEFAULT FALSE,
+  p_nearby_locations text[] DEFAULT NULL
 )
 RETURNS TABLE (
   id UUID,
@@ -40,10 +44,18 @@ SET search_path = public
 AS $$
 DECLARE
   viewer_type text;
+  nearby_patterns text[];
 BEGIN
   -- Normalize date range
   IF p_start_date IS NOT NULL AND p_end_date IS NULL THEN
     p_end_date := p_start_date;
+  END IF;
+
+  -- Pre-compute nearby ILIKE patterns (e.g. '%Riga%', '%Jurmala%')
+  IF p_nearby_locations IS NOT NULL THEN
+    SELECT array_agg('%' || loc || '%')
+    INTO nearby_patterns
+    FROM unnest(p_nearby_locations) AS loc;
   END IF;
 
   -- Determine viewer type
@@ -61,18 +73,45 @@ BEGIN
   IF p_start_date IS NULL AND p_end_date IS NULL THEN
     RETURN QUERY
     WITH filtered_ads AS (
-      SELECT 
+      SELECT
         a.*,
         u.id as owner_id,
         TRIM(COALESCE(u.name,'') || ' ' || COALESCE(u.surname,''))::text as owner_full_name,
         u.created_at as owner_member_since,
         u.picture::text as owner_picture,
-        u.user_type as owner_user_type
+        u.user_type as owner_user_type,
+        -- Track if this is an exact location match (0) or nearby match (1)
+        CASE
+          WHEN p_location IS NULL THEN 0
+          WHEN a.location_city ILIKE '%' || p_location || '%' THEN 0
+          WHEN EXISTS (
+            SELECT 1 FROM public.advertisement_locations al
+            WHERE al.advertisement_id = a.id
+              AND al.label ILIKE '%' || p_location || '%'
+          ) THEN 0
+          ELSE 1
+        END as match_rank
       FROM public.advertisements a
       JOIN public.users u ON u.id = a.user_id
       WHERE a.is_active = TRUE
-        -- Location filter
-        AND (p_location IS NULL OR a.location_city ILIKE '%' || p_location || '%')
+        -- Location filter: exact match OR nearby match
+        AND (
+          p_location IS NULL
+          OR a.location_city ILIKE '%' || p_location || '%'
+          OR EXISTS (
+            SELECT 1 FROM public.advertisement_locations al
+            WHERE al.advertisement_id = a.id
+              AND al.label ILIKE '%' || p_location || '%'
+          )
+          OR (nearby_patterns IS NOT NULL AND (
+            a.location_city ILIKE ANY(nearby_patterns)
+            OR EXISTS (
+              SELECT 1 FROM public.advertisement_locations al
+              WHERE al.advertisement_id = a.id
+                AND al.label ILIKE ANY(nearby_patterns)
+            )
+          ))
+        )
         -- Price filters
         AND (p_price_min IS NULL OR a.price_per_hour >= p_price_min)
         AND (p_price_max IS NULL OR a.price_per_hour <= p_price_max)
@@ -97,7 +136,7 @@ BEGIN
         )
     ),
     with_ratings AS (
-      SELECT 
+      SELECT
         fa.*,
         COALESCE(
           (SELECT AVG(r.rating) FROM public.reviews r WHERE r.reviewee_id = fa.owner_id),
@@ -130,30 +169,56 @@ BEGIN
         WHERE al.advertisement_id = wr.id
       ), '{}'::text[]) as locations
     FROM with_ratings wr
-    WHERE 
+    WHERE
       -- Rating filter
       (p_min_rating IS NULL OR wr.calculated_rating >= p_min_rating)
       -- Has reviews filter
       AND (p_has_reviews = FALSE OR wr.calculated_reviews_count > 0)
       -- Verified filter (for now, just check if has reviews)
       AND (p_verified_only = FALSE OR wr.calculated_reviews_count > 0)
-    ORDER BY wr.created_at DESC;
+    ORDER BY wr.match_rank, wr.created_at DESC;
 
   -- Case 2: With date filters
   ELSE
     RETURN QUERY
     WITH base AS (
-      SELECT 
+      SELECT
         a.*,
         u.id as owner_id,
         TRIM(COALESCE(u.name,'') || ' ' || COALESCE(u.surname,'')) as owner_full_name,
         u.created_at as owner_member_since,
         u.picture as owner_picture,
-        u.user_type as owner_user_type
+        u.user_type as owner_user_type,
+        CASE
+          WHEN p_location IS NULL THEN 0
+          WHEN a.location_city ILIKE '%' || p_location || '%' THEN 0
+          WHEN EXISTS (
+            SELECT 1 FROM public.advertisement_locations al
+            WHERE al.advertisement_id = a.id
+              AND al.label ILIKE '%' || p_location || '%'
+          ) THEN 0
+          ELSE 1
+        END as match_rank
       FROM public.advertisements a
       JOIN public.users u ON u.id = a.user_id
       WHERE a.is_active = TRUE
-        AND (p_location IS NULL OR a.location_city ILIKE '%' || p_location || '%')
+        AND (
+          p_location IS NULL
+          OR a.location_city ILIKE '%' || p_location || '%'
+          OR EXISTS (
+            SELECT 1 FROM public.advertisement_locations al
+            WHERE al.advertisement_id = a.id
+              AND al.label ILIKE '%' || p_location || '%'
+          )
+          OR (nearby_patterns IS NOT NULL AND (
+            a.location_city ILIKE ANY(nearby_patterns)
+            OR EXISTS (
+              SELECT 1 FROM public.advertisement_locations al
+              WHERE al.advertisement_id = a.id
+                AND al.label ILIKE ANY(nearby_patterns)
+            )
+          ))
+        )
         AND (p_price_min IS NULL OR a.price_per_hour >= p_price_min)
         AND (p_price_max IS NULL OR a.price_per_hour <= p_price_max)
         AND (p_skills IS NULL OR p_skills <@ a.skills)
@@ -174,7 +239,7 @@ BEGIN
       )
     ),
     with_ratings AS (
-      SELECT 
+      SELECT
         e.*,
         COALESCE(
           (SELECT AVG(r.rating) FROM public.reviews r WHERE r.reviewee_id = e.owner_id),
@@ -207,18 +272,18 @@ BEGIN
         WHERE al.advertisement_id = wr.id
       ), '{}'::text[]) as locations
     FROM with_ratings wr
-    WHERE 
+    WHERE
       (p_min_rating IS NULL OR wr.calculated_rating >= p_min_rating)
       AND (p_has_reviews = FALSE OR wr.calculated_reviews_count > 0)
       AND (p_verified_only = FALSE OR wr.calculated_reviews_count > 0)
-    ORDER BY wr.created_at DESC;
+    ORDER BY wr.match_rank, wr.created_at DESC;
   END IF;
 END;
 $$;
 
 -- Grant execute permissions
 GRANT EXECUTE ON FUNCTION public.search_ads(
-  text, date, date, text, numeric, numeric, text[], numeric, boolean, boolean
+  text, date, date, text, numeric, numeric, text[], numeric, boolean, boolean, text[]
 ) TO anon, authenticated;
 
 -- Create index on price for better performance
@@ -226,4 +291,3 @@ CREATE INDEX IF NOT EXISTS idx_advertisements_price ON public.advertisements(pri
 
 -- Create GIN index on skills array for better performance
 CREATE INDEX IF NOT EXISTS idx_advertisements_skills ON public.advertisements USING GIN(skills);
-

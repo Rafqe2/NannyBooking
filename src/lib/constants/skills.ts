@@ -1,20 +1,27 @@
 import { Language } from '../i18n';
 
 export const NANNY_SKILLS = [
-  "Infant Care",
-  "Toddler Care", 
-  "Preschool Age",
+  "Toddler Care",
   "School Age",
-  "Special Needs",
-  "CPR Certified",
+  "Preschool Age",
   "First Aid",
   "Meal Preparation",
-  "Light Housekeeping",
-  "Homework Help",
   "Educational Activities",
-  "Outdoor Activities",
   "Pet Care",
   "Driving License",
+  "Special Needs",
+];
+
+export const PARENT_SKILLS = [
+  "Toddler Care",
+  "School Age",
+  "Preschool Age",
+  "First Aid",
+  "Meal Preparation",
+  "Educational Activities",
+  "Pet Care",
+  "Driving License",
+  "Special Needs",
 ];
 
 export const NANNY_SKILLS_TRANSLATIONS = {

@@ -24,6 +24,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [locationSearch, setLocationSearch] = useState("");
   const [filteredLocations, setFilteredLocations] = useState<string[]>([]);
+  const [currentLocationQuery, setCurrentLocationQuery] = useState<string>(""); // Track typed text
 
   const locationRef = useRef<HTMLDivElement>(null);
   const dateRef = useRef<HTMLDivElement>(null);
@@ -115,7 +116,25 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
   );
 
   const handleSearch = () => {
-    onSearch(selectedLocation, startDate, endDate);
+    // Determine which location to use for search
+    let locationToSearch = selectedLocation;
+    
+    // If user has typed something that differs from the selected location,
+    // use the typed text (they're entering a new search)
+    if (currentLocationQuery.trim() && currentLocationQuery.trim() !== selectedLocation) {
+      // User typed something new - use the typed text
+      locationToSearch = currentLocationQuery.trim();
+    } else if (selectedLocation === "Location" && currentLocationQuery.trim()) {
+      // User typed something but never selected a suggestion
+      locationToSearch = currentLocationQuery.trim();
+    }
+    
+    // Only pass location if it's not the default "Location" placeholder
+    if (locationToSearch === "Location") {
+      locationToSearch = "";
+    }
+    
+    onSearch(locationToSearch, startDate, endDate);
   };
 
   // Get today's date for minDate (allows today but not past dates)
@@ -143,7 +162,16 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
                   }
                   onChange={(next) => {
                     setSelectedLocation(next.label);
+                    setCurrentLocationQuery(next.label); // Update query when suggestion is selected
                     setShowLocationPicker(false);
+                  }}
+                  onQueryChange={(query) => {
+                    setCurrentLocationQuery(query); // Track the typed text
+                    // If user is typing something different from selected location,
+                    // reset selectedLocation so we use the typed text instead
+                    if (query.trim() !== selectedLocation && selectedLocation !== "Location") {
+                      setSelectedLocation("Location");
+                    }
                   }}
                   placeholder={t("search.locationPlaceholder")}
                   variant="borderless"

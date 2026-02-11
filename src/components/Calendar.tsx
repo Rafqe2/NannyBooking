@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTranslation } from "./LanguageProvider";
-import { formatDateDDMMYYYY } from "../lib/date";
+import { formatDateDDMMYYYY, stripLatvianGada } from "../lib/date";
 
 interface CalendarProps {
   startDate: Date | null;
@@ -102,10 +102,10 @@ export default function Calendar({
   // Get localized month name
   const locale =
     language === "lv" ? "lv-LV" : language === "ru" ? "ru-RU" : "en-US";
-  const monthName = currentDate.toLocaleDateString(locale, {
+  const monthName = stripLatvianGada(currentDate.toLocaleDateString(locale, {
     month: "long",
     year: "numeric",
-  });
+  }));
 
   // Get localized day names
   const dayNames = t("calendar.dayNames").split(",");
@@ -158,7 +158,7 @@ export default function Calendar({
   }
 
   return (
-    <div className="w-96">
+    <div className="w-full max-w-96">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <button

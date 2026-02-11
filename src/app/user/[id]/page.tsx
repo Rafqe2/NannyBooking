@@ -1,11 +1,13 @@
 "use client";
 
 import { use as useUnwrap, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Header from "../../../components/Header";
 import Footer from "../../../components/Footer";
 import BlockingLoader from "../../../components/BlockingLoader";
 import ReviewsList from "../../../components/ReviewsList";
 import { useTranslation } from "../../../components/LanguageProvider";
+import { stripLatvianGada } from "../../../lib/date";
 
 export default function UserProfile({
   params,
@@ -13,7 +15,8 @@ export default function UserProfile({
   params: Promise<{ id: string }>;
 }) {
   const { id } = useUnwrap(params);
-  const { t } = useTranslation();
+  const router = useRouter();
+  const { t, language } = useTranslation();
   const [profile, setProfile] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -40,6 +43,15 @@ export default function UserProfile({
       <Header />
       <main className="flex-1 px-4 py-8">
         <div className="max-w-4xl mx-auto">
+          <button
+            onClick={() => router.back()}
+            className="mb-4 inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            {t("common.goBack")}
+          </button>
           {loading ? (
             <BlockingLoader message={t("profile.loadingProfile")} />
           ) : error || !profile ? (
@@ -80,10 +92,10 @@ export default function UserProfile({
                     {profile.member_since && (
                       <span>
                         {t("ad.joined")}{" "}
-                        {new Date(profile.member_since).toLocaleDateString(
-                          undefined,
+                        {stripLatvianGada(new Date(profile.member_since).toLocaleDateString(
+                          language === "lv" ? "lv-LV" : language === "ru" ? "ru-RU" : "en-US",
                           { year: "numeric", month: "short" }
-                        )}
+                        ))}
                       </span>
                     )}
                     {typeof profile.rating === "number" && (

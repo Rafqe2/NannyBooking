@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { supabase } from "../lib/supabase";
-import { toLocalYYYYMMDD, formatDateDDMMYYYY } from "../lib/date";
+import { toLocalYYYYMMDD, formatDateDDMMYYYY, stripLatvianGada } from "../lib/date";
 import { useSupabaseUser } from "../lib/useSupabaseUser";
 import { useTranslation } from "./LanguageProvider";
 import { getTranslatedSkill } from "../lib/constants/skills";
@@ -12,6 +12,7 @@ import AdvancedSearchFilters, {
   AdvancedFilters,
   DEFAULT_FILTERS,
 } from "./AdvancedSearchFilters";
+import { getNearbyCities } from "../lib/constants/nearbyLocations";
 
 interface SearchParams {
   location: string;
@@ -100,16 +101,25 @@ export default function SearchResults({
       try {
         // Do not persist here; we only persist when navigating to details
 
-        const locationParam =
+        const rawLocation =
           searchParams.location && searchParams.location !== "Location"
             ? searchParams.location
             : null;
+        // Strip to city/town name only (before first comma) for broader ILIKE matching
+        const locationParam = rawLocation
+          ? rawLocation.split(",")[0].trim()
+          : null;
         const startDateParam = searchParams.startDate
           ? new Date(searchParams.startDate)
           : null;
         const endDateParam = searchParams.endDate
           ? new Date(searchParams.endDate)
           : startDateParam;
+
+        // Look up nearby cities for expanded search
+        const nearbyCities = locationParam
+          ? getNearbyCities(locationParam)
+          : [];
 
         let mapped: ResultItem[] = [];
         try {
@@ -119,15 +129,15 @@ export default function SearchResults({
               ? toLocalYYYYMMDD(startDateParam)
               : null,
             p_end_date: endDateParam ? toLocalYYYYMMDD(endDateParam) : null,
-            p_price_min: filters.priceMin,
-            p_price_max: filters.priceMax,
             p_skills: filters.skills.length > 0 ? filters.skills : null,
-            p_min_rating: filters.minRating,
             p_has_reviews: filters.hasReviews,
             p_verified_only: filters.verifiedOnly,
           };
           if (viewerType) {
             rpcParams.p_viewer_type = viewerType;
+          }
+          if (nearbyCities.length > 0) {
+            rpcParams.p_nearby_locations = nearbyCities;
           }
           const { data, error } = await supabase.rpc("search_ads", rpcParams);
           if (error) {
@@ -160,7 +170,7 @@ export default function SearchResults({
                 : Number(ad.owner_rating || 0),
             ownerReviewsCount: Number(ad.owner_reviews_count || 0),
             locations: ad.locations || [],
-            availabilitySlots: [], // Will be loaded separately
+            availabilitySlots: [] as AvailabilitySlot[], // Will be loaded separately
           }));
           
           // Fetch ad types and availability slots
@@ -199,7 +209,7 @@ export default function SearchResults({
             );
             
             mappedLocal.forEach((ad) => {
-              ad.availabilitySlots = availabilityMap.get(ad.id) || [];
+              ad.availabilitySlots = availabilityMap.get(ad.id) || ([] as AvailabilitySlot[]);
             });
           }
           
@@ -465,10 +475,10 @@ export default function SearchResults({
                         {ad.ownerMemberSince && (
                           <div className="text-xs text-gray-400">
                             {t("ad.joined")}{" "}
-                            {new Date(ad.ownerMemberSince).toLocaleDateString(
-                              undefined,
+                            {stripLatvianGada(new Date(ad.ownerMemberSince).toLocaleDateString(
+                              language === "lv" ? "lv-LV" : language === "ru" ? "ru-RU" : "en-US",
                               { year: "numeric", month: "short" }
-                            )}
+                            ))}
                           </div>
                         )}
                       </div>

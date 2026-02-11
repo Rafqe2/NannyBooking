@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useTranslation } from "./LanguageProvider";
+import { stripLatvianGada } from "../lib/date";
 
 interface MultiDatePickerProps {
   selectedDates: Date[];
@@ -14,9 +15,9 @@ interface MultiDatePickerProps {
   onUpdateDateTime?: (date: Date, start: string, end: string) => void;
   onRemoveDate?: (date: Date) => void;
   initialMonthDate?: Date;
-  showRemoveBadges?: boolean; // optional: show small remove x on calendar cells
-  allowedDateKeys?: Set<string> | string[]; // optional: if provided, only allow selecting these YYYY-MM-DD dates
-  autoOpenTimeEditor?: boolean; // optional: if true, opens time editor immediately on first click
+  showRemoveBadges?: boolean;
+  allowedDateKeys?: Set<string> | string[];
+  hideTip?: boolean;
 }
 
 function toDateKey(d: Date): string {
@@ -41,18 +42,13 @@ export default function MultiDatePicker({
   initialMonthDate,
   showRemoveBadges = false,
   allowedDateKeys,
-  autoOpenTimeEditor = false,
+  hideTip = false,
 }: MultiDatePickerProps) {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const [currentMonth, setCurrentMonth] = useState<Date>(() => {
     const base = initialMonthDate || new Date();
     return new Date(base.getFullYear(), base.getMonth(), 1);
   });
-  const [editingKey, setEditingKey] = useState<string | null>(null);
-  const [editStart, setEditStart] = useState<string>(
-    defaultStartTime || "09:00"
-  );
-  const [editEnd, setEditEnd] = useState<string>(defaultEndTime || "17:00");
 
   const selectedKeys = useMemo(() => {
     const s = new Set<string>();
@@ -65,19 +61,19 @@ export default function MultiDatePicker({
     const month = currentMonth.getMonth();
     const first = new Date(year, month, 1);
     const last = new Date(year, month + 1, 0);
-    // Convert Sunday (0) to 6, Monday (1) to 0, etc. to start week on Monday
     const dayOfWeek = first.getDay();
     const startingDayOfWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
     return { daysInMonth: last.getDate(), startingDayOfWeek };
   }, [currentMonth]);
 
+  const locale = language === "lv" ? "lv-LV" : language === "ru" ? "ru-RU" : "en-US";
   const monthLabel = useMemo(
     () =>
-      currentMonth.toLocaleDateString("en-US", {
+      stripLatvianGada(currentMonth.toLocaleDateString(locale, {
         month: "long",
         year: "numeric",
-      }),
-    [currentMonth]
+      })),
+    [currentMonth, locale]
   );
 
   const allowedSet = useMemo<Set<string> | null>(() => {
@@ -110,7 +106,6 @@ export default function MultiDatePicker({
     const next = new Map<string, Date>();
     for (const sd of selectedDates) next.set(toDateKey(sd), new Date(sd));
     if (next.has(key)) {
-      // Second click removes the date
       next.delete(key);
       if (onRemoveDate) onRemoveDate(d);
     } else {
@@ -121,14 +116,6 @@ export default function MultiDatePicker({
       (a, b) => a.getTime() - b.getTime()
     );
     onChange(out);
-
-    // Auto-open editor for newly added dates if enabled
-    if (autoOpenTimeEditor && next.has(key)) {
-      const ov = perDateTimes && perDateTimes[key];
-      setEditStart(ov?.start || defaultStartTime || "09:00");
-      setEditEnd(ov?.end || defaultEndTime || "17:00");
-      setEditingKey(key);
-    }
   };
 
   return (
@@ -195,20 +182,8 @@ export default function MultiDatePicker({
             <div key={day} className="relative">
               <button
                 type="button"
-                disabled={past || (allowedSet && !isAvailable)}
-                onClick={() => {
-                  // Single click toggles selection (add or remove)
-                  toggleDay(day);
-                }}
-                onDoubleClick={() => {
-                  if (selected) {
-                    // Double-click on selected date opens editor
-                    const ov = perDateTimes && perDateTimes[dateKey];
-                    setEditStart(ov?.start || defaultStartTime || "09:00");
-                    setEditEnd(ov?.end || defaultEndTime || "17:00");
-                    setEditingKey(dateKey);
-                  }
-                }}
+                disabled={past || (allowedSet !== null && !isAvailable)}
+                onClick={() => toggleDay(day)}
                 className={
                   "h-10 w-full rounded-lg text-sm transition " +
                   (past
@@ -248,88 +223,6 @@ export default function MultiDatePicker({
           );
         })}
       </div>
-
-      {!editingKey && selectedDates.length > 0 && (
-        <div className="mt-3 p-3 border border-dashed border-gray-300 rounded-xl bg-white">
-          <div className="text-xs text-gray-600">
-            {autoOpenTimeEditor
-              ? t("calendar.tipClick")
-              : t("calendar.tipDoubleClick")}
-          </div>
-        </div>
-      )}
-
-      {editingKey && (
-        <div className="mt-3 p-3 border border-gray-200 rounded-xl bg-white shadow-sm">
-          <div className="text-sm font-medium text-gray-900 mb-2">
-            {editingKey}
-          </div>
-          <div className="grid grid-cols-2 gap-2 mb-3">
-            <div>
-              <label className="block text-xs text-gray-600 mb-1">
-                {t("booking.startTime")}
-              </label>
-              <input
-                type="time"
-                value={editStart}
-                onChange={(e) => setEditStart(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-              />
-            </div>
-            <div>
-              <label className="block text-xs text-gray-600 mb-1">
-                {t("booking.endTime")}
-              </label>
-              <input
-                type="time"
-                value={editEnd}
-                onChange={(e) => setEditEnd(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-              />
-            </div>
-          </div>
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex gap-2">
-              <button
-                type="button"
-                className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700"
-                onClick={() => {
-                  if (onUpdateDateTime && editingKey) {
-                    const d = new Date(editingKey + "T00:00:00");
-                    onUpdateDateTime(d, editStart, editEnd);
-                  }
-                  setEditingKey(null);
-                }}
-              >
-                {t("common.ok")}
-              </button>
-              <button
-                type="button"
-                className="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50"
-                onClick={() => setEditingKey(null)}
-              >
-                {t("common.cancel")}
-              </button>
-            </div>
-            <button
-              type="button"
-              className="px-4 py-2 border border-red-300 text-red-700 rounded-lg text-sm hover:bg-red-50"
-              onClick={() => {
-                if (!editingKey) return;
-                const d = new Date(editingKey + "T00:00:00");
-                const out = selectedDates.filter(
-                  (sd) => toDateKey(sd) !== editingKey
-                );
-                onChange(out);
-                if (onRemoveDate) onRemoveDate(d);
-                setEditingKey(null);
-              }}
-            >
-              Remove
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

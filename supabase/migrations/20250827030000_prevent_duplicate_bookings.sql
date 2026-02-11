@@ -118,3 +118,4 @@ BEGIN
   RAISE NOTICE 'Updated create_booking_from_ad to prevent duplicate bookings (pending and confirmed)! ✅';
 END $$;
 
+

@@ -21,6 +21,8 @@ export default function EditAdvertisement({
   const [title, setTitle] = useState("");
   const [pricePerHour, setPricePerHour] = useState<number>(0);
   const [description, setDescription] = useState("");
+  const [experience, setExperience] = useState("");
+  const [additionalInfo, setAdditionalInfo] = useState("");
   const [locationCity, setLocationCity] = useState("");
   const [skills, setSkills] = useState<string[]>([]);
   const [type, setType] = useState<"short-term" | "long-term">("short-term");
@@ -47,25 +49,34 @@ export default function EditAdvertisement({
         setTitle(adData.title || "");
         setPricePerHour(Number(adData.price_per_hour) || 0);
         setDescription(adData.description || "");
+        setExperience(adData.experience || "");
+        setAdditionalInfo(adData.additional_info || "");
         setLocationCity(adData.location_city || "");
         setSkills((adData.skills as any) || []);
         setType((adData.type as any) || "short-term");
-        // load dates
+        // load dates, filtering out expired ones
         const slots = await AdvertisementService.getAvailabilitySlots(
           advertisementId
         );
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
         const dates: Date[] = [];
         const per: Record<string, { start: string; end: string }> = {};
         for (const s of slots) {
           const d = new Date(s.available_date + "T00:00:00");
+          if (d < today) continue; // skip expired dates
           dates.push(d);
           per[s.available_date] = { start: s.start_time, end: s.end_time };
         }
         setSelectedDates(dates);
         setPerDateTimes(per);
-        // load extra locations
+        // load extra locations (filter out primary location to avoid duplicates)
         const locs = await AdvertisementService.getLocations(advertisementId);
-        setExtraLocations((locs || []).map((l: any) => l.label));
+        const primary = adData.location_city || "";
+        const extras = (locs || [])
+          .map((l: any) => l.label)
+          .filter((label: string) => label !== primary);
+        setExtraLocations(extras);
       } catch (e: any) {
         setError(e?.message || t("ad.errorLoadFailed"));
       } finally {
@@ -168,7 +179,7 @@ export default function EditAdvertisement({
               const value = e.target.value;
               if (value === "" || /^\d*\.?\d*$/.test(value)) {
                 const numValue = value === "" ? 0 : parseFloat(value);
-                if (value === "" || (numValue >= 0 && numValue <= 1000)) {
+                if (value === "" || (numValue >= 0 && numValue <= 10000)) {
                   setPricePerHour(numValue);
                 }
               }
@@ -176,7 +187,7 @@ export default function EditAdvertisement({
             className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-50"
           />
           <p className="text-xs text-gray-500 mt-1">
-            {pricePerHour > 0 ? `€${pricePerHour.toFixed(2)}` : "Enter price"} (max: €1000)
+            {pricePerHour > 0 ? `€${pricePerHour.toFixed(2)}` : t("adCreate.enterPrice")}
           </p>
         </div>
         <div className="md:col-span-2">
@@ -198,7 +209,7 @@ export default function EditAdvertisement({
           />
           <p className="text-xs text-gray-500 mt-1">
             {title.length}/100 {title.length < 6 && (
-              <span className="text-red-500">(min. 6 characters)</span>
+              <span className="text-red-500">({t("adCreate.minCharacters")})</span>
             )}
           </p>
         </div>
@@ -220,7 +231,49 @@ export default function EditAdvertisement({
             className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-50"
           />
           <p className="text-xs text-gray-500 mt-1">
-            {description.length}/2000 characters
+            {description.length}/2000 {t("adCreate.characters")}
+          </p>
+        </div>
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            {t("adCreate.requirementsPreferences")}
+          </label>
+          <textarea
+            disabled={isActive}
+            rows={3}
+            value={experience}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value.length <= 1000) {
+                setExperience(value);
+              }
+            }}
+            maxLength={1000}
+            className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-50"
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            {experience.length}/1000 {t("adCreate.characters")}
+          </p>
+        </div>
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            {t("adCreate.additionalInfo")}
+          </label>
+          <textarea
+            disabled={isActive}
+            rows={2}
+            value={additionalInfo}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value.length <= 500) {
+                setAdditionalInfo(value);
+              }
+            }}
+            maxLength={500}
+            className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-50"
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            {additionalInfo.length}/500 {t("adCreate.characters")}
           </p>
         </div>
         <div className="md:col-span-2">
@@ -292,18 +345,17 @@ export default function EditAdvertisement({
           <div className="mt-3 space-y-2">
             {extraLocations.map((val, idx) => (
               <div key={idx} className="flex gap-2">
-                <input
-                  disabled={isActive}
-                  type="text"
-                  value={val || ""}
-                  onChange={(e) => {
-                    const next = [...extraLocations];
-                    next[idx] = e.target.value;
-                    setExtraLocations(next);
-                  }}
-                  placeholder={t("adEdit.locationPlaceholder")}
-                  className="flex-1 px-3 py-2 border rounded-lg disabled:bg-gray-50"
-                />
+                <div className="flex-1">
+                  <LocationAutocomplete
+                    value={val || ""}
+                    onChange={(next) => {
+                      const updated = [...extraLocations];
+                      updated[idx] = next.label;
+                      setExtraLocations(updated);
+                    }}
+                    placeholder={t("adEdit.locationPlaceholder")}
+                  />
+                </div>
                 <button
                   type="button"
                   disabled={isActive}
@@ -384,7 +436,7 @@ export default function EditAdvertisement({
               onUpdateDateTime={onUpdateDateTime}
               onRemoveDate={onRemoveDate}
               initialMonthDate={selectedDates[0] || new Date()}
-              autoOpenTimeEditor={true}
+              hideTip
             />
           </div>
           {selectedDates.length > 0 && (
@@ -420,11 +472,30 @@ export default function EditAdvertisement({
                           <div className="text-sm font-medium text-gray-900 whitespace-nowrap">
                             {formatDateDDMMYYYY(d)}
                           </div>
-                          <div className="text-xs text-gray-600 flex items-center gap-1">
-                            <span>🕐</span>
-                            <span className="font-mono">
-                              {start} - {end}
-                            </span>
+                          <div className="flex items-center gap-1">
+                            <input
+                              type="time"
+                              value={start}
+                              onChange={(e) => {
+                                setPerDateTimes((prev) => ({
+                                  ...prev,
+                                  [key]: { start: e.target.value, end },
+                                }));
+                              }}
+                              className="px-1.5 py-0.5 border border-gray-300 rounded text-xs font-mono bg-white focus:ring-1 focus:ring-purple-500 focus:border-purple-500"
+                            />
+                            <span className="text-xs text-gray-400">-</span>
+                            <input
+                              type="time"
+                              value={end}
+                              onChange={(e) => {
+                                setPerDateTimes((prev) => ({
+                                  ...prev,
+                                  [key]: { start, end: e.target.value },
+                                }));
+                              }}
+                              className="px-1.5 py-0.5 border border-gray-300 rounded text-xs font-mono bg-white focus:ring-1 focus:ring-purple-500 focus:border-purple-500"
+                            />
                           </div>
                         </div>
                         <button
@@ -485,17 +556,20 @@ export default function EditAdvertisement({
                 title,
                 price_per_hour: pricePerHour as any,
                 description: description as any,
+                experience: experience as any,
+                additional_info: additionalInfo || null,
                 location_city: locationCity as any,
                 skills: skills as any,
                 availability_start_time: "09:00" as any,
                 availability_end_time: "17:00" as any,
                 type: type as any,
               } as any);
-              // replace locations
-              const allLocs = [locationCity, ...extraLocations]
-                .map((x) => (x || "").trim())
-                .filter((x) => x.length > 0)
-                .slice(0, 3);
+              // replace locations (deduplicate)
+              const allLocs = Array.from(new Set(
+                [locationCity, ...extraLocations]
+                  .map((x) => (x || "").trim())
+                  .filter((x) => x.length > 0)
+              )).slice(0, 3);
               await AdvertisementService.replaceLocations(
                 advertisementId,
                 allLocs

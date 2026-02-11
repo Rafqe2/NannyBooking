@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 interface LocationAutocompleteProps {
   value: string;
   onChange: (next: { label: string }) => void;
+  onQueryChange?: (query: string) => void; // Callback to track current query text
   placeholder?: string;
   variant?: "default" | "borderless";
 }
@@ -18,6 +19,7 @@ interface Suggestion {
 export default function LocationAutocomplete({
   value,
   onChange,
+  onQueryChange,
   placeholder,
   variant = "default",
 }: LocationAutocompleteProps) {
@@ -71,6 +73,7 @@ export default function LocationAutocomplete({
           url.searchParams.set("q", search);
           url.searchParams.set("addressdetails", "1");
           url.searchParams.set("limit", "8");
+          url.searchParams.set("countrycodes", "lv");
           const res = await fetch(url.toString(), {
             headers: {
               "Accept-Language": "en",
@@ -114,6 +117,7 @@ export default function LocationAutocomplete({
   const handleSelect = (s: Suggestion) => {
     onChange({ label: s.label });
     setQuery(s.label);
+    onQueryChange?.(s.label); // Notify parent when suggestion is selected
     setSuggestions([]);
     setOpen(false);
   };
@@ -140,7 +144,11 @@ export default function LocationAutocomplete({
       <input
         type="text"
         value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        onChange={(e) => {
+          const newQuery = e.target.value;
+          setQuery(newQuery);
+          onQueryChange?.(newQuery); // Notify parent of query changes
+        }}
         onFocus={() => setOpen(suggestions.length > 0)}
         placeholder={placeholder || "Search city, country, street"}
         className={

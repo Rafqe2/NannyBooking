@@ -107,14 +107,6 @@ export default function BookingModal({
                     perDateTimes={perDateTimes}
                     defaultStartTime="09:00"
                     defaultEndTime="17:00"
-                    autoOpenTimeEditor={true}
-                    onUpdateDateTime={(date, start, end) => {
-                      const key = toLocalYYYYMMDD(date);
-                      setPerDateTimes((prev) => ({
-                        ...prev,
-                        [key]: { start, end },
-                      }));
-                    }}
                     onSelectedDateClick={(date) => {
                       const key = toLocalYYYYMMDD(date);
                       if (!perDateTimes[key] && defaultTimesPerDate[key]) {
