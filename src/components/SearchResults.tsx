@@ -132,6 +132,7 @@ export default function SearchResults({
             p_skills: filters.skills.length > 0 ? filters.skills : null,
             p_has_reviews: filters.hasReviews,
             p_verified_only: filters.verifiedOnly,
+            p_ad_type: filters.adType || null,
           };
           if (viewerType) {
             rpcParams.p_viewer_type = viewerType;

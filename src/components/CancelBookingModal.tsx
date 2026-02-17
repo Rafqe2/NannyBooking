@@ -10,9 +10,10 @@ interface CancelBookingModalProps {
   booking: any;
   onClose: () => void;
   onSuccess: () => void;
+  userType?: "parent" | "nanny" | "pending" | null;
 }
 
-const CANCELLATION_REASONS = [
+const PARENT_CANCELLATION_REASONS = [
   "Emergency came up",
   "Schedule conflict",
   "Found alternative arrangement",
@@ -22,10 +23,21 @@ const CANCELLATION_REASONS = [
   "Other",
 ];
 
+const NANNY_CANCELLATION_REASONS = [
+  "Emergency came up",
+  "Schedule conflict",
+  "Health issue",
+  "Personal reasons",
+  "Transportation problems",
+  "Other commitment",
+  "Other",
+];
+
 export default function CancelBookingModal({
   booking,
   onClose,
   onSuccess,
+  userType,
 }: CancelBookingModalProps) {
   const { t, language } = useTranslation();
   const [selectedReason, setSelectedReason] = useState<string>("");
@@ -124,7 +136,7 @@ export default function CancelBookingModal({
               <option value="">
                 {t("cancelBooking.selectReasonPlaceholder")}
               </option>
-              {CANCELLATION_REASONS.map((reason) => (
+              {(userType === "nanny" ? NANNY_CANCELLATION_REASONS : PARENT_CANCELLATION_REASONS).map((reason) => (
                 <option key={reason} value={reason}>
                   {getTranslatedCancellationReason(reason, language)}
                 </option>

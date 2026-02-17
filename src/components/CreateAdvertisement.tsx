@@ -241,67 +241,30 @@ export default function CreateAdvertisement() {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-8 space-y-8">
-          {/* Service Type */}
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              {isParent ? t("adCreate.careNeeded") : t("adCreate.serviceType")}
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <label className="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                <input
-                  type="radio"
-                  name="serviceType"
-                  value="short-term"
-                  checked={formData.type === "short-term"}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      type: e.target.value as "short-term" | "long-term",
-                    }))
-                  }
-                  className="mr-3"
-                />
-                <div>
-                  <div className="font-medium text-gray-900">
-                    {isParent
-                      ? t("adCreate.shortTermNeed")
-                      : t("adCreate.shortTermCare")}
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    {t("adCreate.oneTimeOccasional")}
-                  </div>
-                </div>
-              </label>
-              <label className="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                <input
-                  type="radio"
-                  name="serviceType"
-                  value="long-term"
-                  checked={formData.type === "long-term"}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      type: e.target.value as "short-term" | "long-term",
-                    }))
-                  }
-                  className="mr-3"
-                />
-                <div>
-                  <div className="font-medium text-gray-900">
-                    {isParent
-                      ? t("adCreate.longTermNeed")
-                      : t("adCreate.longTermCare")}
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    {t("adCreate.regularOngoing")}
-                  </div>
-                </div>
-              </label>
-            </div>
-          </div>
-
           {/* Basic Information */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {isParent ? t("adCreate.careNeeded") : t("adCreate.serviceType")}
+              </label>
+              <select
+                value={formData.type}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    type: e.target.value as "short-term" | "long-term",
+                  }))
+                }
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+              >
+                <option value="short-term">
+                  {isParent ? t("adCreate.shortTermNeed") : t("adCreate.shortTermCare")}
+                </option>
+                <option value="long-term">
+                  {isParent ? t("adCreate.longTermNeed") : t("adCreate.longTermCare")}
+                </option>
+              </select>
+            </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 {t("adCreate.adTitle")}
@@ -639,38 +602,10 @@ export default function CreateAdvertisement() {
             </div>
           </div>
 
-          {/* Experience */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {experienceLabel}
-            </label>
-            <textarea
-              value={formData.experience}
-              onChange={(e) => {
-                const value = e.target.value;
-                if (value.length <= 1000) {
-                  setFormData((prev) => ({ ...prev, experience: value }));
-                }
-              }}
-              rows={4}
-              maxLength={1000}
-              placeholder={
-                isParent
-                  ? t("adCreate.experiencePlaceholderParent")
-                  : t("adCreate.experiencePlaceholderNanny")
-              }
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
-              required
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              {formData.experience.length}/1000 {t("adCreate.characters")}
-            </p>
-          </div>
-
           {/* Description */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              {descriptionLabel}
+              {descriptionLabel} <span className="text-red-500">*</span>
             </label>
             <textarea
               value={formData.description}
@@ -695,6 +630,34 @@ export default function CreateAdvertisement() {
             />
             <p className="text-xs text-gray-500 mt-1">
               {formData.description.length}/2000 {t("adCreate.characters")}
+            </p>
+          </div>
+
+          {/* Experience / Requirements (optional) */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {experienceLabel}{" "}
+              <span className="text-gray-400 font-normal">({t("common.optional")})</span>
+            </label>
+            <textarea
+              value={formData.experience}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value.length <= 1000) {
+                  setFormData((prev) => ({ ...prev, experience: value }));
+                }
+              }}
+              rows={4}
+              maxLength={1000}
+              placeholder={
+                isParent
+                  ? t("adCreate.experiencePlaceholderParent")
+                  : t("adCreate.experiencePlaceholderNanny")
+              }
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              {formData.experience.length}/1000 {t("adCreate.characters")}
             </p>
           </div>
 

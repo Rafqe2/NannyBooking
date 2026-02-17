@@ -13,11 +13,13 @@ export default function BookingModal({
   onClose,
   ownerType,
   availableSlots,
+  adType,
 }: {
   adId: string;
   onClose: () => void;
   ownerType?: "nanny" | "parent";
   availableSlots?: Slot[];
+  adType?: "short-term" | "long-term";
 }) {
   const { t } = useTranslation();
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
@@ -28,6 +30,8 @@ export default function BookingModal({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+
+  const isLongTerm = adType === "long-term";
 
   const todayKey = useMemo(() => toLocalYYYYMMDD(new Date()), []);
   const futureSlots: Slot[] = useMemo(
@@ -57,20 +61,53 @@ export default function BookingModal({
 
   const hasAvailability = availableDateKeys.size > 0;
 
+  const handleLongTermRequest = async () => {
+    setError(null);
+    setSuccess(null);
+    setSaving(true);
+
+    // For long-term, create a booking with today's date as placeholder
+    const result = await BookingService.createBooking({
+      adId,
+      date: todayKey,
+      start: "09:00",
+      end: "17:00",
+      message: message.trim() || undefined,
+    });
+
+    setSaving(false);
+
+    if (result.success) {
+      setSuccess(t("booking.contactRequestSent"));
+    } else {
+      const errLower = (result.error || "").toLowerCase();
+      const isLimit = errLower.includes("booking_limit") || errLower.includes("maximum") || errLower.includes("5 active") || errLower.includes("reached");
+      if (isLimit) {
+        setError(t("booking.limitReached"));
+      } else if (errLower.includes("booking_conflict")) {
+        setError(t("booking.contactAlreadySent"));
+      } else {
+        setError(result.error || t("booking.createFailed"));
+      }
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
       <div className="relative bg-white w-full max-w-4xl max-h-[90vh] rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
         <div className="px-5 py-3 border-b border-gray-100 flex items-center justify-between">
           <h3 className="text-lg font-semibold text-gray-900">
-            {t("booking.bookThis", {
-              type:
-                ownerType === "nanny"
-                  ? t("userType.nanny")
-                  : ownerType === "parent"
-                  ? t("userType.parent")
-                  : "ad",
-            })}
+            {isLongTerm
+              ? t("booking.contactRequest")
+              : t("booking.bookThis", {
+                  type:
+                    ownerType === "nanny"
+                      ? t("userType.nanny")
+                      : ownerType === "parent"
+                      ? t("userType.parent")
+                      : "ad",
+                })}
           </h3>
           <button
             onClick={onClose}
@@ -91,7 +128,28 @@ export default function BookingModal({
             </div>
           )}
 
-          {hasAvailability ? (
+          {isLongTerm ? (
+            /* Long-term: contact request without dates */
+            <div className="p-5 space-y-4">
+              <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                <p className="text-sm text-purple-800">
+                  {t("booking.longTermDescription")}
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-700 mb-2">
+                  {t("booking.message")}
+                </label>
+                <textarea
+                  rows={4}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-lg resize-none"
+                  placeholder={t("booking.longTermMessagePlaceholder")}
+                />
+              </div>
+            </div>
+          ) : hasAvailability ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-5">
               {/* Left Column - Calendar */}
               <div className="space-y-4">
@@ -102,7 +160,7 @@ export default function BookingModal({
                   <MultiDatePicker
                     selectedDates={selectedDates}
                     onChange={setSelectedDates}
-                    minDate={new Date()}
+                    minDate={(() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; })()}
                     allowedDateKeys={availableDateKeys}
                     perDateTimes={perDateTimes}
                     defaultStartTime="09:00"
@@ -130,21 +188,50 @@ export default function BookingModal({
                     <div className="space-y-2">
                       {selectedDates.map((date) => {
                         const key = toLocalYYYYMMDD(date);
-                        const times = perDateTimes[key] ||
-                          defaultTimesPerDate[key] || {
-                            start: "09:00",
-                            end: "17:00",
-                          };
+                        const slotTimes = defaultTimesPerDate[key] || {
+                          start: "09:00",
+                          end: "17:00",
+                        };
+                        const times = perDateTimes[key] || slotTimes;
                         return (
                           <div
                             key={key}
                             className="text-sm text-gray-700 bg-white rounded-md p-2 border"
                           >
-                            <div className="font-medium">
+                            <div className="font-medium mb-1">
                               {formatDateDDMMYYYY(date)}
+                              <span className="text-xs text-gray-400 ml-2">
+                                ({t("booking.available")}: {slotTimes.start} - {slotTimes.end})
+                              </span>
                             </div>
-                            <div className="text-gray-600">
-                              {times.start} - {times.end}
+                            <div className="flex items-center gap-1">
+                              <input
+                                type="time"
+                                value={times.start}
+                                min={slotTimes.start}
+                                max={slotTimes.end}
+                                onChange={(e) =>
+                                  setPerDateTimes((prev) => ({
+                                    ...prev,
+                                    [key]: { ...times, start: e.target.value },
+                                  }))
+                                }
+                                className="px-1.5 py-0.5 border border-gray-300 rounded text-xs font-mono bg-white focus:ring-1 focus:ring-purple-500 focus:border-purple-500"
+                              />
+                              <span className="text-xs text-gray-400">-</span>
+                              <input
+                                type="time"
+                                value={times.end}
+                                min={slotTimes.start}
+                                max={slotTimes.end}
+                                onChange={(e) =>
+                                  setPerDateTimes((prev) => ({
+                                    ...prev,
+                                    [key]: { ...times, end: e.target.value },
+                                  }))
+                                }
+                                className="px-1.5 py-0.5 border border-gray-300 rounded text-xs font-mono bg-white focus:ring-1 focus:ring-purple-500 focus:border-purple-500"
+                              />
                             </div>
                           </div>
                         );
@@ -182,98 +269,121 @@ export default function BookingModal({
           >
             {t("common.cancel")}
           </button>
-          <button
-            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50"
-            disabled={saving || selectedDates.length === 0}
-            onClick={async () => {
-              setError(null);
-              setSuccess(null);
+          {isLongTerm ? (
+            <button
+              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50"
+              disabled={saving}
+              onClick={handleLongTermRequest}
+            >
+              {saving ? t("booking.submitting") : t("booking.sendContactRequest")}
+            </button>
+          ) : (
+            <button
+              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50"
+              disabled={saving || selectedDates.length === 0}
+              onClick={async () => {
+                setError(null);
+                setSuccess(null);
 
-              if (selectedDates.length === 0) {
-                setError(t("booking.errorSelectDate"));
-                return;
-              }
-
-              // Build the slots to submit from selected dates and times
-              const toSubmit: Slot[] = selectedDates.map((date) => {
-                const key = toLocalYYYYMMDD(date);
-                const times = perDateTimes[key] ||
-                  defaultTimesPerDate[key] || { start: "09:00", end: "17:00" };
-                return {
-                  available_date: key,
-                  start_time: times.start,
-                  end_time: times.end,
-                };
-              });
-
-              // Validate all slots
-              for (const s of toSubmit) {
-                if (!s.available_date || !s.start_time || !s.end_time) {
-                  setError(t("booking.selectDateAndTime"));
+                if (selectedDates.length === 0) {
+                  setError(t("booking.errorSelectDate"));
                   return;
                 }
-                if (s.end_time <= s.start_time) {
-                  setError(t("booking.endTimeAfterStart"));
-                  return;
-                }
-              }
 
-              setSaving(true);
-              let successCount = 0;
-              let conflictError = false;
-
-              for (const s of toSubmit) {
-                const result = await BookingService.createBooking({
-                  adId,
-                  date: s.available_date,
-                  start: s.start_time,
-                  end: s.end_time,
-                  message: message.trim() || undefined,
+                // Build the slots to submit from selected dates and times
+                const toSubmit: Slot[] = selectedDates.map((date) => {
+                  const key = toLocalYYYYMMDD(date);
+                  const times = perDateTimes[key] ||
+                    defaultTimesPerDate[key] || { start: "09:00", end: "17:00" };
+                  return {
+                    available_date: key,
+                    start_time: times.start,
+                    end_time: times.end,
+                  };
                 });
 
-                if (result.success) {
-                  successCount++;
-                } else {
-                  // Log the actual error for debugging
-                  console.error("Booking failed for slot:", s, "Error:", result.error);
-                  // Check if it's a booking conflict error
-                  if (result.error && result.error.includes("BOOKING_CONFLICT")) {
-                    conflictError = true;
-                    break; // Stop trying other bookings
+                // Validate all slots
+                for (const s of toSubmit) {
+                  if (!s.available_date || !s.start_time || !s.end_time) {
+                    setError(t("booking.selectDateAndTime"));
+                    return;
+                  }
+                  // Validate times are within the available slot range
+                  const slotRange = defaultTimesPerDate[s.available_date];
+                  if (slotRange) {
+                    if (s.start_time < slotRange.start || s.end_time > slotRange.end) {
+                      setError(t("booking.timeOutOfRange"));
+                      return;
+                    }
+                  }
+                  if (s.end_time <= s.start_time) {
+                    setError(t("booking.endTimeAfterStart"));
+                    return;
                   }
                 }
-              }
 
-              setSaving(false);
+                setSaving(true);
+                let successCount = 0;
+                let lastError = "";
 
-              if (conflictError) {
-                setError(t("booking.conflictError"));
-              } else if (successCount === 0) {
-                setError(t("booking.createFailed"));
-              } else if (successCount < toSubmit.length) {
-                setError(
-                  t("booking.partialSuccess", {
-                    successCount,
-                    totalCount: toSubmit.length,
+                for (const s of toSubmit) {
+                  const result = await BookingService.createBooking({
+                    adId,
+                    date: s.available_date,
+                    start: s.start_time,
+                    end: s.end_time,
+                    message: message.trim() || undefined,
+                  });
+
+                  if (result.success) {
+                    successCount++;
+                  } else {
+                    lastError = result.error || "";
+                    console.error("Booking failed for slot:", s, "Error:", lastError);
+                    // Stop on conflict or limit errors
+                    const errCheck = lastError.toLowerCase();
+                    if (errCheck.includes("booking_conflict") || errCheck.includes("booking_limit") || errCheck.includes("maximum") || errCheck.includes("5 active")) {
+                      break;
+                    }
+                  }
+                }
+
+                setSaving(false);
+
+                const errLower = lastError.toLowerCase();
+                const isLimitError = errLower.includes("booking_limit") || errLower.includes("maximum") || errLower.includes("5 active") || errLower.includes("reached");
+                const isConflictError = errLower.includes("booking_conflict");
+                if (isLimitError) {
+                  setError(t("booking.limitReached"));
+                } else if (isConflictError) {
+                  setError(t("booking.conflictError"));
+                } else if (successCount === 0 && lastError) {
+                  setError(t("booking.createFailed"));
+                } else if (successCount < toSubmit.length) {
+                  setError(
+                    t("booking.partialSuccess", {
+                      successCount,
+                      totalCount: toSubmit.length,
+                    })
+                  );
+                } else {
+                  setSuccess(
+                    toSubmit.length > 1
+                      ? t("booking.requestsSentMultiple")
+                      : t("booking.requestSent")
+                  );
+                }
+              }}
+            >
+              {saving
+                ? t("booking.submitting")
+                : selectedDates.length > 1
+                ? t("booking.sendMultipleRequests", {
+                    count: selectedDates.length,
                   })
-                );
-              } else {
-                setSuccess(
-                  toSubmit.length > 1
-                    ? t("booking.requestsSentMultiple")
-                    : t("booking.requestSent")
-                );
-              }
-            }}
-          >
-            {saving
-              ? t("booking.submitting")
-              : selectedDates.length > 1
-              ? t("booking.sendMultipleRequests", {
-                  count: selectedDates.length,
-                })
-              : t("booking.submitRequest")}
-          </button>
+                : t("booking.submitRequest")}
+            </button>
+          )}
         </div>
       </div>
     </div>

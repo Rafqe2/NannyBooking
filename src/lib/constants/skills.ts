@@ -137,6 +137,26 @@ export const CANCELLATION_REASONS_TRANSLATIONS = {
     en: "Other",
     lv: "Citi",
     ru: "Другое"
+  },
+  "Health issue": {
+    en: "Health issue",
+    lv: "Veselības problēma",
+    ru: "Проблемы со здоровьем"
+  },
+  "Personal reasons": {
+    en: "Personal reasons",
+    lv: "Personiski iemesli",
+    ru: "Личные причины"
+  },
+  "Transportation problems": {
+    en: "Transportation problems",
+    lv: "Transporta problēmas",
+    ru: "Проблемы с транспортом"
+  },
+  "Other commitment": {
+    en: "Other commitment",
+    lv: "Citas saistības",
+    ru: "Другие обязательства"
   }
 } as const;
 

@@ -494,6 +494,7 @@ export default function AdvertisementDetails({
                 : undefined
             }
             availableSlots={slots as any}
+            adType={ad.type === "long-term" ? "long-term" : "short-term"}
           />
         )}
       </main>

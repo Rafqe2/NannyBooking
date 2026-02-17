@@ -9,6 +9,7 @@ export interface AdvancedFilters {
   experienceYears: number | null;
   hasReviews: boolean;
   verifiedOnly: boolean;
+  adType: "short-term" | "long-term" | null;
 }
 
 interface AdvancedSearchFiltersProps {
@@ -23,6 +24,7 @@ export const DEFAULT_FILTERS: AdvancedFilters = {
   experienceYears: null,
   hasReviews: false,
   verifiedOnly: false,
+  adType: null,
 };
 
 export default function AdvancedSearchFilters({
@@ -70,6 +72,7 @@ export default function AdvancedSearchFilters({
     if (filters.experienceYears !== null) count++;
     if (filters.hasReviews) count++;
     if (filters.verifiedOnly) count++;
+    if (filters.adType !== null) count++;
     return count;
   };
 
@@ -170,6 +173,34 @@ export default function AdvancedSearchFilters({
                     })}
                   </p>
                 )}
+              </div>
+
+              {/* Ad Type */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-900 mb-3">
+                  📋 {t("search.adTypeFilter")}
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {([null, "short-term", "long-term"] as const).map((type) => (
+                    <button
+                      key={type ?? "all"}
+                      onClick={() =>
+                        handleLocalChange("adType", type)
+                      }
+                      className={`px-3 py-2 rounded-lg border-2 transition-all text-sm whitespace-nowrap ${
+                        localFilters.adType === type
+                          ? "border-purple-600 bg-purple-50 text-purple-700 font-semibold"
+                          : "border-gray-200 hover:border-gray-300"
+                      }`}
+                    >
+                      {type === null
+                        ? t("search.any")
+                        : type === "short-term"
+                        ? t("search.shortTerm")
+                        : t("search.longTerm")}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {/* Experience Years */}

@@ -26,24 +26,11 @@ export class BookingService {
         console.error("createBooking error - error.hint:", error.hint);
         console.error("createBooking error - error.code:", error.code);
         
-        // Handle different error formats - Supabase errors have a message property
-        let errorMessage = 'Failed to create booking. Please try again.';
-        
-        if (error.message) {
-          errorMessage = error.message;
-        } else if (error.details) {
-          errorMessage = error.details;
-        } else if (error.hint) {
-          errorMessage = error.hint;
-        } else if (typeof error === 'string') {
-          errorMessage = error;
-        } else {
-          // Try to extract message from error object
-          const errorStr = JSON.stringify(error);
-          if (errorStr && errorStr !== '{}') {
-            errorMessage = errorStr;
-          }
-        }
+        // Combine all error fields so we never lose the raise exception message
+        const allParts = [error.message, error.details, error.hint]
+          .filter(Boolean)
+          .join(' | ');
+        const errorMessage = allParts || (typeof error === 'string' ? error : JSON.stringify(error)) || 'Failed to create booking. Please try again.';
         
         return { success: false, error: errorMessage };
       }

@@ -1131,9 +1131,9 @@ export const translations = {
     ru: 'Опишите свою семью, график, обязанности и ожидания.'
   },
   'adCreate.descriptionPlaceholderNanny': {
-    en: 'Describe what services you offer (meal prep, homework help, etc.).',
-    lv: 'Aprakstiet, kādus pakalpojumus piedāvājat (ēdiena gatavošana, palīdzība ar mājasdarbu u.c.).',
-    ru: 'Опишите, какие услуги вы предлагаете (приготовление еды, помощь с домашним заданием и т.д.).'
+    en: 'Tell families about yourself — your personality, childcare approach, past experiences, relevant education or certifications, and what makes you a great caregiver.',
+    lv: 'Pastāstiet ģimenēm par sevi — savu personību, bērnu aprūpes pieeju, iepriekšējo pieredzi, atbilstošo izglītību vai sertifikātus un to, kas padara jūs par lielisku aprūpētāju.',
+    ru: 'Расскажите семьям о себе — вашем характере, подходе к уходу за детьми, прошлом опыте, соответствующем образовании или сертификатах и о том, что делает вас отличной няней.'
   },
   'adCreate.characters': {
     en: 'characters',
@@ -1468,9 +1468,14 @@ export const translations = {
     ru: 'Отправить {{count}} запросов на бронирование'
   },
   'booking.conflictError': {
-    en: 'You already have a booking for this time slot. Please check your existing bookings.',
-    lv: 'Jums jau ir rezervācija šajā laika sprīdī. Lūdzu, pārbaudiet savas esošās rezervācijas.',
-    ru: 'У вас уже есть бронирование на это время. Пожалуйста, проверьте ваши существующие бронирования.'
+    en: 'You already have a pending or confirmed booking for this date.',
+    lv: 'Jums jau ir gaidoša vai apstiprināta rezervācija šim datumam.',
+    ru: 'У вас уже есть ожидающее или подтвержденное бронирование на эту дату.'
+  },
+  'booking.limitReached': {
+    en: 'You have reached the maximum of 5 active bookings. Please complete or cancel existing bookings first.',
+    lv: 'Jūs esat sasnieguši maksimālo 5 aktīvo rezervāciju skaitu. Lūdzu, pabeidziet vai atceliet esošās rezervācijas.',
+    ru: 'Вы достигли максимума в 5 активных бронирований. Пожалуйста, завершите или отмените существующие бронирования.'
   },
   'booking.createFailed': {
     en: 'Failed to create any bookings. Please try again.',
@@ -1501,6 +1506,47 @@ export const translations = {
     en: 'End time must be after start time for all dates',
     lv: 'Beigu laikam jābūt pēc sākuma laika visiem datumiem',
     ru: 'Время окончания должно быть после времени начала для всех дат'
+  },
+  'booking.contactRequest': {
+    en: 'Contact Request',
+    lv: 'Kontakta pieprasījums',
+    ru: 'Запрос на контакт'
+  },
+  'booking.longTermDescription': {
+    en: 'This is a long-term care advertisement. Send a contact request to start a conversation with the caregiver.',
+    lv: 'Šis ir ilgtermiņa aprūpes sludinājums. Nosūtiet kontakta pieprasījumu, lai sāktu sarunu ar aprūpētāju.',
+    ru: 'Это объявление о долгосрочном уходе. Отправьте запрос на контакт, чтобы начать общение с няней.'
+  },
+  'booking.longTermMessagePlaceholder': {
+    en: 'Introduce yourself and describe what you are looking for...',
+    lv: 'Iepazīstieties un aprakstiet, ko meklējat...',
+    ru: 'Представьтесь и опишите, что вы ищете...'
+  },
+  'booking.sendContactRequest': {
+    en: 'Send Contact Request',
+    lv: 'Nosūtīt kontakta pieprasījumu',
+    ru: 'Отправить запрос на контакт'
+  },
+  'booking.contactRequestSent': {
+    en: 'Contact request sent successfully! The caregiver will review your request.',
+    lv: 'Kontakta pieprasījums veiksmīgi nosūtīts! Aprūpētājs izskatīs jūsu pieprasījumu.',
+    ru: 'Запрос на контакт успешно отправлен! Няня рассмотрит ваш запрос.'
+  },
+  'booking.contactAlreadySent': {
+    en: 'You have already sent a contact request for this advertisement.',
+    lv: 'Jūs jau esat nosūtījuši kontakta pieprasījumu šim sludinājumam.',
+    ru: 'Вы уже отправили запрос на контакт для этого объявления.'
+  },
+
+  'booking.available': {
+    en: 'Available',
+    lv: 'Pieejams',
+    ru: 'Доступно'
+  },
+  'booking.timeOutOfRange': {
+    en: 'Selected times must be within the available time range',
+    lv: 'Izvēlētajiem laikiem jābūt pieejamā laika diapazonā',
+    ru: 'Выбранное время должно быть в пределах доступного диапазона'
   },
 
   // Advertisement Cards & Preview
@@ -1769,6 +1815,21 @@ export const translations = {
     en: 'Send',
     lv: 'Sūtīt',
     ru: 'Отправить'
+  },
+  'messages.conversationClosed': {
+    en: 'This conversation is closed because the booking was cancelled.',
+    lv: 'Šī saruna ir slēgta, jo rezervācija tika atcelta.',
+    ru: 'Этот разговор закрыт, так как бронирование было отменено.'
+  },
+  'messages.bookingAccepted': {
+    en: 'Your booking has been accepted! Feel free to discuss any details here.',
+    lv: 'Jūsu rezervācija ir apstiprināta! Šeit varat apspriest jebkādas detaļas.',
+    ru: 'Ваше бронирование подтверждено! Здесь вы можете обсудить любые детали.'
+  },
+  'messages.contactAccepted': {
+    en: 'Your contact request has been accepted! You can now discuss the details here.',
+    lv: 'Jūsu kontakta pieprasījums ir apstiprināts! Tagad varat apspriest detaļas šeit.',
+    ru: 'Ваш запрос на контакт принят! Теперь вы можете обсудить детали здесь.'
   },
   'messages.template1': {
     en: 'Hello! Looking forward to our booking!',
@@ -2302,6 +2363,21 @@ export const translations = {
     en: 'Any',
     lv: 'Jebkurš',
     ru: 'Любой'
+  },
+  'search.adTypeFilter': {
+    en: 'Service Type',
+    lv: 'Pakalpojuma veids',
+    ru: 'Тип услуги'
+  },
+  'search.shortTerm': {
+    en: 'Short-term',
+    lv: 'Īstermiņa',
+    ru: 'Краткосрочный'
+  },
+  'search.longTerm': {
+    en: 'Long-term',
+    lv: 'Ilgtermiņa',
+    ru: 'Долгосрочный'
   },
   'search.skillsFilter': {
     en: 'Skills & Qualifications',

@@ -11,6 +11,7 @@ export interface Conversation {
   counterparty_name: string;
   counterparty_picture: string | null;
   booking_date: string | null;
+  booking_status: string | null;
   last_message: string | null;
   last_message_at: string | null;
   unread_count: number;
@@ -63,7 +64,7 @@ export class MessageService {
       // All bookings in one query
       supabase
         .from("bookings")
-        .select("id, start_date")
+        .select("id, start_date, status")
         .in("id", Array.from(bookingIds)),
       // Last message per conversation - get recent messages and pick latest per conv
       supabase
@@ -86,9 +87,9 @@ export class MessageService {
       userMap.set(u.id, u);
     }
 
-    const bookingMap = new Map<string, string>();
+    const bookingMap = new Map<string, { start_date: string; status: string }>();
     for (const b of (bookingsRes.data || []) as any[]) {
-      bookingMap.set(b.id, b.start_date);
+      bookingMap.set(b.id, { start_date: b.start_date, status: b.status });
     }
 
     // Last message per conversation (first occurrence = latest due to order desc)
@@ -106,10 +107,11 @@ export class MessageService {
     }
 
     // Assemble enriched conversations
-    return convs.map((conv: any) => {
+    const enriched = convs.map((conv: any) => {
       const cpId = conv.participant_1 === userId ? conv.participant_2 : conv.participant_1;
       const userInfo = userMap.get(cpId);
       const lastMsg = lastMsgMap.get(conv.id);
+      const bookingInfo = bookingMap.get(conv.booking_id);
 
       return {
         ...conv,
@@ -117,12 +119,23 @@ export class MessageService {
           ? `${userInfo.name || ""} ${userInfo.surname || ""}`.trim()
           : "Unknown",
         counterparty_picture: userInfo?.picture || null,
-        booking_date: bookingMap.get(conv.booking_id) || null,
+        booking_date: bookingInfo?.start_date || null,
+        booking_status: bookingInfo?.status || null,
         last_message: lastMsg?.content || null,
         last_message_at: lastMsg?.created_at || null,
         unread_count: unreadMap.get(conv.id) || 0,
       } as Conversation;
     });
+
+    // Sort: cancelled bookings go to the end
+    enriched.sort((a, b) => {
+      const aCanc = a.booking_status === "cancelled" ? 1 : 0;
+      const bCanc = b.booking_status === "cancelled" ? 1 : 0;
+      if (aCanc !== bCanc) return aCanc - bCanc;
+      return 0; // preserve existing order within groups
+    });
+
+    return enriched;
   }
 
   static async getMessages(conversationId: string): Promise<Message[]> {

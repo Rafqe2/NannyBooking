@@ -35,6 +35,7 @@ interface BookingItem {
   counterparty_full_name: string | null;
   counterparty_id: string | null;
   advertisement_id: string | null;
+  ad_type: string | null;
   cancellation_reason: string | null;
   cancellation_note: string | null;
   cancelled_at: string | null;
@@ -512,7 +513,7 @@ export default function ProfilePage() {
     },
     {
       id: "bookings",
-      label: t("profile.bookings"),
+      label: t("profile.bookings") + (pendingBookings > 0 ? ` (${pendingBookings})` : ""),
       icon: pendingBookings > 0 ? "⚠️" : "📅",
     },
     { id: "messages", label: t("profile.messages") + (unreadMessageCount > 0 ? ` (${unreadMessageCount})` : ""), icon: "💬" },
@@ -1099,7 +1100,9 @@ export default function ProfilePage() {
                             >
                               <div className="flex items-center gap-5">
                                 <div className="text-gray-900 font-medium text-base">
-                                  {b.booking_date
+                                  {b.ad_type === "long-term"
+                                    ? t("booking.contactRequest")
+                                    : b.booking_date
                                     ? formatDateDDMMYYYY(
                                         new Date(b.booking_date + "T00:00:00")
                                       )
@@ -1154,7 +1157,14 @@ export default function ProfilePage() {
                                               );
                                             if (success) {
                                               try {
-                                                await MessageService.getOrCreateConversation(b.id);
+                                                const convId = await MessageService.getOrCreateConversation(b.id);
+                                                // Auto-send acceptance message so parent sees notification
+                                                if (convId) {
+                                                  const acceptMsg = b.ad_type === "long-term"
+                                                    ? t("messages.contactAccepted")
+                                                    : t("messages.bookingAccepted");
+                                                  await MessageService.sendMessage(convId, acceptMsg, true);
+                                                }
                                                 if (userProfile?.id) {
                                                   const convs = await MessageService.getConversations(userProfile.id);
                                                   setConversations(convs);
@@ -1361,58 +1371,73 @@ export default function ProfilePage() {
 
               {/* Booking Details Grid */}
               <div className="grid grid-cols-1 gap-4">
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <svg
-                      className="w-5 h-5 text-purple-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                      />
-                    </svg>
-                    <span className="font-medium text-gray-900">
-                      {t("booking.date")}
-                    </span>
-                  </div>
-                  <span className="text-gray-700">
-                    {selectedBooking.booking_date
-                      ? formatDateDDMMYYYY(
-                          new Date(selectedBooking.booking_date + "T00:00:00")
-                        )
-                      : "—"}
-                  </span>
-                </div>
-
-                {selectedBooking.start_time && selectedBooking.end_time && (
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <svg
-                        className="w-5 h-5 text-purple-600"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                      <span className="font-medium text-gray-900">
-                        {t("booking.time")}
+                {selectedBooking.ad_type === "long-term" ? (
+                  <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-medium text-purple-900">
+                        {t("booking.contactRequest")}
                       </span>
                     </div>
-                    <span className="text-gray-700">
-                      {selectedBooking.start_time} - {selectedBooking.end_time}
+                    <span className="text-sm text-purple-700">
+                      {t("booking.longTermDescription")}
                     </span>
                   </div>
+                ) : (
+                  <>
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <svg
+                          className="w-5 h-5 text-purple-600"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                          />
+                        </svg>
+                        <span className="font-medium text-gray-900">
+                          {t("booking.date")}
+                        </span>
+                      </div>
+                      <span className="text-gray-700">
+                        {selectedBooking.booking_date
+                          ? formatDateDDMMYYYY(
+                              new Date(selectedBooking.booking_date + "T00:00:00")
+                            )
+                          : "—"}
+                      </span>
+                    </div>
+
+                    {selectedBooking.start_time && selectedBooking.end_time && (
+                      <div className="bg-gray-50 rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <svg
+                            className="w-5 h-5 text-purple-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                          <span className="font-medium text-gray-900">
+                            {t("booking.time")}
+                          </span>
+                        </div>
+                        <span className="text-gray-700">
+                          {selectedBooking.start_time} - {selectedBooking.end_time}
+                        </span>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
               {/* Message from parent */}
@@ -1562,6 +1587,7 @@ export default function ProfilePage() {
       {cancellingBooking && (
         <CancelBookingModal
           booking={cancellingBooking}
+          userType={userProfile?.user_type as any}
           onClose={() => setCancellingBooking(null)}
           onSuccess={async () => {
             // Reload bookings after successful cancellation
@@ -1672,6 +1698,9 @@ export default function ProfilePage() {
                             {t("messages.bookingOn")} {formatDateDDMMYYYY(new Date(conv.booking_date + "T00:00:00"))}
                           </p>
                         )}
+                        {conv.booking_status === "cancelled" && (
+                          <span className="text-xs text-red-500 font-medium">{t("booking.cancelled")}</span>
+                        )}
                       </div>
                     </div>
                   </button>
@@ -1740,8 +1769,8 @@ export default function ProfilePage() {
                       <div ref={messagesEndRef} />
                     </div>
 
-                    {/* Quick reply templates - show when no messages */}
-                    {conversationMessages.length === 0 && !loadingMessages && (
+                    {/* Quick reply templates - show when no messages and not cancelled */}
+                    {conversationMessages.length === 0 && !loadingMessages && activeConvData?.booking_status !== "cancelled" && (
                       <div className="px-4 py-3 border-t border-gray-100">
                         <p className="text-xs text-gray-500 mb-2">{t("messages.quickReplies")}</p>
                         <div className="flex flex-wrap gap-2">
@@ -1760,29 +1789,35 @@ export default function ProfilePage() {
                     )}
 
                     {/* Input area */}
-                    <div className="p-3 border-t border-gray-200 flex gap-2">
-                      <input
-                        type="text"
-                        value={messageInput}
-                        onChange={(e) => setMessageInput(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" && !e.shiftKey) {
-                            e.preventDefault();
-                            handleSendMessage();
-                          }
-                        }}
-                        placeholder={t("messages.typeMessage")}
-                        maxLength={1000}
-                        className="flex-1 px-4 py-2 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                      />
-                      <button
-                        onClick={handleSendMessage}
-                        disabled={!messageInput.trim() || sendingMessage}
-                        className="px-5 py-2 bg-purple-600 text-white rounded-full text-sm font-medium hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {t("messages.send")}
-                      </button>
-                    </div>
+                    {activeConvData?.booking_status === "cancelled" ? (
+                      <div className="p-3 border-t border-gray-200 text-center text-sm text-gray-500 bg-gray-50">
+                        {t("messages.conversationClosed")}
+                      </div>
+                    ) : (
+                      <div className="p-3 border-t border-gray-200 flex gap-2">
+                        <input
+                          type="text"
+                          value={messageInput}
+                          onChange={(e) => setMessageInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" && !e.shiftKey) {
+                              e.preventDefault();
+                              handleSendMessage();
+                            }
+                          }}
+                          placeholder={t("messages.typeMessage")}
+                          maxLength={1000}
+                          className="flex-1 px-4 py-2 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        />
+                        <button
+                          onClick={handleSendMessage}
+                          disabled={!messageInput.trim() || sendingMessage}
+                          className="px-5 py-2 bg-purple-600 text-white rounded-full text-sm font-medium hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {t("messages.send")}
+                        </button>
+                      </div>
+                    )}
                   </>
                 )}
               </div>

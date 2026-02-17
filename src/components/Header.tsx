@@ -216,9 +216,14 @@ export default function Header() {
                     </button>
                     <button
                       onClick={() => handleTabSwitch("bookings")}
-                      className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors duration-200 border-b border-gray-100 text-sm font-medium bg-white"
+                      className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors duration-200 border-b border-gray-100 text-sm font-medium bg-white flex items-center justify-between"
                     >
                       {t("profile.bookings")}
+                      {pendingCount > 0 && (
+                        <span className="bg-orange-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                          {pendingCount}
+                        </span>
+                      )}
                     </button>
                     <button
                       onClick={() => handleTabSwitch("messages")}
