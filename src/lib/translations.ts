@@ -1,5 +1,3 @@
-import { Language } from './i18n';
-
 // Main translations object
 export const translations = {
   // Header & Navigation
@@ -66,6 +64,11 @@ export const translations = {
     en: 'Name',
     lv: 'Vārds',
     ru: 'Имя'
+  },
+  'profile.surname': {
+    en: 'Surname',
+    lv: 'Uzvārds',
+    ru: 'Фамилия'
   },
   'profile.phone': {
     en: 'Phone',
@@ -572,9 +575,9 @@ export const translations = {
     ru: 'Карта Сайта'
   },
   'footer.copyright': {
-    en: '© 2024 NannyBooking, Inc.',
-    lv: '© 2024 NannyBooking, SIA.',
-    ru: '© 2024 NannyBooking, ООО.'
+    en: '© 2026 NannyBooking.org',
+    lv: '© 2026 NannyBooking.org',
+    ru: '© 2026 NannyBooking.org'
   },
 
   // Common
@@ -638,6 +641,36 @@ export const translations = {
     lv: 'Atcelt',
     ru: 'Отмена'
   },
+  'common.learnMore': {
+    en: 'Learn more',
+    lv: 'Uzzināt vairāk',
+    ru: 'Узнать больше'
+  },
+  'common.seeAll': {
+    en: 'See all',
+    lv: 'Skatīt visus',
+    ru: 'Смотреть все'
+  },
+  'home.nanniesNear': {
+    en: 'Nannies near {city}',
+    lv: 'Aukles netālu no {city}',
+    ru: 'Няни рядом с {city}'
+  },
+  'home.nanniesNearYou': {
+    en: 'Nannies near you',
+    lv: 'Aukles jūsu tuvumā',
+    ru: 'Няни рядом с вами'
+  },
+  'home.availableChildcare': {
+    en: 'Available childcare in your area',
+    lv: 'Pieejama bērnu aprūpe jūsu rajonā',
+    ru: 'Доступный уход за детьми в вашем районе'
+  },
+  'home.howItWorks': {
+    en: 'How it works',
+    lv: 'Kā tas darbojas',
+    ru: 'Как это работает'
+  },
   'common.close': {
     en: 'Close',
     lv: 'Aizvērt',
@@ -667,6 +700,16 @@ export const translations = {
     en: 'No',
     lv: 'Nē',
     ru: 'Нет'
+  },
+  'common.optional': {
+    en: 'optional',
+    lv: 'neobligāts',
+    ru: 'необязательно'
+  },
+  'common.remaining': {
+    en: 'left',
+    lv: 'atlikuši',
+    ru: 'ост.'
   },
 
   // Search Bar
@@ -981,6 +1024,41 @@ export const translations = {
     lv: 'Biogrāfija vēl nav pievienota.',
     ru: 'Биография еще не добавлена.'
   },
+  'profile.uploadPhoto': {
+    en: 'Upload photo',
+    lv: 'Augšupielādēt fotogrāfiju',
+    ru: 'Загрузить фото'
+  },
+  'profile.photoTooLarge': {
+    en: 'Photo must be under 2 MB.',
+    lv: 'Fotogrāfijai jābūt mazākai par 2 MB.',
+    ru: 'Фото должно быть меньше 2 МБ.'
+  },
+  'profile.photoUpdated': {
+    en: 'Profile photo updated.',
+    lv: 'Profila foto atjaunināts.',
+    ru: 'Фото профиля обновлено.'
+  },
+  'profile.photoError': {
+    en: 'Failed to upload photo. Try again.',
+    lv: 'Neizdevās augšupielādēt fotogrāfiju. Mēģiniet vēlreiz.',
+    ru: 'Не удалось загрузить фото. Попробуйте ещё раз.'
+  },
+  'profile.removePhoto': {
+    en: 'Remove photo',
+    lv: 'Noņemt fotogrāfiju',
+    ru: 'Удалить фото'
+  },
+  'profile.accountType': {
+    en: 'I am a',
+    lv: 'Es esmu',
+    ru: 'Я являюсь'
+  },
+  'profile.roleChangeWarning': {
+    en: 'Changing your role will deactivate your current listings.',
+    lv: 'Mainot lomu, jūsu pašreizējie sludinājumi tiks deaktivizēti.',
+    ru: 'Смена роли деактивирует ваши текущие объявления.'
+  },
 
   // Bookings
   'bookings.upcoming': {
@@ -1004,6 +1082,21 @@ export const translations = {
     en: 'Create a professional advertisement to showcase your childcare services',
     lv: 'Izveidojiet profesionālu sludinājumu, lai demonstrētu savus bērnu aprūpes pakalpojumus',
     ru: 'Создайте профессиональное объявление, чтобы продемонстрировать ваши услуги по уходу за детьми'
+  },
+  'adCreate.nannyOnly': {
+    en: 'This page is for nannies',
+    lv: 'Šī lapa ir paredzēta auklēm',
+    ru: 'Эта страница предназначена для нянь'
+  },
+  'adCreate.nannyOnlyDesc': {
+    en: 'Your account is set up as a parent. You can browse available nannies from the home page.',
+    lv: 'Jūsu konts ir iestatīts kā vecāka konts. Varat pārlūkot pieejamās aukles no sākumlapas.',
+    ru: 'Ваш аккаунт настроен как родительский. Вы можете просматривать доступных нянь на главной странице.'
+  },
+  'adCreate.browseNannies': {
+    en: 'Browse nannies',
+    lv: 'Pārlūkot aukles',
+    ru: 'Просмотреть нянь'
   },
   'adCreate.careNeeded': {
     en: 'Care Needed',
@@ -1066,14 +1159,14 @@ export const translations = {
     ru: 'Введите цену'
   },
   'adCreate.requirementsPreferences': {
-    en: 'Requirements & Preferences *',
-    lv: 'Prasības un Preferences *',
-    ru: 'Требования и Предпочтения *'
+    en: 'Requirements & Preferences',
+    lv: 'Prasības un Preferences',
+    ru: 'Требования и Предпочтения'
   },
   'adCreate.experienceBackground': {
-    en: 'Experience & Background *',
-    lv: 'Pieredze un Izglītība *',
-    ru: 'Опыт и Образование *'
+    en: 'Experience & Background',
+    lv: 'Pieredze un Izglītība',
+    ru: 'Опыт и Образование'
   },
   'adCreate.jobDescription': {
     en: 'Job Description *',
@@ -1149,6 +1242,36 @@ export const translations = {
     en: 'Please select new dates',
     lv: 'Lūdzu, izvēlieties jaunus datumus',
     ru: 'Пожалуйста, выберите новые даты'
+  },
+  'ad.shortTerm': {
+    en: 'Short-term',
+    lv: 'Īstermiņa',
+    ru: 'Краткосрочно'
+  },
+  'ad.longTerm': {
+    en: 'Long-term',
+    lv: 'Ilgtermiņa',
+    ru: 'Долгосрочно'
+  },
+  'ad.noReviews': {
+    en: 'No reviews yet',
+    lv: 'Vēl nav atsauksmju',
+    ru: 'Отзывов пока нет'
+  },
+  'ad.requiredDates': {
+    en: 'Required dates',
+    lv: 'Nepieciešamie datumi',
+    ru: 'Необходимые даты'
+  },
+  'ad.longTermExpiry': {
+    en: 'Long-term listings are automatically deactivated after 7 days to keep results fresh.',
+    lv: 'Ilgtermiņa sludinājumi tiek automātiski deaktivizēti pēc 7 dienām, lai rezultāti būtu aktuāli.',
+    ru: 'Долгосрочные объявления автоматически деактивируются через 7 дней, чтобы результаты оставались актуальными.'
+  },
+  'ad.longTermReactivate': {
+    en: 'Deactivated after 7 days — reactivate to make it visible again.',
+    lv: 'Deaktivizēts pēc 7 dienām — aktivizējiet atkārtoti, lai tas atkal būtu redzams.',
+    ru: 'Деактивировано через 7 дней — повторно активируйте, чтобы снова отображалось.'
   },
   'adCreate.availabilitySchedule': {
     en: 'Availability & Schedule',
@@ -1295,6 +1418,21 @@ export const translations = {
     lv: 'Lietotājs nav autentificēts',
     ru: 'Пользователь не аутентифицирован'
   },
+  'adCreate.errorSelectLocation': {
+    en: 'Please select a service location from the suggestions',
+    lv: 'Lūdzu, izvēlieties pakalpojuma atrašanās vietu no ieteikumiem',
+    ru: 'Пожалуйста, выберите место предоставления услуги из подсказок'
+  },
+  'adCreate.errorNoDates': {
+    en: 'Please add at least one available date for this short-term listing',
+    lv: 'Lūdzu, pievienojiet vismaz vienu pieejamo datumu šim īstermiņa sludinājumam',
+    ru: 'Пожалуйста, добавьте хотя бы одну доступную дату для этого краткосрочного объявления'
+  },
+  'adEdit.errorNoDates': {
+    en: 'Short-term listings must have at least one future date to be saved',
+    lv: 'Īstermiņa sludinājumiem jābūt vismaz vienam nākotnes datumam, lai tos varētu saglabāt',
+    ru: 'Краткосрочные объявления должны иметь хотя бы одну будущую дату для сохранения'
+  },
 
   // Booking Modal
   'booking.bookThis': {
@@ -1353,9 +1491,9 @@ export const translations = {
     ru: 'Не удалось отправить запрос на бронирование'
   },
   'booking.noAvailabilityDesc': {
-    en: 'This nanny has no available dates in the future.',
-    lv: 'Šai auklei nav pieejamu datumu nākotnē.',
-    ru: 'У этой няни нет доступных дат в будущем.'
+    en: 'This nanny has no available dates.',
+    lv: 'Šai auklei nav pieejamu datumu.',
+    ru: 'У этой няни нет доступных дат.'
   },
   'booking.errorSelectDate': {
     en: 'Please select at least one date',
@@ -1755,9 +1893,9 @@ export const translations = {
 
   // Login Page
   'login.title': {
-    en: 'Sign in to NannyBooking.lv',
-    lv: 'Ieiet NannyBooking.lv',
-    ru: 'Войти в NannyBooking.lv'
+    en: 'Sign in to NannyBooking.org',
+    lv: 'Ieiet NannyBooking.org',
+    ru: 'Войти в NannyBooking.org'
   },
   'login.subtitle': {
     en: 'Connect with trusted childcare providers in the Baltic region',
@@ -1788,6 +1926,16 @@ export const translations = {
     en: 'Sign In',
     lv: 'Ieiet',
     ru: 'Войти'
+  },
+  'login.signInFailed': {
+    en: 'Failed to sign in',
+    lv: 'Neizdevās pierakstīties',
+    ru: 'Не удалось войти'
+  },
+  'login.termsText': {
+    en: 'By continuing, you agree to our Terms and Privacy Policy.',
+    lv: 'Turpinot, jūs piekrītat mūsu Noteikumiem un Konfidencialitātes politikai.',
+    ru: 'Продолжая, вы соглашаетесь с нашими Условиями и Политикой конфиденциальности.'
   },
 
   // Messages
@@ -1832,19 +1980,24 @@ export const translations = {
     ru: 'Ваш запрос на контакт принят! Теперь вы можете обсудить детали здесь.'
   },
   'messages.template1': {
-    en: 'Hello! Looking forward to our booking!',
-    lv: 'Sveiki! Ar nepacietību gaidu mūsu rezervāciju!',
-    ru: 'Здравствуйте! С нетерпением жду нашу встречу!'
+    en: "Hi! I'd like to connect. Please share your preferred contact method.",
+    lv: 'Sveiki! Vēlētos sazināties. Lūdzu, dalieties ar savu vēlamo saziņas veidu.',
+    ru: 'Привет! Хотел(а) бы связаться. Пожалуйста, поделитесь удобным способом связи.'
   },
   'messages.template2': {
-    en: 'Hi! Could we discuss the booking details?',
-    lv: 'Sveiki! Vai mēs varētu apspriest rezervācijas detaļas?',
-    ru: 'Привет! Можем ли мы обсудить детали бронирования?'
+    en: "Hello! Happy to share my contact details — feel free to send your email or WhatsApp.",
+    lv: 'Sveiki! Gatavs(-a) dalīties ar kontaktiem — droši sūtiet e-pastu vai WhatsApp.',
+    ru: 'Привет! Готов(а) поделиться контактами — отправьте свой email или WhatsApp.'
   },
   'messages.template3': {
-    en: 'Hello! Let me know if you need anything before our booking.',
-    lv: 'Sveiki! Informējiet mani, ja jums kaut kas nepieciešams pirms rezervācijas.',
-    ru: 'Здравствуйте! Дайте знать, если вам что-нибудь нужно перед встречей.'
+    en: "Hi! Interested in connecting. Let's exchange contact info to coordinate.",
+    lv: 'Sveiki! Vēlos sazināties. Apmainīsimies ar kontaktiem, lai vienotos par detaļām.',
+    ru: 'Привет! Хочу связаться. Давайте обменяемся контактами для координации.'
+  },
+  'messages.templatesOnly': {
+    en: 'For privacy, messaging uses pre-set templates. Share your email or WhatsApp through these messages.',
+    lv: 'Privātuma dēļ ziņojumi izmanto iepriekš iestatītas veidnes. Dalieties ar e-pastu vai WhatsApp šo ziņu ietvaros.',
+    ru: 'В целях конфиденциальности используются готовые шаблоны. Поделитесь email или WhatsApp через эти сообщения.'
   },
   'messages.today': {
     en: 'Today',
@@ -1875,6 +2028,61 @@ export const translations = {
     en: 'Message sent',
     lv: 'Ziņojums nosūtīts',
     ru: 'Сообщение отправлено'
+  },
+  'messages.shareContact': {
+    en: 'Share your contact info',
+    lv: 'Dalieties ar kontaktinformāciju',
+    ru: 'Поделитесь контактной информацией'
+  },
+  'messages.shareContactDesc': {
+    en: "They've reached out — share your email or WhatsApp so you can connect directly.",
+    lv: 'Viņi ir sazinājušies — dalieties ar e-pastu vai WhatsApp, lai varētu tieši sazināties.',
+    ru: 'Они написали вам — поделитесь email или WhatsApp, чтобы связаться напрямую.'
+  },
+  'messages.emailPlaceholder': {
+    en: 'your@email.com',
+    lv: 'jūsu@epasts.lv',
+    ru: 'ваш@email.com'
+  },
+  'messages.phonePlaceholder': {
+    en: '+371 2X XXX XXX',
+    lv: '+371 2X XXX XXX',
+    ru: '+371 2X XXX XXX'
+  },
+  'messages.shareContactBtn': {
+    en: 'Send contact info',
+    lv: 'Nosūtīt kontaktinformāciju',
+    ru: 'Отправить контактные данные'
+  },
+  'messages.contactShared': {
+    en: 'Contact info shared',
+    lv: 'Kontaktinformācija nosūtīta',
+    ru: 'Контактная информация отправлена'
+  },
+  'messages.contactSharedDesc': {
+    en: 'The other party can now reach you directly. Waiting for their response.',
+    lv: 'Otra puse tagad var ar jums sazināties tieši. Gaidām viņu atbildi.',
+    ru: 'Другая сторона теперь может связаться с вами напрямую. Ожидаем ответа.'
+  },
+  'messages.fillAtLeastOne': {
+    en: 'Please enter at least an email or phone number',
+    lv: 'Lūdzu, ievadiet vismaz e-pastu vai tālruņa numuru',
+    ru: 'Пожалуйста, введите хотя бы email или номер телефона'
+  },
+  'messages.invalidEmail': {
+    en: 'Please enter a valid email address',
+    lv: 'Lūdzu, ievadiet derīgu e-pasta adresi',
+    ru: 'Пожалуйста, введите корректный email адрес'
+  },
+  'messages.invalidPhone': {
+    en: 'Please enter a valid phone number (digits, +, spaces, dashes only)',
+    lv: 'Lūdzu, ievadiet derīgu tālruņa numuru (cipari, +, atstarpes, domuzīmes)',
+    ru: 'Пожалуйста, введите корректный номер телефона (цифры, +, пробелы, дефисы)'
+  },
+  'booking.expired': {
+    en: 'Expired',
+    lv: 'Termiņš beidzies',
+    ru: 'Истёк'
   },
 
   // User Types
@@ -2348,6 +2556,38 @@ export const translations = {
     ru: 'Отзывы'
   },
 
+  // ===== SORT & RECENTLY VIEWED =====
+  'search.sortBy': {
+    en: 'Sort by',
+    lv: 'Kārtot pēc',
+    ru: 'Сортировать по'
+  },
+  'search.sortNewest': {
+    en: 'Newest',
+    lv: 'Jaunākie',
+    ru: 'Новые'
+  },
+  'search.sortPriceAsc': {
+    en: 'Price: Low to High',
+    lv: 'Cena: no zemākās',
+    ru: 'Цена: по возрастанию'
+  },
+  'search.sortPriceDesc': {
+    en: 'Price: High to Low',
+    lv: 'Cena: no augstākās',
+    ru: 'Цена: по убыванию'
+  },
+  'search.sortRating': {
+    en: 'Highest Rated',
+    lv: 'Augstākais vērtējums',
+    ru: 'Высший рейтинг'
+  },
+  'search.recentlyViewed': {
+    en: 'Recently Viewed',
+    lv: 'Nesen Skatīti',
+    ru: 'Недавно Просмотренные'
+  },
+
   // ===== ADVANCED SEARCH FILTERS =====
   'search.filters': {
     en: 'Filters',
@@ -2478,6 +2718,164 @@ export const translations = {
     en: 'Used to deliver relevant advertisements.',
     lv: 'Tiek izmantotas, lai rādītu atbilstošas reklāmas.',
     ru: 'Используются для показа релевантной рекламы.'
+  },
+
+  // Profile Completion Page
+  'profileComplete.title': {
+    en: 'Complete Your Profile',
+    lv: 'Aizpildiet Savu Profilu',
+    ru: 'Заполните Свой Профиль'
+  },
+  'profileComplete.welcome': {
+    en: 'Welcome! Please complete your profile to get started.',
+    lv: 'Laipni lūdzam! Lūdzu, aizpildiet savu profilu, lai sāktu.',
+    ru: 'Добро пожаловать! Пожалуйста, заполните свой профиль, чтобы начать.'
+  },
+  'profileComplete.yourInfo': {
+    en: 'Your Information',
+    lv: 'Jūsu Informācija',
+    ru: 'Ваша Информация'
+  },
+  'profileComplete.enterName': {
+    en: 'Enter your name',
+    lv: 'Ievadiet savu vārdu',
+    ru: 'Введите ваше имя'
+  },
+  'profileComplete.enterSurname': {
+    en: 'Enter your surname',
+    lv: 'Ievadiet savu uzvārdu',
+    ru: 'Введите вашу фамилию'
+  },
+  'profileComplete.characters': {
+    en: 'characters',
+    lv: 'rakstzīmes',
+    ru: 'символов'
+  },
+  'profileComplete.emailCannotChange': {
+    en: 'Email cannot be changed',
+    lv: 'E-pastu nevar mainīt',
+    ru: 'Электронную почту нельзя изменить'
+  },
+  'profileComplete.iAmA': {
+    en: 'I am a...',
+    lv: 'Es esmu...',
+    ru: 'Я...'
+  },
+  'profileComplete.parentBioLabel': {
+    en: 'Bio about yourself',
+    lv: 'Biogrāfija par sevi',
+    ru: 'Биография о себе'
+  },
+  'profileComplete.nannyBioLabel': {
+    en: 'Short text about your experience and yourself',
+    lv: 'Īss teksts par savu pieredzi un sevi',
+    ru: 'Краткий текст о вашем опыте и о себе'
+  },
+  'profileComplete.parentBioPlaceholder': {
+    en: 'Tell us about yourself...',
+    lv: 'Pastāstiet par sevi...',
+    ru: 'Расскажите о себе...'
+  },
+  'profileComplete.nannyBioPlaceholder': {
+    en: 'Tell us about your experience and yourself...',
+    lv: 'Pastāstiet par savu pieredzi un sevi...',
+    ru: 'Расскажите о своём опыте и о себе...'
+  },
+  'profileComplete.minCharacters': {
+    en: 'min. {{count}} characters',
+    lv: 'min. {{count}} rakstzīmes',
+    ru: 'мин. {{count}} символов'
+  },
+  'profileComplete.completing': {
+    en: 'Completing...',
+    lv: 'Aizpilda...',
+    ru: 'Заполняется...'
+  },
+  'profileComplete.completeProfile': {
+    en: 'Complete Profile',
+    lv: 'Aizpildīt Profilu',
+    ru: 'Заполнить Профиль'
+  },
+  'profileComplete.userNotFound': {
+    en: 'User not found',
+    lv: 'Lietotājs nav atrasts',
+    ru: 'Пользователь не найден'
+  },
+  'profileComplete.signInAgain': {
+    en: 'Sign In Again',
+    lv: 'Pieteikties Vēlreiz',
+    ru: 'Войти Снова'
+  },
+  'profileComplete.enterBothNames': {
+    en: 'Please enter both your name and surname',
+    lv: 'Lūdzu, ievadiet gan vārdu, gan uzvārdu',
+    ru: 'Пожалуйста, введите имя и фамилию'
+  },
+  'profileComplete.parentBioRequired': {
+    en: 'Please write a bio about yourself',
+    lv: 'Lūdzu, uzrakstiet biogrāfiju par sevi',
+    ru: 'Пожалуйста, напишите биографию о себе'
+  },
+  'profileComplete.nannyBioRequired': {
+    en: 'Please write about your experience and yourself',
+    lv: 'Lūdzu, uzrakstiet par savu pieredzi un sevi',
+    ru: 'Пожалуйста, напишите о своём опыте и о себе'
+  },
+  'profileComplete.saveFailed': {
+    en: 'Failed to save user data',
+    lv: 'Neizdevās saglabāt lietotāja datus',
+    ru: 'Не удалось сохранить данные пользователя'
+  },
+  'profileComplete.completeFailed': {
+    en: 'Failed to complete profile',
+    lv: 'Neizdevās aizpildīt profilu',
+    ru: 'Не удалось заполнить профиль'
+  },
+
+  // Error Boundary
+  'error.somethingWentWrong': {
+    en: 'Something went wrong',
+    lv: 'Kaut kas nogāja greizi',
+    ru: 'Что-то пошло не так'
+  },
+  'error.unexpectedError': {
+    en: 'We encountered an unexpected error. Please try refreshing the page or return to the home page.',
+    lv: 'Radās neparedzēta kļūda. Lūdzu, mēģiniet atsvaidzināt lapu vai atgriezieties sākumlapā.',
+    ru: 'Произошла непредвиденная ошибка. Пожалуйста, попробуйте обновить страницу или вернитесь на главную.'
+  },
+  'error.refreshPage': {
+    en: 'Refresh Page',
+    lv: 'Atsvaidzināt Lapu',
+    ru: 'Обновить Страницу'
+  },
+  'error.goHome': {
+    en: 'Go to Home',
+    lv: 'Uz Sākumlapu',
+    ru: 'На Главную'
+  },
+
+  // Location Autocomplete
+  'location.searchPlaceholder': {
+    en: 'Search city, country, street',
+    lv: 'Meklēt pilsētu, valsti, ielu',
+    ru: 'Поиск города, страны, улицы'
+  },
+  'location.searching': {
+    en: 'Searching…',
+    lv: 'Meklē…',
+    ru: 'Поиск…'
+  },
+  'location.noMatches': {
+    en: 'No matches',
+    lv: 'Nav rezultātu',
+    ru: 'Нет совпадений'
+  },
+
+  // Cancel Booking - missing key
+  'cancelBooking.noDate': {
+    en: 'No date',
+    lv: 'Nav datuma',
+    ru: 'Нет даты'
   }
 } as const;
 

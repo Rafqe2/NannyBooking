@@ -21,6 +21,7 @@ import ReviewModal from "../../components/ReviewModal";
 import { useTranslation } from "../../components/LanguageProvider";
 import { getTranslatedSkill } from "../../lib/constants/skills";
 import { MessageService, Conversation, Message as ChatMessage } from "../../lib/messageService";
+import ErrorBoundary from "../../components/ErrorBoundary";
 
 type Advertisement = Database["public"]["Tables"]["advertisements"]["Row"];
 
@@ -47,7 +48,7 @@ export default function ProfilePage() {
   const { user, isLoading } = useSupabaseUser();
   const router = useRouter();
   const { t, language } = useTranslation();
-  const avatarUrl =
+  const oauthAvatarUrl =
     (user?.user_metadata as any)?.avatar_url ||
     (user?.user_metadata as any)?.picture ||
     null;
@@ -57,6 +58,9 @@ export default function ProfilePage() {
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [showAvatarModal, setShowAvatarModal] = useState(false);
+  const photoInputRef = useRef<HTMLInputElement>(null);
   const [toast, setToast] = useState<{ message: string; type: "error" | "success" } | null>(null);
   const [activeTab, setActiveTab] = useState<
     "job-ads" | "bookings" | "messages" | "profile"
@@ -95,11 +99,21 @@ export default function ProfilePage() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConversation, setActiveConversation] = useState<string | null>(null);
   const [conversationMessages, setConversationMessages] = useState<ChatMessage[]>([]);
-  const [messageInput, setMessageInput] = useState("");
   const [sendingMessage, setSendingMessage] = useState(false);
+  const [contactEmail, setContactEmail] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
+  const [contactError, setContactError] = useState<string | null>(null);
+
+  // Reset contact fields when switching conversations
+  useEffect(() => {
+    setContactEmail("");
+    setContactPhone("");
+    setContactError(null);
+  }, [activeConversation]);
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
   const [loadingMessages, setLoadingMessages] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   // Auto-dismiss toast after 4 seconds
   useEffect(() => {
@@ -235,6 +249,14 @@ export default function ProfilePage() {
                   p_ad_id: ad.id,
                 });
               }
+              if (ad.type === "long-term" && ad.is_active && ad.updated_at) {
+                // Auto-deactivate long-term ads after 7 days of being active
+                const activatedAt = new Date(ad.updated_at);
+                const daysSince = (Date.now() - activatedAt.getTime()) / (1000 * 60 * 60 * 24);
+                if (daysSince >= 7) {
+                  await supabase.rpc("ad_toggle", { p_ad_id: ad.id, p_active: false });
+                }
+              }
             }
             // Reload after potential changes
             userAds = await AdvertisementService.getUserAdvertisements(
@@ -261,6 +283,13 @@ export default function ProfilePage() {
             console.error("Error auto-completing bookings:", err);
           }
 
+          // Auto-cancel pending bookings whose date has passed
+          try {
+            await supabase.rpc("auto_cancel_expired_pending_bookings");
+          } catch (err) {
+            console.error("Error auto-cancelling expired bookings:", err);
+          }
+
           // Load bookings + pending count
           try {
             const { data: bdata, error: berror } = await supabase.rpc(
@@ -277,7 +306,6 @@ export default function ProfilePage() {
             const { data: pcount, error: perror } = await supabase.rpc(
               "get_pending_booking_count_for_me"
             );
-            console.log("Pending count:", pcount, "Error:", perror); // Debug log
             if (perror) {
               console.error("Error loading pending count:", perror);
             }
@@ -329,10 +357,12 @@ export default function ProfilePage() {
     return () => { active = false; clearInterval(interval); };
   }, [activeConversation]);
 
-  // Messaging: auto-scroll to bottom
+  // Messaging: auto-scroll to bottom of messages container (not the page)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [conversationMessages]);
+    if (activeTab !== "messages") return;
+    const container = messagesContainerRef.current;
+    if (container) container.scrollTop = container.scrollHeight;
+  }, [conversationMessages, activeTab]);
 
   // Messaging: poll unread count
   useEffect(() => {
@@ -347,17 +377,6 @@ export default function ProfilePage() {
     return () => { active = false; clearInterval(interval); };
   }, [user?.id]);
 
-  const handleSendMessage = useCallback(async () => {
-    if (!activeConversation || !messageInput.trim() || sendingMessage) return;
-    setSendingMessage(true);
-    const msg = await MessageService.sendMessage(activeConversation, messageInput.trim());
-    if (msg) {
-      setConversationMessages((prev) => [...prev, msg]);
-      setMessageInput("");
-    }
-    setSendingMessage(false);
-  }, [activeConversation, messageInput, sendingMessage]);
-
   const handleSendTemplate = useCallback(async (text: string) => {
     if (!activeConversation || sendingMessage) return;
     setSendingMessage(true);
@@ -367,6 +386,40 @@ export default function ProfilePage() {
     }
     setSendingMessage(false);
   }, [activeConversation, sendingMessage]);
+
+  const handleSendContact = useCallback(async () => {
+    if (!activeConversation || sendingMessage) return;
+    const email = contactEmail.trim();
+    const phone = contactPhone.trim();
+    if (!email && !phone) {
+      setContactError(t("messages.fillAtLeastOne"));
+      return;
+    }
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+      setContactError(t("messages.invalidEmail"));
+      return;
+    }
+    if (phone && !/^[+]?[\d\s\-()\u200B]{7,20}$/.test(phone.replace(/\s/g, "").replace(/[\-()]/g, ""))) {
+      setContactError(t("messages.invalidPhone"));
+      return;
+    }
+    if (phone && phone.replace(/\D/g, "").length < 7) {
+      setContactError(t("messages.invalidPhone"));
+      return;
+    }
+    setContactError(null);
+    setSendingMessage(true);
+    const parts: string[] = [];
+    if (email) parts.push(`📧 ${email}`);
+    if (phone) parts.push(`📱 ${phone}`);
+    const msg = await MessageService.sendMessage(activeConversation, parts.join("\n"), false);
+    if (msg) {
+      setConversationMessages((prev) => [...prev, msg]);
+      setContactEmail("");
+      setContactPhone("");
+    }
+    setSendingMessage(false);
+  }, [activeConversation, sendingMessage, contactEmail, contactPhone, t]);
 
   const formatMessageTime = useCallback((dateStr: string) => {
     const date = new Date(dateStr);
@@ -416,6 +469,50 @@ export default function ProfilePage() {
     );
   }
 
+  const displayAvatar = userProfile?.picture || oauthAvatarUrl;
+
+  const handlePhotoUpload = async (file: File) => {
+    if (!user?.id) return;
+    if (file.size > 2 * 1024 * 1024) {
+      setToast({ message: t("profile.photoTooLarge"), type: "error" });
+      return;
+    }
+    setUploadingPhoto(true);
+    try {
+      const filePath = `${user.id}/avatar`;
+      const { error: uploadError } = await supabase.storage
+        .from("Avatars")
+        .upload(filePath, file, { upsert: true, contentType: file.type });
+      if (uploadError) throw uploadError;
+      const { data: { publicUrl } } = supabase.storage
+        .from("Avatars")
+        .getPublicUrl(filePath);
+      const url = `${publicUrl}?t=${Date.now()}`;
+      await UserService.updateProfileById(user.id, { picture: url });
+      setUserProfile((prev) => prev ? { ...prev, picture: url } : prev);
+      setToast({ message: t("profile.photoUpdated"), type: "success" });
+    } catch (err: any) {
+      console.error("Photo upload error:", err?.message, err);
+      setToast({ message: err?.message || t("profile.photoError"), type: "error" });
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
+
+  const handleRemovePhoto = async () => {
+    if (!user?.id) return;
+    setUploadingPhoto(true);
+    try {
+      await supabase.storage.from("Avatars").remove([`${user.id}/avatar`]);
+      await supabase.from("users").update({ picture: null, updated_at: new Date().toISOString() }).eq("id", user.id);
+      setUserProfile((prev) => prev ? { ...prev, picture: undefined } : prev);
+    } catch {
+      setToast({ message: t("profile.photoError"), type: "error" });
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
+
   const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -427,6 +524,8 @@ export default function ProfilePage() {
     setIsUpdating(true);
 
     try {
+      const roleChanged = editForm.user_type !== userProfile?.user_type;
+
       const updatedProfile = await UserService.updateProfileById(user.id, {
         name: editForm.name,
         user_type: editForm.user_type,
@@ -436,6 +535,15 @@ export default function ProfilePage() {
       });
 
       if (updatedProfile) {
+        // Deactivate all ads if the user changed their role
+        if (roleChanged && advertisements.length > 0) {
+          await supabase
+            .from("advertisements")
+            .update({ is_active: false })
+            .eq("user_id", user.id);
+          setAdvertisements((prev) => prev.map((ad) => ({ ...ad, is_active: false })));
+        }
+
         setUserProfile(updatedProfile);
         setIsEditing(false);
 
@@ -444,9 +552,6 @@ export default function ProfilePage() {
         if (refreshedProfile) {
           setUserProfile(refreshedProfile);
         }
-
-        // Show success message (you could add a toast notification here)
-        console.log("Profile updated successfully");
       }
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -581,10 +686,10 @@ export default function ProfilePage() {
               {advertisements.map((ad) => (
                 <div
                   key={ad.id}
-                  className={`border rounded-xl p-6 transition-shadow duration-200 cursor-pointer ${
+                  className={`border rounded-2xl p-6 transition-all duration-200 cursor-pointer ${
                     ad.is_active
-                      ? "bg-white border-gray-200 hover:shadow-md"
-                      : "bg-gray-50 border-gray-200"
+                      ? "bg-white border-purple-100 shadow-sm hover:shadow-md hover:border-purple-200"
+                      : "bg-gray-50/70 border-gray-200 hover:bg-gray-50"
                   }`}
                   onClick={(e) => {
                     const target = e.target as HTMLElement;
@@ -615,6 +720,14 @@ export default function ProfilePage() {
                           {ad.location_city}
                         </span>
                       </div>
+                      {ad.type === "long-term" && ad.is_active && ad.updated_at && (() => {
+                        const daysLeft = Math.max(0, 7 - (Date.now() - new Date(ad.updated_at).getTime()) / (1000 * 60 * 60 * 24));
+                        return (
+                          <div className="mt-1 text-xs text-amber-600">
+                            ⏳ {Math.ceil(daysLeft)}d {t("common.remaining")}
+                          </div>
+                        );
+                      })()}
                     </div>
                     <div className="flex items-center space-x-2">
                       {ad.is_active ? (
@@ -739,11 +852,24 @@ export default function ProfilePage() {
                       (s) => new Date(s.available_date + "T00:00:00") < today
                     );
                     const noSlots = ad.type === "short-term" && slots.length === 0;
-                    return (allExpired || noSlots) ? (
-                      <div className="text-xs text-amber-600 mt-1 text-right">
-                        {t("ad.expiredDates")}
-                      </div>
-                    ) : null;
+                    if (allExpired || noSlots) {
+                      return (
+                        <div className="text-xs text-amber-600 mt-1 text-right">
+                          {t("ad.expiredDates")}
+                        </div>
+                      );
+                    }
+                    if (ad.type === "long-term" && ad.updated_at) {
+                      const daysSince = (Date.now() - new Date(ad.updated_at).getTime()) / (1000 * 60 * 60 * 24);
+                      if (daysSince >= 7) {
+                        return (
+                          <div className="text-xs text-blue-600 mt-1 text-right">
+                            {t("ad.longTermReactivate")}
+                          </div>
+                        );
+                      }
+                    }
+                    return null;
                   })()}
 
                   <p
@@ -1140,7 +1266,15 @@ export default function ProfilePage() {
                                   </span>
                                 )}
                                 {b.status === "pending" &&
-                                  userProfile?.user_type === "nanny" && (
+                                  b.booking_date &&
+                                  b.booking_date < new Date().toISOString().slice(0, 10) && (
+                                    <span className="text-xs px-2.5 py-1 rounded-full bg-gray-100 text-gray-500 border border-gray-200">
+                                      {t("booking.expired")}
+                                    </span>
+                                  )}
+                                {b.status === "pending" &&
+                                  userProfile?.user_type === "nanny" &&
+                                  (!b.booking_date || b.booking_date >= new Date().toISOString().slice(0, 10)) && (
                                     <div
                                       className="flex gap-2"
                                       onClick={(e) => e.stopPropagation()}
@@ -1214,7 +1348,8 @@ export default function ProfilePage() {
                                     </div>
                                   )}
                                 {b.status === "pending" &&
-                                  userProfile?.user_type === "parent" && (
+                                  userProfile?.user_type === "parent" &&
+                                  (!b.booking_date || b.booking_date >= new Date().toISOString().slice(0, 10)) && (
                                     <div
                                       className="flex gap-2"
                                       onClick={(e) => e.stopPropagation()}
@@ -1738,7 +1873,7 @@ export default function ProfilePage() {
                     )}
 
                     {/* Message history */}
-                    <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                    <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3">
                       {loadingMessages && conversationMessages.length === 0 && (
                         <div className="text-center text-gray-400 text-sm py-8">
                           Loading...
@@ -1769,55 +1904,91 @@ export default function ProfilePage() {
                       <div ref={messagesEndRef} />
                     </div>
 
-                    {/* Quick reply templates - show when no messages and not cancelled */}
-                    {conversationMessages.length === 0 && !loadingMessages && activeConvData?.booking_status !== "cancelled" && (
-                      <div className="px-4 py-3 border-t border-gray-100">
-                        <p className="text-xs text-gray-500 mb-2">{t("messages.quickReplies")}</p>
-                        <div className="flex flex-wrap gap-2">
-                          {templates.map((tmpl, i) => (
-                            <button
-                              key={i}
-                              onClick={() => handleSendTemplate(tmpl)}
-                              disabled={sendingMessage}
-                              className="text-xs px-3 py-1.5 bg-purple-50 text-purple-700 rounded-full hover:bg-purple-100 transition-colors disabled:opacity-50"
-                            >
-                              {tmpl}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+                    {/* Bottom action panel - 3 states */}
+                    {(() => {
+                      if (activeConvData?.booking_status === "cancelled") {
+                        return (
+                          <div className="p-4 border-t border-gray-200 text-center text-sm text-gray-500 bg-gray-50">
+                            {t("messages.conversationClosed")}
+                          </div>
+                        );
+                      }
+                      const myMsgs = conversationMessages.filter(m => m.sender_id === user?.id);
+                      const sentTemplate = myMsgs.some(m => m.is_template);
+                      const sentContact = myMsgs.some(m => !m.is_template);
 
-                    {/* Input area */}
-                    {activeConvData?.booking_status === "cancelled" ? (
-                      <div className="p-3 border-t border-gray-200 text-center text-sm text-gray-500 bg-gray-50">
-                        {t("messages.conversationClosed")}
-                      </div>
-                    ) : (
-                      <div className="p-3 border-t border-gray-200 flex gap-2">
-                        <input
-                          type="text"
-                          value={messageInput}
-                          onChange={(e) => setMessageInput(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" && !e.shiftKey) {
-                              e.preventDefault();
-                              handleSendMessage();
-                            }
-                          }}
-                          placeholder={t("messages.typeMessage")}
-                          maxLength={1000}
-                          className="flex-1 px-4 py-2 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                        />
-                        <button
-                          onClick={handleSendMessage}
-                          disabled={!messageInput.trim() || sendingMessage}
-                          className="px-5 py-2 bg-purple-600 text-white rounded-full text-sm font-medium hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          {t("messages.send")}
-                        </button>
-                      </div>
-                    )}
+                      if (sentContact) {
+                        // State 3: done
+                        return (
+                          <div className="p-4 border-t border-gray-100 bg-green-50 flex items-start gap-3">
+                            <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                              <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                              </svg>
+                            </div>
+                            <div>
+                              <p className="text-sm font-semibold text-green-800">{t("messages.contactShared")}</p>
+                              <p className="text-xs text-green-600 mt-0.5">{t("messages.contactSharedDesc")}</p>
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (sentTemplate) {
+                        // State 2: share contact info
+                        return (
+                          <div className="p-4 border-t border-gray-100 bg-purple-50/50">
+                            <p className="text-sm font-semibold text-gray-800 mb-0.5">{t("messages.shareContact")}</p>
+                            <p className="text-xs text-gray-500 mb-3">{t("messages.shareContactDesc")}</p>
+                            <div className="space-y-2">
+                              <input
+                                type="email"
+                                value={contactEmail}
+                                onChange={(e) => { setContactEmail(e.target.value); setContactError(null); }}
+                                placeholder={t("messages.emailPlaceholder")}
+                                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400 bg-white"
+                              />
+                              <input
+                                type="tel"
+                                value={contactPhone}
+                                onChange={(e) => { setContactPhone(e.target.value); setContactError(null); }}
+                                placeholder={t("messages.phonePlaceholder")}
+                                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400 bg-white"
+                              />
+                              {contactError && (
+                                <p className="text-xs text-red-500">{contactError}</p>
+                              )}
+                              <button
+                                onClick={handleSendContact}
+                                disabled={sendingMessage}
+                                className="w-full py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                {sendingMessage ? "..." : t("messages.shareContactBtn")}
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      // State 1: choose a connect template
+                      return (
+                        <div className="p-4 border-t border-gray-100 bg-gray-50">
+                          <p className="text-xs text-gray-400 mb-3">{t("messages.templatesOnly")}</p>
+                          <div className="flex flex-col gap-2">
+                            {templates.map((tmpl, i) => (
+                              <button
+                                key={i}
+                                onClick={() => handleSendTemplate(tmpl)}
+                                disabled={sendingMessage}
+                                className="w-full text-left text-sm px-4 py-2.5 bg-white border border-purple-200 text-purple-700 rounded-xl hover:bg-purple-50 hover:border-purple-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium shadow-sm"
+                              >
+                                {tmpl}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </>
                 )}
               </div>
@@ -1837,83 +2008,7 @@ export default function ProfilePage() {
 
   const renderProfileTab = () => (
     <div className="space-y-6">
-      {/* Profile Header */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="bg-gradient-to-r from-purple-600 to-purple-700 px-8 py-8 text-white">
-          <div className="flex items-center space-x-6">
-            <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center border-2 border-white/30">
-              {avatarUrl ? (
-                <img
-                  src={avatarUrl}
-                  alt="Profile"
-                  className="w-16 h-16 rounded-full"
-                />
-              ) : (
-                <svg
-                  className="w-10 h-10 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                  />
-                </svg>
-              )}
-            </div>
-            <div className="flex-1">
-              <h2 className="text-3xl font-bold mb-2">
-                {displayNameFromProfile}
-              </h2>
-              <p className="text-purple-100 text-lg mb-3">{user?.email}</p>
-              <div className="flex flex-wrap items-center gap-3">
-                <span
-                  className={`px-3 py-1.5 rounded-full text-sm font-medium border border-white/30 ${
-                    userProfile?.user_type === "parent"
-                      ? "bg-blue-500/20 text-blue-100"
-                      : userProfile?.user_type === "nanny"
-                      ? "bg-green-500/20 text-green-100"
-                      : "bg-yellow-500/20 text-yellow-100"
-                  }`}
-                >
-                  {userProfile?.user_type === "parent"
-                    ? `👨‍👩‍👧‍👦 ${t("common.parent")}`
-                    : userProfile?.user_type === "nanny"
-                    ? `👶 ${t("common.nanny")}`
-                    : `⏳ ${t("userType.pending")}`}
-                </span>
-                <span className="text-purple-100 text-sm flex items-center gap-1">
-                  <span>📅</span>
-                  <span>
-                    {t("profile.memberSince")}{" "}
-                    {userProfile?.created_at
-                      ? formatDate(userProfile.created_at)
-                      : t("profile.recently")}
-                  </span>
-                </span>
-                <span className="text-purple-100 text-sm flex items-center gap-1">
-                  <span>⭐</span>
-                  <span>
-                    {t("profile.rating")}:{" "}
-                    {(userProfile as any)?.average_rating && Number((userProfile as any).average_rating) > 0
-                      ? `${Number((userProfile as any).average_rating).toFixed(1)} (${(userProfile as any).total_reviews || 0})`
-                      : t("profile.noReviewsYet")}
-                  </span>
-                </span>
-              </div>
-            </div>
-            <button
-              onClick={() => setIsEditing(!isEditing)}
-              className="bg-white/20 hover:bg-white/30 px-6 py-3 rounded-lg font-medium transition-colors duration-200 border border-white/30 hover:border-white/50"
-            >
-              {isEditing ? t("common.cancel") : t("profile.editProfile")}
-            </button>
-          </div>
-        </div>
-
         {/* Profile Form */}
         {isEditing ? (
           <div className="p-6 sm:p-8">
@@ -1921,6 +2016,52 @@ export default function ProfilePage() {
               {t("profile.editProfile")}
             </h3>
             <form onSubmit={handleEditSubmit} className="space-y-6">
+              {/* Account type */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  {t("profile.accountType")}
+                </label>
+                <div className="flex gap-3">
+                  {(["nanny", "parent"] as const).map((role) => (
+                    <button
+                      key={role}
+                      type="button"
+                      onClick={() => setEditForm({ ...editForm, user_type: role })}
+                      className={`flex-1 py-3 rounded-xl border-2 font-medium text-sm transition-all ${
+                        editForm.user_type === role
+                          ? "border-purple-500 bg-purple-50 text-purple-700"
+                          : "border-gray-200 bg-white text-gray-500 hover:border-gray-300"
+                      }`}
+                    >
+                      {role === "nanny" ? t("profile.nanny") : t("profile.parent")}
+                    </button>
+                  ))}
+                </div>
+                {editForm.user_type !== userProfile?.user_type && (
+                  <p className="text-xs text-amber-600 mt-2 flex items-center gap-1">
+                    <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+                    {t("profile.roleChangeWarning")}
+                  </p>
+                )}
+              </div>
+              {/* Photo upload hint */}
+              <div className="flex items-center gap-3 text-sm text-gray-500">
+                <svg className="w-4 h-4 text-purple-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                <span>
+                  <button type="button" onClick={() => photoInputRef.current?.click()} disabled={uploadingPhoto} className="text-purple-600 hover:underline font-medium">
+                    {userProfile?.picture ? "Change photo" : t("profile.uploadPhoto")}
+                  </button>
+                  {userProfile?.picture && (
+                    <>
+                      {" · "}
+                      <button type="button" onClick={handleRemovePhoto} disabled={uploadingPhoto} className="text-red-500 hover:underline">
+                        {t("profile.removePhoto")}
+                      </button>
+                    </>
+                  )}
+                  {uploadingPhoto && <span className="ml-2 text-gray-400">uploading…</span>}
+                </span>
+              </div>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -2056,33 +2197,58 @@ export default function ProfilePage() {
           </div>
         ) : (
           <div className="p-8">
-            <h3 className="text-2xl font-semibold mb-6 text-gray-900">
+            <h3 className="text-xl font-semibold mb-6 text-gray-900">
               {t("profile.profileInformation")}
             </h3>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-500 mb-1">
-                  {t("profile.phoneNumber")}
-                </label>
-                <p className="text-gray-900 font-medium">
-                  {userProfile?.phone || t("profile.notSet")}
-                </p>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="flex items-start gap-3 p-4 rounded-xl bg-gray-50 border border-gray-100">
+                <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-gray-500 mb-0.5">{t("profile.phoneNumber")}</p>
+                  <p className="text-gray-900 font-medium text-sm">{userProfile?.phone || t("profile.notSet")}</p>
+                </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-500 mb-1">
-                  {t("profile.location")}
-                </label>
-                <p className="text-gray-900 font-medium">
-                  {userProfile?.location || t("profile.notSet")}
-                </p>
+              <div className="flex items-start gap-3 p-4 rounded-xl bg-gray-50 border border-gray-100">
+                <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-gray-500 mb-0.5">{t("profile.location")}</p>
+                  <p className="text-gray-900 font-medium text-sm">{userProfile?.location || t("profile.notSet")}</p>
+                </div>
               </div>
-              <div className="lg:col-span-2">
-                <label className="block text-sm font-medium text-gray-500 mb-1">
-                  {t("profile.bio")}
-                </label>
-                <p className="text-gray-900 leading-relaxed">
-                  {editForm.additional_info || t("profile.noBioAdded")}
-                </p>
+              <div className="flex items-start gap-3 p-4 rounded-xl bg-gray-50 border border-gray-100">
+                <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-gray-500 mb-0.5">{t("profile.email")}</p>
+                  <p className="text-gray-900 font-medium text-sm">{user?.email}</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3 p-4 rounded-xl bg-gray-50 border border-gray-100">
+                <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-gray-500 mb-0.5">{t("profile.memberSince")}</p>
+                  <p className="text-gray-900 font-medium text-sm">
+                    {userProfile?.created_at ? formatDate(userProfile.created_at) : t("profile.recently")}
+                  </p>
+                </div>
+              </div>
+              <div className="lg:col-span-2 flex items-start gap-3 p-4 rounded-xl bg-gray-50 border border-gray-100">
+                <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs font-medium text-gray-500 mb-0.5">{t("profile.bio")}</p>
+                  <p className="text-gray-900 leading-relaxed text-sm">
+                    {editForm.additional_info || t("profile.noBioAdded")}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -2165,40 +2331,168 @@ export default function ProfilePage() {
         </div>
       )}
 
-      <main className="flex-1 px-4 sm:px-6 py-8 sm:py-12">
+      <main className="flex-1 px-4 sm:px-6 py-6 sm:py-10">
         <div className="max-w-7xl mx-auto">
+
+          {/* Persistent profile banner */}
+          <div className="bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-600 rounded-2xl px-6 py-5 mb-6 shadow-md">
+            <div className="flex items-center gap-4">
+              <div className="relative w-14 h-14 flex-shrink-0 group/avatar">
+                <div className="w-14 h-14 rounded-full border-2 border-white/40 overflow-hidden bg-white/20 shadow-inner">
+                  {displayAvatar ? (
+                    <img src={displayAvatar} alt="avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-white font-bold text-xl">
+                      {displayNameFromProfile[0]?.toUpperCase() || "?"}
+                    </div>
+                  )}
+                </div>
+                {isEditing ? (
+                  <button
+                    type="button"
+                    onClick={() => photoInputRef.current?.click()}
+                    disabled={uploadingPhoto}
+                    className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover/avatar:opacity-100 transition-opacity"
+                  >
+                    {uploadingPhoto ? (
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    )}
+                  </button>
+                ) : displayAvatar && (
+                  <button
+                    type="button"
+                    onClick={() => setShowAvatarModal(true)}
+                    className="absolute inset-0 rounded-full bg-black/30 flex items-center justify-center opacity-0 group-hover/avatar:opacity-100 transition-opacity"
+                  >
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                  </button>
+                )}
+                <input
+                  ref={photoInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handlePhotoUpload(file);
+                    e.target.value = "";
+                  }}
+                />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-white font-semibold text-lg leading-tight truncate">{displayNameFromProfile}</p>
+                <div className="flex flex-wrap items-center gap-2 mt-1">
+                  <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${
+                    userProfile?.user_type === "parent"
+                      ? "bg-blue-400/30 text-blue-100"
+                      : userProfile?.user_type === "nanny"
+                      ? "bg-green-400/30 text-green-100"
+                      : "bg-yellow-400/30 text-yellow-100"
+                  }`}>
+                    {userProfile?.user_type === "parent"
+                      ? t("common.parent")
+                      : userProfile?.user_type === "nanny"
+                      ? t("common.nanny")
+                      : t("userType.pending")}
+                  </span>
+                  {(userProfile as any)?.average_rating && Number((userProfile as any).average_rating) > 0 && (
+                    <span className="text-xs text-purple-200 flex items-center gap-1">
+                      <svg className="w-3.5 h-3.5 text-yellow-300 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                      {Number((userProfile as any).average_rating).toFixed(1)} ({(userProfile as any).total_reviews || 0})
+                    </span>
+                  )}
+                  {userProfile?.location && (
+                    <span className="text-xs text-purple-200 flex items-center gap-1">
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                      {userProfile.location}
+                    </span>
+                  )}
+                  {userProfile?.created_at && (
+                    <span className="text-xs text-purple-200 flex items-center gap-1">
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                      {t("profile.memberSince")} {formatDate(userProfile.created_at)}
+                    </span>
+                  )}
+                </div>
+              </div>
+              <button
+                onClick={() => { setActiveTab("profile"); setIsEditing(true); }}
+                className="hidden sm:flex items-center gap-1.5 text-xs text-purple-200 hover:text-white border border-white/20 hover:border-white/40 px-3 py-1.5 rounded-lg transition-colors flex-shrink-0"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                {t("profile.editProfile")}
+              </button>
+            </div>
+          </div>
+
           {/* Tab Navigation */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-2 mb-8">
-            <div className="grid grid-cols-2 sm:flex sm:space-x-2 gap-2">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-1.5 mb-7">
+            <div className="grid grid-cols-2 sm:flex gap-1">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => {
                     setActiveTab(tab.id);
-                    // Update URL without page reload
                     const url = new URL(window.location.href);
                     url.searchParams.set("tab", tab.id);
                     window.history.pushState({}, "", url.toString());
                   }}
-                  className={`flex-1 flex items-center justify-center space-x-3 px-4 sm:px-6 py-3 sm:py-4 rounded-xl font-medium transition-all duration-200 text-sm sm:text-base ${
+                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-150 text-sm ${
                     activeTab === tab.id
-                      ? "bg-purple-600 text-white shadow-md"
-                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                      ? "bg-purple-600 text-white shadow-sm"
+                      : "text-gray-500 hover:text-gray-800 hover:bg-gray-50"
                   }`}
                 >
-                  <span className="text-lg">{tab.icon}</span>
-                  <span>{tab.label}</span>
+                  {tab.id === "job-ads" && (
+                    <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+                  )}
+                  {tab.id === "bookings" && (
+                    <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                  )}
+                  {tab.id === "messages" && (
+                    <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+                  )}
+                  {tab.id === "profile" && (
+                    <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                  )}
+                  <span className="truncate">{tab.label}</span>
                 </button>
               ))}
             </div>
           </div>
 
           {/* Tab Content */}
-          <div className="space-y-8">{renderTabContent()}</div>
+          <div className="space-y-8">
+            <ErrorBoundary>{renderTabContent()}</ErrorBoundary>
+          </div>
         </div>
       </main>
 
       <Footer />
+
+      {/* Avatar lightbox */}
+      {showAvatarModal && displayAvatar && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
+          onClick={() => setShowAvatarModal(false)}
+        >
+          <div className="relative max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
+            <img
+              src={displayAvatar}
+              alt="Profile photo"
+              className="w-full rounded-2xl object-cover shadow-2xl"
+            />
+            <button
+              onClick={() => setShowAvatarModal(false)}
+              className="absolute -top-3 -right-3 w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-600 hover:text-gray-900"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

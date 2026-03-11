@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { AdvertisementService } from "../lib/advertisementService";
 import LocationAutocomplete from "./LocationAutocomplete";
 import MultiDatePicker from "./MultiDatePicker";
@@ -8,6 +9,7 @@ import { toLocalYYYYMMDD, formatDateDDMMYYYY } from "../lib/date";
 import { NANNY_SKILLS } from "../lib/constants/skills";
 import { useTranslation } from "./LanguageProvider";
 import { getTranslatedSkill } from "../lib/constants/skills";
+import { useSupabaseUser } from "../lib/useSupabaseUser";
 
 export default function EditAdvertisement({
   advertisementId,
@@ -15,6 +17,8 @@ export default function EditAdvertisement({
   advertisementId: string;
 }) {
   const { t, language } = useTranslation();
+  const { user, isLoading: authLoading } = useSupabaseUser();
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [ad, setAd] = useState<any | null>(null);
@@ -33,10 +37,17 @@ export default function EditAdvertisement({
     Record<string, { start: string; end: string }>
   >({});
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const availableSkills = useMemo(() => NANNY_SKILLS, []);
 
+  // Redirect unauthenticated users
   useEffect(() => {
+    if (!authLoading && !user) router.push("/login");
+  }, [authLoading, user, router]);
+
+  useEffect(() => {
+    if (!user?.id) return;
     const run = async () => {
       setLoading(true);
       setError(null);
@@ -45,6 +56,11 @@ export default function EditAdvertisement({
           advertisementId
         );
         if (!adData) throw new Error(t("ad.notFound"));
+        // Ownership check — only the ad's owner may edit it
+        if (adData.user_id !== user.id) {
+          router.push("/");
+          return;
+        }
         setAd(adData);
         setTitle(adData.title || "");
         setPricePerHour(Number(adData.price_per_hour) || 0);
@@ -84,7 +100,7 @@ export default function EditAdvertisement({
       }
     };
     run();
-  }, [advertisementId]);
+  }, [advertisementId, user?.id]);
 
   const handleSkillToggle = (skill: string) => {
     setSkills((prev) =>
@@ -139,17 +155,18 @@ export default function EditAdvertisement({
   const isActive = !!ad.is_active;
 
   return (
-    <div className="max-w-3xl mx-auto bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">
+    <div className="max-w-3xl mx-auto bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+      <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-purple-50 to-indigo-50/40 flex items-start justify-between gap-4">
+        <h1 className="text-xl font-bold text-gray-900">
           {t("createAd.editTitle")}
         </h1>
         {isActive && (
-          <span className="text-sm text-gray-500">
+          <span className="text-xs text-gray-500 max-w-xs text-right leading-relaxed">
             {t("adEdit.lockedWhileActive")}
           </span>
         )}
       </div>
+      <div className="p-6">
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
@@ -534,6 +551,15 @@ export default function EditAdvertisement({
         </div>
       )}
 
+      {saveError && (
+        <div className="mt-6 flex items-start gap-3 px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
+          <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+          </svg>
+          {saveError}
+        </div>
+      )}
+
       <div className="mt-8 flex justify-end gap-3">
         <button
           type="button"
@@ -549,6 +575,11 @@ export default function EditAdvertisement({
           type="button"
           disabled={saving}
           onClick={async () => {
+            setSaveError(null);
+            if (type === "short-term" && selectedDates.length === 0) {
+              setSaveError(t("adEdit.errorNoDates"));
+              return;
+            }
             setSaving(true);
             try {
               // update base ad
@@ -607,6 +638,7 @@ export default function EditAdvertisement({
         >
           {saving ? t("adEdit.saving") : t("adEdit.save")}
         </button>
+      </div>
       </div>
     </div>
   );

@@ -44,6 +44,19 @@ export default function Header() {
       clearInterval(id);
     };
   }, [user?.id]);
+
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (!user?.id) { setIsAdmin(false); return; }
+    supabase
+      .from("users")
+      .select("user_type")
+      .eq("id", user.id)
+      .single()
+      .then(({ data }) => setIsAdmin(data?.user_type === "admin"));
+  }, [user?.id]);
+
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showLanguageMenu, setShowLanguageMenu] = useState(false);
   const langCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -166,7 +179,7 @@ export default function Header() {
             }}
             className="text-2xl font-bold text-purple-600 tracking-wide hover:text-purple-700 transition-colors"
           >
-            NannyBooking.lv
+            NannyBooking.org
           </button>
         </div>
         {/* User Menu (right) */}
@@ -242,6 +255,14 @@ export default function Header() {
                     >
                       {t("profile.profile")}
                     </button>
+                    {isAdmin && (
+                      <button
+                        onClick={() => handleNavigation("/admin")}
+                        className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors duration-200 border-b border-gray-100 text-sm font-medium bg-white text-purple-700"
+                      >
+                        Admin Panel
+                      </button>
+                    )}
                     <button
                       onClick={async () => {
                         setShowUserMenu(false);

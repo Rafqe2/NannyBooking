@@ -19,13 +19,6 @@ export class BookingService {
         p_message: input.message ?? null,
       });
       if (error) {
-        // eslint-disable-next-line no-console
-        console.error("createBooking error - full error object:", JSON.stringify(error, null, 2));
-        console.error("createBooking error - error.message:", error.message);
-        console.error("createBooking error - error.details:", error.details);
-        console.error("createBooking error - error.hint:", error.hint);
-        console.error("createBooking error - error.code:", error.code);
-        
         // Combine all error fields so we never lose the raise exception message
         const allParts = [error.message, error.details, error.hint]
           .filter(Boolean)
@@ -38,10 +31,10 @@ export class BookingService {
         return { success: false, error: 'No booking ID returned from server' };
       }
       return { success: true, id: data as string };
-    } catch (e: any) {
+    } catch (e: unknown) {
       // eslint-disable-next-line no-console
       console.error("createBooking exception", e);
-      const errorMsg = e?.message || e?.toString() || JSON.stringify(e) || 'Failed to create booking. Please try again.';
+      const errorMsg = e instanceof Error ? e.message : (typeof e === 'string' ? e : 'Failed to create booking. Please try again.');
       return { 
         success: false, 
         error: errorMsg

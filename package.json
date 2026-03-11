@@ -9,10 +9,10 @@
     "lint": "next lint"
   },
   "overrides": {
-  "whatwg-url": "^14.0.0",
-  "tr46": "^4.1.1",
-  "webidl-conversions": "^7.0.0",
-  "punycode": "^2.3.1"
+    "whatwg-url": "^14.0.0",
+    "tr46": "^4.1.1",
+    "webidl-conversions": "^7.0.0",
+    "punycode": "^2.3.1"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.55.0",

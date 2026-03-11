@@ -4,7 +4,10 @@
       "Bash(npx next build:*)",
       "Bash(git stash:*)",
       "Bash(npm run build:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "WebSearch",
+      "Bash(git rm --cached .env.local.backup)",
+      "Bash(grep -n 'from\\(\"\"users\"\"\\)' /Users/rafa/Desktop/Projects/Auklite1/src/app/advertisement/[id]/page.tsx -A 3)"
     ]
   }
 }

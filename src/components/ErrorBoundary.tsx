@@ -1,6 +1,8 @@
 "use client";
 
 import React, { Component, ReactNode } from "react";
+import { translations } from "../lib/translations";
+import { Language } from "../lib/i18n";
 
 interface Props {
   children: ReactNode;
@@ -10,6 +12,18 @@ interface Props {
 interface State {
   hasError: boolean;
   error?: Error;
+}
+
+function getTranslation(key: keyof typeof translations, lang: Language): string {
+  const entry = translations[key];
+  return entry?.[lang] || entry?.en || key;
+}
+
+function getBrowserLanguage(): Language {
+  if (typeof window === "undefined") return "en";
+  const stored = localStorage.getItem("language");
+  if (stored === "lv" || stored === "ru" || stored === "en") return stored;
+  return "en";
 }
 
 export class ErrorBoundary extends Component<Props, State> {
@@ -22,7 +36,7 @@ export class ErrorBoundary extends Component<Props, State> {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: any) {
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error("Error boundary caught an error:", error, errorInfo);
 
     // Handle authentication-related errors specifically
@@ -42,6 +56,8 @@ export class ErrorBoundary extends Component<Props, State> {
       if (this.props.fallback) {
         return this.props.fallback;
       }
+
+      const lang = getBrowserLanguage();
 
       return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4">
@@ -64,24 +80,23 @@ export class ErrorBoundary extends Component<Props, State> {
               </div>
             </div>
             <h2 className="text-lg font-semibold text-gray-900 mb-2">
-              Something went wrong
+              {getTranslation("error.somethingWentWrong", lang)}
             </h2>
             <p className="text-gray-600 mb-6">
-              We encountered an unexpected error. Please try refreshing the page
-              or return to the home page.
+              {getTranslation("error.unexpectedError", lang)}
             </p>
             <div className="space-y-3">
               <button
                 onClick={() => window.location.reload()}
                 className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
               >
-                Refresh Page
+                {getTranslation("error.refreshPage", lang)}
               </button>
               <button
                 onClick={() => window.location.replace("/")}
                 className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
               >
-                Go to Home
+                {getTranslation("error.goHome", lang)}
               </button>
             </div>
           </div>

@@ -62,13 +62,8 @@ export class AdvertisementService {
         { p_ad_id: advertisementId }
       );
       if (error) {
-        // If RPC doesn't exist yet, fallback to regular availability
-        if (error.message?.includes("function") && error.message?.includes("does not exist")) {
-          console.warn("get_filtered_ad_availability RPC not found, falling back to regular availability");
-          return this.getAvailabilitySlots(advertisementId);
-        }
-        console.error("Error fetching filtered availability slots:", error);
-        return [];
+        console.warn("get_filtered_ad_availability failed, falling back:", error.message);
+        return this.getAvailabilitySlots(advertisementId);
       }
       return (data as any[]) || [];
     } catch (error) {

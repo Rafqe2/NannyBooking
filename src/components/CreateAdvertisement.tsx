@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useSupabaseUser } from "../lib/useSupabaseUser";
 import { LV_CITIES } from "../lib/constants/cities";
 import { NANNY_SKILLS, PARENT_SKILLS } from "../lib/constants/skills";
@@ -33,10 +35,12 @@ interface AdvertisementForm {
 }
 
 export default function CreateAdvertisement() {
-  const { user } = useSupabaseUser();
+  const { user, isLoading } = useSupabaseUser();
+  const router = useRouter();
   const { t, language } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [locationError, setLocationError] = useState(false);
   const [userType, setUserType] = useState<
     "parent" | "nanny" | "pending" | null
   >(null);
@@ -66,6 +70,13 @@ export default function CreateAdvertisement() {
   const [showAdditionalInfo, setShowAdditionalInfo] = useState(false);
 
   const cities = LV_CITIES;
+
+  // Redirect unauthenticated users to login
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.push("/login");
+    }
+  }, [isLoading, user, router]);
 
   // Load user profile to determine user type for conditional form copy
   useEffect(() => {
@@ -109,6 +120,7 @@ export default function CreateAdvertisement() {
     }
     if (!formData.location.city || formData.location.city.trim().length < 2) {
       setError(t("adCreate.errorSelectLocation"));
+      setLocationError(true);
       setIsSubmitting(false);
       return;
     }
@@ -205,7 +217,6 @@ export default function CreateAdvertisement() {
         );
       }
 
-      console.log("Advertisement created successfully:", createdAdvertisement);
       window.location.href = "/profile";
     } catch (error) {
       console.error("Error creating advertisement:", error);
@@ -228,15 +239,33 @@ export default function CreateAdvertisement() {
     ? t("adCreate.jobDescription")
     : t("adCreate.serviceDescription");
 
+  if (userType === "parent") {
+    return (
+      <div className="max-w-4xl mx-auto p-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
+          <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          </div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">{t("adCreate.nannyOnly")}</h2>
+          <p className="text-gray-500 mb-6 max-w-sm mx-auto">{t("adCreate.nannyOnlyDesc")}</p>
+          <Link href="/" className="inline-flex items-center gap-2 px-6 py-2.5 bg-purple-600 text-white font-semibold rounded-xl hover:bg-purple-700 transition-colors text-sm">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            {t("adCreate.browseNannies")}
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         {/* Header */}
-        <div className="px-8 py-6 border-b border-gray-100 bg-gray-50">
-          <h1 className="text-3xl font-bold text-gray-900">
+        <div className="px-8 py-7 border-b border-gray-100 bg-gradient-to-r from-purple-50 to-indigo-50/50">
+          <h1 className="text-2xl font-bold text-gray-900">
             {t("adCreate.title")}
           </h1>
-          <p className="text-gray-600 mt-2">{t("adCreate.subtitle")}</p>
+          <p className="text-gray-500 mt-1 text-sm">{t("adCreate.subtitle")}</p>
         </div>
 
         {/* Form */}
@@ -326,7 +355,7 @@ export default function CreateAdvertisement() {
           {/* Availability (hidden for long-term) */}
           {formData.type === "short-term" && (
             <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              <h2 className="text-base font-semibold text-gray-900 mb-4 flex items-center gap-2 after:flex-1 after:h-px after:bg-gray-100">
                 {t("adCreate.availabilitySchedule")}
               </h2>
               <p className="text-sm text-gray-600 mb-4">
@@ -506,29 +535,35 @@ export default function CreateAdvertisement() {
 
           {/* Location */}
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+            <h2 className="text-base font-semibold text-gray-900 mb-4 flex items-center gap-2 after:flex-1 after:h-px after:bg-gray-100">
               {t("adCreate.location")}
             </h2>
             <div className="grid grid-cols-1 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t("adCreate.primaryLocation")}
+                  {t("adCreate.primaryLocation")} <span className="text-red-500">*</span>
                 </label>
-                <LocationAutocomplete
-                  value={formData.location.city}
-                  onChange={(next) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      location: {
-                        ...prev.location,
-                        city: next.label,
-                        address: "",
-                        zipCode: "",
-                      },
-                    }))
-                  }
-                  placeholder={t("adCreate.placeholderSearch")}
-                />
+                <div className={locationError ? "ring-2 ring-red-400 rounded-lg" : ""}>
+                  <LocationAutocomplete
+                    value={formData.location.city}
+                    onChange={(next) => {
+                      setLocationError(false);
+                      setFormData((prev) => ({
+                        ...prev,
+                        location: {
+                          ...prev.location,
+                          city: next.label,
+                          address: "",
+                          zipCode: "",
+                        },
+                      }));
+                    }}
+                    placeholder={t("adCreate.placeholderSearch")}
+                  />
+                </div>
+                {locationError && (
+                  <p className="text-xs text-red-500 mt-1">{t("adCreate.errorSelectLocation")}</p>
+                )}
               </div>
               {/* Extra locations (up to 2) */}
               {extraLocations.map((loc, idx) => (
@@ -574,7 +609,7 @@ export default function CreateAdvertisement() {
 
           {/* Skills */}
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+            <h2 className="text-base font-semibold text-gray-900 mb-4 flex items-center gap-2 after:flex-1 after:h-px after:bg-gray-100">
               {isParent ? t("adCreate.requiredSkills") : t("adCreate.skills")}
             </h2>
             <p className="text-sm text-gray-600 mb-4">
@@ -582,23 +617,24 @@ export default function CreateAdvertisement() {
                 ? t("adCreate.selectRequiredSkills")
                 : t("adCreate.selectYourSkills")}
             </p>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {availableSkills.map((skill) => (
-                <label
-                  key={skill}
-                  className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
-                >
-                  <input
-                    type="checkbox"
-                    checked={formData.skills.includes(skill)}
-                    onChange={() => handleSkillToggle(skill)}
-                    className="mr-2"
-                  />
-                  <span className="text-sm">
+            <div className="flex flex-wrap gap-2">
+              {availableSkills.map((skill) => {
+                const selected = formData.skills.includes(skill);
+                return (
+                  <button
+                    key={skill}
+                    type="button"
+                    onClick={() => handleSkillToggle(skill)}
+                    className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-all duration-150 ${
+                      selected
+                        ? "bg-purple-600 text-white border-purple-600 shadow-sm"
+                        : "bg-white text-gray-600 border-gray-200 hover:border-purple-300 hover:text-purple-700"
+                    }`}
+                  >
                     {getTranslatedSkill(skill, language)}
-                  </span>
-                </label>
-              ))}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -702,7 +738,14 @@ export default function CreateAdvertisement() {
           </div>
 
           {/* Error Message */}
-          {error && <div className="text-red-500 text-sm mt-4">{error}</div>}
+          {error && (
+            <div className="flex items-start gap-3 px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
+              <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+              </svg>
+              {error}
+            </div>
+          )}
 
           {/* Submit Button */}
           <div className="flex justify-end space-x-4 pt-6">

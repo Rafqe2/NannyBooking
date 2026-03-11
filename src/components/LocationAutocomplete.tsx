@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "./LanguageProvider";
 
 interface LocationAutocompleteProps {
   value: string;
@@ -23,6 +24,7 @@ export default function LocationAutocomplete({
   placeholder,
   variant = "default",
 }: LocationAutocompleteProps) {
+  const { t } = useTranslation();
   const [query, setQuery] = useState<string>(value || "");
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -97,8 +99,8 @@ export default function LocationAutocomplete({
           }
           setOpen(true);
           setHighlight(-1);
-        } catch (err: any) {
-          if (err?.name === "AbortError") return;
+        } catch (err: unknown) {
+          if (err instanceof DOMException && err.name === "AbortError") return;
           if (!active) return;
           setSuggestions([]);
         } finally {
@@ -150,7 +152,7 @@ export default function LocationAutocomplete({
           onQueryChange?.(newQuery); // Notify parent of query changes
         }}
         onFocus={() => setOpen(suggestions.length > 0)}
-        placeholder={placeholder || "Search city, country, street"}
+        placeholder={placeholder || t("location.searchPlaceholder")}
         className={
           variant === "borderless"
             ? "w-full px-0 lg:px-0 py-3 lg:py-4 bg-transparent border-0 outline-none focus:outline-none focus:ring-0"
@@ -167,10 +169,10 @@ export default function LocationAutocomplete({
           role="listbox"
         >
           {loading && (
-            <div className="px-4 py-3 text-sm text-gray-500">Searching…</div>
+            <div className="px-4 py-3 text-sm text-gray-500">{t("location.searching")}</div>
           )}
           {!loading && suggestions.length === 0 && (
-            <div className="px-4 py-3 text-sm text-gray-500">No matches</div>
+            <div className="px-4 py-3 text-sm text-gray-500">{t("location.noMatches")}</div>
           )}
           {!loading &&
             suggestions.map((s, idx) => (

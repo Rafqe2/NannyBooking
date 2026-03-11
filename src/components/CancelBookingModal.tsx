@@ -6,8 +6,31 @@ import { useTranslation } from "./LanguageProvider";
 import { getTranslatedCancellationReason } from "../lib/constants/skills";
 import { formatDateDDMMYYYY } from "../lib/date";
 
+interface BookingRecord {
+  id: string;
+  booking_date?: string | null;
+  start_time?: string | null;
+  end_time?: string | null;
+  status?: string | null;
+  message?: string | null;
+  total_amount?: number | null;
+  counterparty_full_name?: string | null;
+  counterparty_id?: string | null;
+  advertisement_id?: string | null;
+  ad_type?: string | null;
+  has_review?: boolean | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  cancellation_reason?: string | null;
+  cancellation_note?: string | null;
+  cancelled_at?: string | null;
+  cancelled_by?: string | null;
+  parent_id?: string | null;
+  nanny_id?: string | null;
+}
+
 interface CancelBookingModalProps {
-  booking: any;
+  booking: BookingRecord;
   onClose: () => void;
   onSuccess: () => void;
   userType?: "parent" | "nanny" | "pending" | null;
@@ -71,8 +94,8 @@ export default function CancelBookingModal({
       } else {
         setError(t("cancelBooking.failed"));
       }
-    } catch (err: any) {
-      setError(err.message || t("cancelBooking.failed"));
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : t("cancelBooking.failed"));
     } finally {
       setIsSubmitting(false);
     }
@@ -110,7 +133,7 @@ export default function CancelBookingModal({
                 ? formatDateDDMMYYYY(
                     new Date(booking.booking_date + "T00:00:00")
                   )
-                : "No date"}
+                : t("cancelBooking.noDate")}
               {booking.start_time && booking.end_time && (
                 <span>
                   {" "}

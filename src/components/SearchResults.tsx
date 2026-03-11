@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
 import { supabase } from "../lib/supabase";
 import { toLocalYYYYMMDD, formatDateDDMMYYYY, stripLatvianGada } from "../lib/date";
@@ -13,6 +13,7 @@ import AdvancedSearchFilters, {
   DEFAULT_FILTERS,
 } from "./AdvancedSearchFilters";
 import { getNearbyCities } from "../lib/constants/nearbyLocations";
+import ErrorBoundary from "./ErrorBoundary";
 
 interface SearchParams {
   location: string;
@@ -61,6 +62,22 @@ export default function SearchResults({
   const [viewerType, setViewerType] = useState<null | "parent" | "nanny">(null);
   const runIdRef = useRef(0);
   const [filters, setFilters] = useState<AdvancedFilters>(DEFAULT_FILTERS);
+  const [sortBy, setSortBy] = useState<"newest" | "price_asc" | "price_desc" | "rating">("newest");
+
+  const sortedResults = useMemo(() => {
+    const arr = [...results];
+    switch (sortBy) {
+      case "price_asc":
+        return arr.sort((a, b) => (a.hourlyRate || 0) - (b.hourlyRate || 0));
+      case "price_desc":
+        return arr.sort((a, b) => (b.hourlyRate || 0) - (a.hourlyRate || 0));
+      case "rating":
+        return arr.sort((a, b) => (b.ownerRating || 0) - (a.ownerRating || 0));
+      case "newest":
+      default:
+        return arr; // already ordered by created_at desc from the server
+    }
+  }, [results, sortBy]);
 
   useEffect(() => {
     const fetchViewerType = async () => {
@@ -217,47 +234,7 @@ export default function SearchResults({
           if (runId !== runIdRef.current) return;
           mapped = mappedLocal;
         } catch (_rpcErr) {
-          // Fallback only for unauthenticated viewers; avoid wrong-role results for signed-in users
-          if (!user?.id) {
-            let query = supabase
-              .from("advertisements")
-              .select(
-                "id, title, location_city, price_per_hour, experience, skills, availability_start_time, availability_end_time"
-              )
-              .eq("is_active", true)
-              .order("created_at", { ascending: false });
-
-            if (locationParam) {
-              query = query.ilike("location_city", `%${locationParam}%`);
-            }
-
-            const { data, error } = await query;
-            if (error) {
-              console.warn(
-                "Fallback query failed:",
-                error.message,
-                "- Check database permissions"
-              );
-              throw error;
-            }
-            const mappedLocal = (data || []).map((ad: any) => ({
-              id: ad.id,
-              title: ad.title,
-              location: ad.location_city,
-              hourlyRate: Number(ad.price_per_hour) || 0,
-              experience: ad.experience || "",
-              skills: ad.skills || [],
-              availability:
-                ad.availability_start_time && ad.availability_end_time
-                  ? `${ad.availability_start_time} - ${ad.availability_end_time}`
-                  : "",
-            }));
-            if (runId !== runIdRef.current) return;
-            mapped = mappedLocal;
-          } else {
-            // Signed-in and RPC failed: keep empty until next retry to avoid cross-role flicker
-            mapped = [];
-          }
+          mapped = [];
         }
 
         if (runId === runIdRef.current) {
@@ -334,7 +311,7 @@ export default function SearchResults({
             </h2>
             <p className="text-gray-600">
               {t("search.resultsFound", {
-                count: results.length,
+                count: sortedResults.length,
                 plural:
                   results.length !== 1
                     ? language === "lv"
@@ -346,27 +323,38 @@ export default function SearchResults({
               })}
             </p>
           </div>
-          <AdvancedSearchFilters
-            filters={filters}
-            onChange={setFilters}
-            onApply={() => {
-              // Trigger search by updating filters state (already in dependency array)
-            }}
-            onReset={() => {
-              setFilters(DEFAULT_FILTERS);
-            }}
-          />
+          <div className="flex items-center gap-2">
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+              className="text-sm border border-gray-200 rounded-xl px-3 py-2.5 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-sm h-[42px]"
+              aria-label={t("search.sortBy")}
+            >
+              <option value="newest">{t("search.sortNewest")}</option>
+              <option value="price_asc">{t("search.sortPriceAsc")}</option>
+              <option value="price_desc">{t("search.sortPriceDesc")}</option>
+              <option value="rating">{t("search.sortRating")}</option>
+            </select>
+            <AdvancedSearchFilters
+              filters={filters}
+              onChange={setFilters}
+              onApply={() => {}}
+              onReset={() => setFilters(DEFAULT_FILTERS)}
+            />
+          </div>
         </div>
 
         {/* Result Cards */}
+        <ErrorBoundary>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {results.map((ad) => (
+          {sortedResults.map((ad) => {
+            return (
             <div
               key={ad.id}
-              className="group bg-white rounded-2xl shadow-sm border border-gray-200 hover:shadow-xl hover:border-purple-200 transition-all duration-300 overflow-hidden cursor-pointer"
+              className="group bg-white rounded-2xl shadow-sm border border-gray-100 hover:border-purple-200 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden cursor-pointer"
             >
               <Link
-                href={`/advertisement/${ad.id}`}
+                href={user ? `/advertisement/${ad.id}` : "/login"}
                 className="block h-full"
                 onClick={() => {
                   try {
@@ -390,234 +378,104 @@ export default function SearchResults({
                   } catch {}
                 }}
               >
-                <div className="h-full flex flex-col">
-                  {/* Header - Title, Pricing, Location, and Rating */}
-                  <div className="bg-gray-50 px-6 pt-5 pb-4 border-b border-gray-200">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1 min-w-0">
-                        {/* Title */}
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-purple-600 transition-colors">
-                          {ad.title}
-                        </h3>
-                        {/* Pricing */}
-                        <div className="flex items-baseline gap-2 mb-2">
-                          <span className="text-2xl font-bold text-purple-600">
-                            €{ad.hourlyRate}
-                          </span>
-                          <span className="text-sm text-gray-500">
-                            {t("ad.perHour")}
-                          </span>
-                        </div>
-                        {/* Location */}
-                        <div className="flex items-center gap-1 text-sm text-gray-600">
-                          <span>📍</span>
-                          <span className="truncate">
-                            {ad.location}
-                            {ad.locations && ad.locations.length > 0 && (
-                              <span className="ml-1">+{ad.locations.length}</span>
-                            )}
-                          </span>
-                        </div>
+                <div className="h-full flex flex-col p-5">
+                  {/* Top row: avatar + name + rating + type badge */}
+                  <div className="flex items-start gap-3 mb-4">
+                    <div className="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center font-bold text-lg flex-shrink-0 border-2 border-white shadow-sm bg-purple-100 text-purple-700">
+                      {ad.ownerPicture ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={ad.ownerPicture} alt={ad.ownerFullName || ""} className="w-full h-full object-cover" />
+                      ) : (
+                        <span>{(ad.ownerFullName || "?").charAt(0).toUpperCase()}</span>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="font-semibold text-gray-900 truncate text-sm leading-tight">
+                          {ad.ownerFullName || "—"}
+                        </p>
+                        <span className={`flex-shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ${ad.adType === "long-term" ? "bg-blue-50 text-blue-600" : "bg-emerald-50 text-emerald-600"}`}>
+                          {ad.adType === "long-term" ? t("ad.longTerm") : t("ad.shortTerm")}
+                        </span>
                       </div>
-                      {/* Rating Stars - Right Side */}
-                      {ad.ownerRating !== undefined && (
-                        <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                          <div className="flex items-center gap-0.5">
-                            {[1, 2, 3, 4, 5].map((star) => {
-                              const rounded = Math.round(Number(ad.ownerRating) * 2) / 2;
-                              const isFull = rounded >= star;
-                              const isHalf = !isFull && rounded >= star - 0.5;
-                              return (
-                                <span key={star} className="relative inline-block text-lg leading-none">
-                                  <span className="text-gray-300">★</span>
-                                  {(isFull || isHalf) && (
-                                    <span
-                                      className="absolute inset-0 overflow-hidden text-yellow-400"
-                                      style={{ width: isHalf ? '50%' : '100%' }}
-                                    >
-                                      ★
-                                    </span>
-                                  )}
-                                </span>
-                              );
-                            })}
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <span className="text-sm font-semibold text-gray-900">
-                              {Number(ad.ownerRating).toFixed(1)}
-                            </span>
-                            <span className="text-xs text-gray-500">
-                              ({ad.ownerReviewsCount || 0})
-                            </span>
-                          </div>
+                      {/* Rating */}
+                      {Number(ad.ownerRating) > 0 ? (
+                        <div className="flex items-center gap-1 mt-0.5">
+                          <svg className="w-3.5 h-3.5 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                          <span className="text-xs font-semibold text-gray-800">{Number(ad.ownerRating).toFixed(1)}</span>
+                          <span className="text-xs text-gray-400">({ad.ownerReviewsCount || 0})</span>
                         </div>
+                      ) : (
+                        <p className="text-xs text-gray-400 mt-0.5">{t("ad.noReviews")}</p>
                       )}
                     </div>
                   </div>
-                  
-                  {/* Content */}
-                  <div className="p-6 flex-1 flex flex-col">
 
-                  {/* Owner Profile */}
-                  {user && (ad.ownerFullName || ad.ownerRating !== undefined) && (
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-12 h-12 rounded-full overflow-hidden bg-gradient-to-br from-purple-100 to-purple-200 flex items-center justify-center text-purple-700 font-semibold flex-shrink-0">
-                        {ad.ownerPicture ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={ad.ownerPicture}
-                            alt={ad.ownerFullName || "Owner"}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <span className="text-lg">
-                            {(ad.ownerFullName || "?").charAt(0).toUpperCase()}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium text-gray-900 truncate">
-                          {ad.ownerFullName || "—"}
-                        </div>
-                        {ad.ownerMemberSince && (
-                          <div className="text-xs text-gray-400">
-                            {t("ad.joined")}{" "}
-                            {stripLatvianGada(new Date(ad.ownerMemberSince).toLocaleDateString(
-                              language === "lv" ? "lv-LV" : language === "ru" ? "ru-RU" : "en-US",
-                              { year: "numeric", month: "short" }
-                            ))}
-                          </div>
-                        )}
-                      </div>
+                  {/* Title */}
+                  <h3 className="text-base font-semibold text-gray-900 mb-1 line-clamp-2 group-hover:text-purple-600 transition-colors leading-snug">
+                    {ad.title}
+                  </h3>
+
+                  {/* Location */}
+                  <div className="flex items-center gap-1 text-xs text-gray-500 mb-3">
+                    <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    <span className="truncate">{ad.location}{ad.locations && ad.locations.length > 0 && <span className="text-gray-400"> +{ad.locations.length}</span>}</span>
+                  </div>
+
+                  {/* Skills */}
+                  {ad.skills && ad.skills.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mb-3">
+                      {ad.skills.slice(0, 3).map((skill, i) => (
+                        <span key={i} className="bg-purple-50 text-purple-700 text-xs px-2 py-0.5 rounded-md font-medium border border-purple-100">
+                          {getTranslatedSkill(skill, language)}
+                        </span>
+                      ))}
+                      {ad.skills.length > 3 && (
+                        <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-md">+{ad.skills.length - 3}</span>
+                      )}
                     </div>
                   )}
 
-                  {/* Skills Preview */}
-                  {ad.skills && ad.skills.length > 0 && (
-                    <div className="mb-4 flex-1">
+                  {/* Availability dates (short-term) */}
+                  {ad.adType === "short-term" && ad.availabilitySlots && ad.availabilitySlots.length > 0 && (
+                    <div className="mb-3">
                       <div className="flex flex-wrap gap-1">
-                        {ad.skills.slice(0, 3).map((skill, index) => (
-                          <span
-                            key={index}
-                            className="bg-purple-50 text-purple-700 text-xs px-2 py-1 rounded-md font-medium"
-                          >
-                            {getTranslatedSkill(skill, language)}
+                        {Array.from(new Set(ad.availabilitySlots.map(s => s.available_date))).sort().slice(0, 3).map((date) => (
+                          <span key={date} className="text-xs bg-emerald-50 text-emerald-700 border border-emerald-100 px-2 py-0.5 rounded-md font-medium">
+                            {formatDateDDMMYYYY(new Date(date + "T00:00:00Z"))}
                           </span>
                         ))}
-                        {ad.skills.length > 3 && (
-                          <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-md">
-                            +{ad.skills.length - 3}{" "}
-                            {t("ad.moreSkills", {
-                              count: ad.skills.length - 3,
-                            })}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Experience Preview */}
-                  {ad.experience && (
-                    <div className="mb-4">
-                      <p className="text-sm text-gray-600 line-clamp-2">
-                        {ad.experience}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Availability - Dates and Times */}
-                  {ad.adType === "short-term" && ad.availabilitySlots && ad.availabilitySlots.length > 0 && (
-                    <div className="mb-4">
-                      <div className="text-xs font-medium text-gray-700 mb-2">
-                        {t("ad.availability")}
-                      </div>
-                      <div className="space-y-1.5">
-                        {(() => {
-                          // Group slots by date
-                          const grouped = new Map<string, typeof ad.availabilitySlots>();
-                          ad.availabilitySlots.forEach((slot) => {
-                            if (!grouped.has(slot.available_date)) {
-                              grouped.set(slot.available_date, []);
-                            }
-                            grouped.get(slot.available_date)!.push(slot);
-                          });
-                          // Get first 3 dates
-                          const dates = Array.from(grouped.keys())
-                            .sort()
-                            .slice(0, 3);
-                          return dates.map((date) => {
-                            const slots = grouped.get(date)!;
-                            return (
-                              <div
-                                key={date}
-                                className="flex items-center justify-between text-xs bg-gray-50 border border-gray-200 rounded px-2 py-1.5"
-                              >
-                                <span className="font-medium text-gray-900">
-                                  {formatDateDDMMYYYY(new Date(date + "T00:00:00Z"))}
-                                </span>
-                                <div className="flex gap-1.5 flex-wrap">
-                                  {slots.slice(0, 2).map((slot, idx) => (
-                                    <span
-                                      key={idx}
-                                      className="text-gray-600 font-mono"
-                                    >
-                                      {slot.start_time}-{slot.end_time}
-                                    </span>
-                                  ))}
-                                  {slots.length > 2 && (
-                                    <span className="text-gray-500">
-                                      +{slots.length - 2}
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-                            );
-                          });
-                        })()}
-                        {ad.availabilitySlots.length > 3 && (
-                          <div className="text-xs text-gray-500 text-center pt-1">
-                            +{ad.availabilitySlots.length - 3} {t("ad.moreDates")}
-                          </div>
+                        {new Set(ad.availabilitySlots.map(s => s.available_date)).size > 3 && (
+                          <span className="text-xs text-gray-400 px-1 py-0.5">+{new Set(ad.availabilitySlots.map(s => s.available_date)).size - 3} {t("ad.moreDates")}</span>
                         )}
                       </div>
                     </div>
                   )}
                   {ad.adType === "long-term" && ad.availability && (
-                    <div className="mb-4">
-                      <div className="text-xs font-medium text-gray-700 mb-1">
-                        {t("ad.availability")}
-                      </div>
-                      <div className="text-xs text-gray-600">
-                        ⏰ {ad.availability}
-                      </div>
+                    <div className="mb-3 text-xs text-gray-500 flex items-center gap-1">
+                      <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                      {ad.availability}
                     </div>
                   )}
 
-                    {/* Action Button */}
-                    <div className="mt-auto pt-4">
-                      <div className="w-full bg-purple-600 text-white py-3 px-4 rounded-xl font-medium text-center group-hover:bg-purple-700 transition-colors duration-200 flex items-center justify-center gap-2">
-                        <span>{t("ad.viewDetails")}</span>
-                        <svg
-                          className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M9 5l7 7-7 7"
-                          />
-                        </svg>
-                      </div>
+                  {/* Footer: price + CTA */}
+                  <div className="mt-auto pt-3 border-t border-gray-100 flex items-center justify-between">
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-xl font-bold text-purple-600">€{ad.hourlyRate}</span>
+                      <span className="text-xs text-gray-400">{t("ad.perHour")}</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-sm font-semibold group-hover:gap-2 transition-all text-purple-600">
+                      {t("ad.viewDetails")}
+                      <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/></svg>
                     </div>
                   </div>
                 </div>
               </Link>
             </div>
-          ))}
+          );
+          })}
         </div>
+        </ErrorBoundary>
 
         {/* No Results */}
         {results.length === 0 && (

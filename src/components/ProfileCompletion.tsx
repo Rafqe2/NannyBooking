@@ -6,9 +6,11 @@ import Header from "./Header";
 import Footer from "./Footer";
 import { useSupabaseUser } from "../lib/useSupabaseUser";
 import { supabase } from "../lib/supabase";
+import { useTranslation } from "./LanguageProvider";
 
 export default function ProfileCompletion() {
   const { user: auth0User, isLoading } = useSupabaseUser();
+  const { t } = useTranslation();
   const [userType, setUserType] = useState<"parent" | "nanny">("parent");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -19,7 +21,7 @@ export default function ProfileCompletion() {
   // Pre-fill name and surname from user metadata when available
   useEffect(() => {
     if (auth0User) {
-      const meta: any = auth0User.user_metadata || {};
+      const meta = (auth0User.user_metadata || {}) as Record<string, string | undefined>;
       // Split full name if only name is provided
       const fullName = meta.name || "";
       if (fullName && !meta.given_name && !meta.family_name) {
@@ -41,20 +43,20 @@ export default function ProfileCompletion() {
 
   const handleCompleteProfile = async () => {
     if (!auth0User?.email) {
-      setSubmitError("User not found");
+      setSubmitError(t("profileComplete.userNotFound"));
       return;
     }
 
     if (!firstName.trim() || !lastName.trim()) {
-      setSubmitError("Please enter both your name and surname");
+      setSubmitError(t("profileComplete.enterBothNames"));
       return;
     }
 
     if (!bio.trim()) {
       setSubmitError(
         userType === "parent"
-          ? "Please write a bio about yourself"
-          : "Please write about your experience and yourself"
+          ? t("profileComplete.parentBioRequired")
+          : t("profileComplete.nannyBioRequired")
       );
       return;
     }
@@ -69,8 +71,8 @@ export default function ProfileCompletion() {
         name: firstName.trim(),
         surname: lastName.trim(),
         picture:
-          (auth0User.user_metadata as any)?.avatar_url ||
-          (auth0User.user_metadata as any)?.picture ||
+          (auth0User.user_metadata as Record<string, string | undefined>)?.avatar_url ||
+          (auth0User.user_metadata as Record<string, string | undefined>)?.picture ||
           null,
         user_type: "pending", // Temporary value, will be updated in the next step
         updated_at: new Date().toISOString(),
@@ -84,7 +86,7 @@ export default function ProfileCompletion() {
 
       if (saveError) {
         console.error("Error saving user:", saveError);
-        setSubmitError("Failed to save user data");
+        setSubmitError(t("profileComplete.saveFailed"));
         return;
       }
 
@@ -97,7 +99,7 @@ export default function ProfileCompletion() {
       );
 
       if (!completedUser) {
-        setSubmitError("Failed to complete profile");
+        setSubmitError(t("profileComplete.completeFailed"));
         return;
       }
 
@@ -117,8 +119,8 @@ export default function ProfileCompletion() {
 
       // Redirect to main app
       window.location.href = "/";
-    } catch (err: any) {
-      setSubmitError(err.message || "Failed to complete profile");
+    } catch (err: unknown) {
+      setSubmitError(err instanceof Error ? err.message : t("profileComplete.completeFailed"));
     } finally {
       setIsSubmitting(false);
     }
@@ -131,7 +133,7 @@ export default function ProfileCompletion() {
         <main className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading...</p>
+            <p className="mt-4 text-gray-600">{t("common.loading")}...</p>
           </div>
         </main>
         <Footer />
@@ -145,12 +147,12 @@ export default function ProfileCompletion() {
         <Header />
         <main className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <p className="text-red-600">User not found</p>
+            <p className="text-red-600">{t("profileComplete.userNotFound")}</p>
             <a
               href="/login"
               className="mt-4 inline-block bg-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-purple-700 transition-colors duration-200"
             >
-              Sign In Again
+              {t("profileComplete.signInAgain")}
             </a>
           </div>
         </main>
@@ -168,12 +170,12 @@ export default function ProfileCompletion() {
           <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
             <div className="text-center mb-8">
               <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                {(auth0User.user_metadata as any)?.avatar_url ||
-                (auth0User.user_metadata as any)?.picture ? (
+                {(auth0User.user_metadata as Record<string, string | undefined>)?.avatar_url ||
+                (auth0User.user_metadata as Record<string, string | undefined>)?.picture ? (
                   <img
                     src={
-                      (auth0User.user_metadata as any)?.avatar_url ||
-                      (auth0User.user_metadata as any)?.picture
+                      (auth0User.user_metadata as Record<string, string | undefined>)?.avatar_url ||
+                      (auth0User.user_metadata as Record<string, string | undefined>)?.picture
                     }
                     alt="Profile"
                     className="w-16 h-16 rounded-full"
@@ -195,10 +197,10 @@ export default function ProfileCompletion() {
                 )}
               </div>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                Complete Your Profile
+                {t("profileComplete.title")}
               </h1>
               <p className="text-gray-600">
-                Welcome! Please complete your profile to get started.
+                {t("profileComplete.welcome")}
               </p>
             </div>
 
@@ -206,12 +208,12 @@ export default function ProfileCompletion() {
               {/* Editable user information */}
               <div className="bg-gray-50 rounded-xl p-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                  Your Information
+                  {t("profileComplete.yourInfo")}
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Name
+                      {t("profile.name")}
                     </label>
                     <input
                       type="text"
@@ -224,7 +226,7 @@ export default function ProfileCompletion() {
                       }}
                       maxLength={50}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                      placeholder="Enter your name"
+                      placeholder={t("profileComplete.enterName")}
                     />
                     <p className="text-xs text-gray-500 mt-1">
                       {firstName.length}/50 characters
@@ -232,7 +234,7 @@ export default function ProfileCompletion() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Surname
+                      {t("profile.surname")}
                     </label>
                     <input
                       type="text"
@@ -245,7 +247,7 @@ export default function ProfileCompletion() {
                       }}
                       maxLength={50}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                      placeholder="Enter your surname"
+                      placeholder={t("profileComplete.enterSurname")}
                     />
                     <p className="text-xs text-gray-500 mt-1">
                       {lastName.length}/50 characters
@@ -253,7 +255,7 @@ export default function ProfileCompletion() {
                   </div>
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Email
+                      {t("profile.email")}
                     </label>
                     <input
                       type="email"
@@ -262,7 +264,7 @@ export default function ProfileCompletion() {
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed"
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                      Email cannot be changed
+                      {t("profileComplete.emailCannotChange")}
                     </p>
                   </div>
                 </div>
@@ -271,7 +273,7 @@ export default function ProfileCompletion() {
               {/* User type selection */}
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                  I am a...
+                  {t("profileComplete.iAmA")}
                 </h2>
                 <div className="flex gap-4 mb-6">
                   <button
@@ -296,7 +298,7 @@ export default function ProfileCompletion() {
                           d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
                         />
                       </svg>
-                      <h3 className="font-semibold">Parent</h3>
+                      <h3 className="font-semibold">{t("common.parent")}</h3>
                     </div>
                   </button>
 
@@ -322,7 +324,7 @@ export default function ProfileCompletion() {
                           d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                         />
                       </svg>
-                      <h3 className="font-semibold">Nanny</h3>
+                      <h3 className="font-semibold">{t("common.nanny")}</h3>
                     </div>
                   </button>
                 </div>
@@ -332,8 +334,8 @@ export default function ProfileCompletion() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   {userType === "parent"
-                    ? "Bio about yourself"
-                    : "Short text about your experience and yourself"}
+                    ? t("profileComplete.parentBioLabel")
+                    : t("profileComplete.nannyBioLabel")}
                 </label>
                 <textarea
                   value={bio}
@@ -349,13 +351,13 @@ export default function ProfileCompletion() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
                   placeholder={
                     userType === "parent"
-                      ? "Tell us about yourself..."
-                      : "Tell us about your experience and yourself..."
+                      ? t("profileComplete.parentBioPlaceholder")
+                      : t("profileComplete.nannyBioPlaceholder")
                   }
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  {bio.length}/1000 characters {bio.length > 0 && bio.length < 10 && (
-                    <span className="text-red-500">(min. 10 characters)</span>
+                  {bio.length}/1000 {t("profileComplete.characters")} {bio.length > 0 && bio.length < 10 && (
+                    <span className="text-red-500">({t("profileComplete.minCharacters").replace("{{count}}", "10")})</span>
                   )}
                 </p>
               </div>
@@ -376,7 +378,7 @@ export default function ProfileCompletion() {
                   }
                   className="bg-purple-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-purple-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isSubmitting ? "Completing..." : "Complete Profile"}
+                  {isSubmitting ? t("profileComplete.completing") : t("profileComplete.completeProfile")}
                 </button>
               </div>
             </div>

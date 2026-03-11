@@ -28,7 +28,6 @@ export class UserService {
         email: sessionUser.email,
         name: (meta as any).given_name || (meta as any).name || "",
         surname: (meta as any).family_name || "",
-        picture: (meta as any).picture || null,
         updated_at: new Date().toISOString(),
       } as Partial<UserProfile>;
 

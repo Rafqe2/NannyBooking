@@ -19,10 +19,7 @@ export async function POST(req: Request) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY as string;
     if (!supabaseUrl || !serviceKey) {
-      return NextResponse.json({
-        error:
-          "Missing server env. Set SUPABASE_SERVICE_ROLE_KEY and NEXT_PUBLIC_SUPABASE_URL",
-      }, { status: 500 });
+      return NextResponse.json({ error: "Server configuration error" }, { status: 500 });
     }
 
     const admin = createClient(supabaseUrl, serviceKey);
