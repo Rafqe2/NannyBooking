@@ -10,6 +10,7 @@ import BlockingLoader from "../../../components/BlockingLoader";
 import { AdvertisementService } from "../../../lib/advertisementService";
 import { UserService } from "../../../lib/userService";
 import BookingModal from "../../../components/BookingModal";
+import ReportModal from "../../../components/ReportModal";
 import { useSupabaseUser } from "../../../lib/useSupabaseUser";
 import { useTranslation } from "../../../components/LanguageProvider";
 import { getTranslatedSkill } from "../../../lib/constants/skills";
@@ -48,6 +49,7 @@ export default function AdvertisementDetails({
   const [error, setError] = useState<string | null>(null);
   const [showBooking, setShowBooking] = useState(false);
   const [showOwnerPhoto, setShowOwnerPhoto] = useState(false);
+  const [showReport, setShowReport] = useState(false);
   const [viewerType, setViewerType] = useState<null | "parent" | "nanny">(null);
 
   useEffect(() => {
@@ -208,7 +210,12 @@ export default function AdvertisementDetails({
   }
 
   const ownerIsNanny = owner?.userType === "nanny";
-  const canBook = !!user && ownerIsNanny && viewerType === "parent";
+  const ownerIsParent = owner?.userType === "parent";
+  // Parents can book nanny ads; nannies can book parent ads (apply to job posts)
+  const canBook = !!user && (
+    (ownerIsNanny && viewerType === "parent") ||
+    (ownerIsParent && viewerType === "nanny")
+  );
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-gray-100">
@@ -448,11 +455,28 @@ export default function AdvertisementDetails({
                   {!user && (
                     <p className="text-xs text-gray-500 text-center">{t("ad.needToRegister")}</p>
                   )}
+                  {user && user.id !== ad.user_id && (
+                    <div className="pt-1 text-center">
+                      <button
+                        onClick={() => setShowReport(true)}
+                        className="text-xs text-gray-400 hover:text-red-500 transition-colors"
+                      >
+                        {t("report.flag")}
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
           </div>
         </div>
+        {showReport && user && user.id !== ad.user_id && (
+          <ReportModal
+            reportedType="ad"
+            reportedId={ad.id}
+            onClose={() => setShowReport(false)}
+          />
+        )}
         {showBooking && user && (
           <BookingModal
             adId={ad.id}

@@ -43,3 +43,14 @@ export function formatDateDDMMYYYY(d: Date): string {
   const year = d.getFullYear();
   return `${day}/${month}/${year}`;
 }
+
+export function formatMonthYear(dateString: string, language: string): string {
+  const date = new Date(dateString);
+  const monthNames =
+    language === "lv"
+      ? ["Janvāris","Februāris","Marts","Aprīlis","Maijs","Jūnijs","Jūlijs","Augusts","Septembris","Oktobris","Novembris","Decembris"]
+      : language === "ru"
+      ? ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"]
+      : ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  return `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+}

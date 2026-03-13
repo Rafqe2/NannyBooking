@@ -652,19 +652,34 @@ export const translations = {
     ru: 'Смотреть все'
   },
   'home.nanniesNear': {
-    en: 'Nannies near {city}',
-    lv: 'Aukles netālu no {city}',
-    ru: 'Няни рядом с {city}'
+    en: 'Nannies near {{city}}',
+    lv: 'Aukles netālu no {{city}}',
+    ru: 'Няни рядом с {{city}}'
   },
   'home.nanniesNearYou': {
     en: 'Nannies near you',
     lv: 'Aukles jūsu tuvumā',
     ru: 'Няни рядом с вами'
   },
+  'home.jobsNear': {
+    en: 'Jobs near {{city}}',
+    lv: 'Darba sludinājumi netālu no {{city}}',
+    ru: 'Вакансии рядом с {{city}}'
+  },
+  'home.jobsNearYou': {
+    en: 'Jobs near you',
+    lv: 'Darba sludinājumi jūsu tuvumā',
+    ru: 'Вакансии рядом с вами'
+  },
+  'home.parentJobPosts': {
+    en: 'Parent job posts in your area',
+    lv: 'Vecāku sludinājumi jūsu rajonā',
+    ru: 'Объявления родителей в вашем районе'
+  },
   'home.availableChildcare': {
     en: 'Available childcare in your area',
     lv: 'Pieejama bērnu aprūpe jūsu rajonā',
-    ru: 'Доступный уход за детьми в вашем районе'
+    ru: 'Доступный уход за детьми в вашem районе'
   },
   'home.howItWorks': {
     en: 'How it works',
@@ -1418,6 +1433,21 @@ export const translations = {
     lv: 'Lietotājs nav autentificēts',
     ru: 'Пользователь не аутентифицирован'
   },
+  'adCreate.errorTitleTooShort': {
+    en: 'Title must be at least 6 characters',
+    lv: 'Nosaukumam jābūt vismaz 6 rakstzīmēm',
+    ru: 'Заголовок должен содержать не менее 6 символов'
+  },
+  'adCreate.errorPriceGreaterThanZero': {
+    en: 'Price must be greater than 0',
+    lv: 'Cenai jābūt lielākai par 0',
+    ru: 'Цена должна быть больше 0'
+  },
+  'adCreate.errorStartTimeBeforeEnd': {
+    en: 'Start time must be before end time',
+    lv: 'Sākuma laikam jābūt pirms beigu laika',
+    ru: 'Время начала должно быть раньше времени окончания'
+  },
   'adCreate.errorSelectLocation': {
     en: 'Please select a service location from the suggestions',
     lv: 'Lūdzu, izvēlieties pakalpojuma atrašanās vietu no ieteikumiem',
@@ -1655,10 +1685,20 @@ export const translations = {
     lv: 'Šis ir ilgtermiņa aprūpes sludinājums. Nosūtiet kontakta pieprasījumu, lai sāktu sarunu ar aprūpētāju.',
     ru: 'Это объявление о долгосрочном уходе. Отправьте запрос на контакт, чтобы начать общение с няней.'
   },
+  'booking.longTermDescriptionForNanny': {
+    en: 'This family is looking for childcare. Send a contact request to express your interest and start a conversation.',
+    lv: 'Šī ģimene meklē bērnu aprūpi. Nosūtiet kontakta pieprasījumu, lai izteiktu savu interesi un sāktu sarunu.',
+    ru: 'Эта семья ищет няню. Отправьте запрос на контакт, чтобы выразить свой интерес и начать общение.'
+  },
   'booking.longTermMessagePlaceholder': {
     en: 'Introduce yourself and describe what you are looking for...',
     lv: 'Iepazīstieties un aprakstiet, ko meklējat...',
     ru: 'Представьтесь и опишите, что вы ищете...'
+  },
+  'booking.longTermMessagePlaceholderForNanny': {
+    en: 'Introduce yourself and describe your experience and availability...',
+    lv: 'Iepazīstieties un aprakstiet savu pieredzi un pieejamību...',
+    ru: 'Представьтесь и опишите свой опыт и доступность...'
   },
   'booking.sendContactRequest': {
     en: 'Send Contact Request',
@@ -1670,12 +1710,22 @@ export const translations = {
     lv: 'Kontakta pieprasījums veiksmīgi nosūtīts! Aprūpētājs izskatīs jūsu pieprasījumu.',
     ru: 'Запрос на контакт успешно отправлен! Няня рассмотрит ваш запрос.'
   },
+  'booking.contactRequestSentToFamily': {
+    en: 'Application sent successfully! The family will review your request.',
+    lv: 'Pieteikums veiksmīgi nosūtīts! Ģimene izskatīs jūsu pieteikumu.',
+    ru: 'Заявка успешно отправлена! Семья рассмотрит ваш запрос.'
+  },
   'booking.contactAlreadySent': {
     en: 'You have already sent a contact request for this advertisement.',
     lv: 'Jūs jau esat nosūtījuši kontakta pieprasījumu šim sludinājumam.',
     ru: 'Вы уже отправили запрос на контакт для этого объявления.'
   },
 
+  'booking.completed': {
+    en: 'Completed',
+    lv: 'Pabeigts',
+    ru: 'Завершено'
+  },
   'booking.available': {
     en: 'Available',
     lv: 'Pieejams',
@@ -2876,6 +2926,113 @@ export const translations = {
     en: 'No date',
     lv: 'Nav datuma',
     ru: 'Нет даты'
+  },
+
+  // ── Report functionality ────────────────────────────────────────────────
+  'report.reportUser': {
+    en: 'Report this user',
+    lv: 'Ziņot par šo lietotāju',
+    ru: 'Пожаловаться на пользователя'
+  },
+  'report.reportAd': {
+    en: 'Report this listing',
+    lv: 'Ziņot par šo sludinājumu',
+    ru: 'Пожаловаться на объявление'
+  },
+  'report.flag': {
+    en: 'Report',
+    lv: 'Ziņot',
+    ru: 'Пожаловаться'
+  },
+  'report.reasonLabel': {
+    en: 'Reason',
+    lv: 'Iemesls',
+    ru: 'Причина'
+  },
+  'report.reasonPlaceholder': {
+    en: 'Select a reason',
+    lv: 'Izvēlieties iemeslu',
+    ru: 'Выберите причину'
+  },
+  'report.noteLabel': {
+    en: 'Additional details (optional)',
+    lv: 'Papildu informācija (neobligāti)',
+    ru: 'Дополнительные сведения (необязательно)'
+  },
+  'report.notePlaceholder': {
+    en: 'Briefly describe the issue…',
+    lv: 'Īsi aprakstiet problēmu…',
+    ru: 'Кратко опишите проблему…'
+  },
+  'report.submit': {
+    en: 'Submit Report',
+    lv: 'Iesniegt sūdzību',
+    ru: 'Отправить жалобу'
+  },
+  'report.submitting': {
+    en: 'Submitting…',
+    lv: 'Iesniedz…',
+    ru: 'Отправка…'
+  },
+  'report.success': {
+    en: 'Report submitted. Thank you for helping keep the platform safe.',
+    lv: 'Sūdzība iesniegta. Paldies, ka palīdzat uzturēt platformu drošu.',
+    ru: 'Жалоба отправлена. Спасибо за помощь в поддержании безопасности платформы.'
+  },
+  'report.selectReason': {
+    en: 'Please select a reason.',
+    lv: 'Lūdzu izvēlieties iemeslu.',
+    ru: 'Пожалуйста, выберите причину.'
+  },
+  'report.failed': {
+    en: 'Could not submit report. Please try again.',
+    lv: 'Neizdevās iesniegt sūdzību. Lūdzu mēģiniet vēlreiz.',
+    ru: 'Не удалось отправить жалобу. Попробуйте ещё раз.'
+  },
+  'report.notLoggedIn': {
+    en: 'You must be logged in to report.',
+    lv: 'Lai ziņotu, jums jāpiesakās.',
+    ru: 'Для подачи жалобы необходимо войти в систему.'
+  },
+  'report.reasons.inappropriate_behavior': {
+    en: 'Inappropriate behavior',
+    lv: 'Nepiemērota uzvedība',
+    ru: 'Неподобающее поведение'
+  },
+  'report.reasons.harassment': {
+    en: 'Harassment',
+    lv: 'Uzmākšanās',
+    ru: 'Преследование'
+  },
+  'report.reasons.fake_profile': {
+    en: 'Fake profile',
+    lv: 'Viltus profils',
+    ru: 'Фейковый профиль'
+  },
+  'report.reasons.inappropriate_content': {
+    en: 'Inappropriate content',
+    lv: 'Nepiemērots saturs',
+    ru: 'Неприемлемый контент'
+  },
+  'report.reasons.misleading_info': {
+    en: 'Misleading information',
+    lv: 'Maldinoša informācija',
+    ru: 'Вводящая в заблуждение информация'
+  },
+  'report.reasons.fake_listing': {
+    en: 'Fake listing',
+    lv: 'Viltus sludinājums',
+    ru: 'Фейковое объявление'
+  },
+  'report.reasons.spam': {
+    en: 'Spam',
+    lv: 'Surogātpasts',
+    ru: 'Спам'
+  },
+  'report.reasons.other': {
+    en: 'Other',
+    lv: 'Cits',
+    ru: 'Другое'
   }
 } as const;
 

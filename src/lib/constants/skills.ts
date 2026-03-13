@@ -12,17 +12,8 @@ export const NANNY_SKILLS = [
   "Special Needs",
 ];
 
-export const PARENT_SKILLS = [
-  "Toddler Care",
-  "School Age",
-  "Preschool Age",
-  "First Aid",
-  "Meal Preparation",
-  "Educational Activities",
-  "Pet Care",
-  "Driving License",
-  "Special Needs",
-];
+// Parents filter by the same skill set as nannies
+export const PARENT_SKILLS = NANNY_SKILLS;
 
 export const NANNY_SKILLS_TRANSLATIONS = {
   "Infant Care": {

@@ -113,6 +113,12 @@ export default function AdminDashboard() {
               >
                 Manage Ads
               </Link>
+              <Link
+                href="/admin/reports"
+                className="px-4 py-2 border border-red-200 text-red-700 rounded-lg hover:bg-red-50 transition-colors text-sm font-medium"
+              >
+                Reports
+              </Link>
             </div>
           </div>
 

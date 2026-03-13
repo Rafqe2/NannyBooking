@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { useSupabaseUser } from "../lib/useSupabaseUser";
 import { LV_CITIES } from "../lib/constants/cities";
 import { NANNY_SKILLS, PARENT_SKILLS } from "../lib/constants/skills";
@@ -129,6 +128,11 @@ export default function CreateAdvertisement() {
       setIsSubmitting(false);
       return;
     }
+    if (formData.type === "short-term" && formData.availability.dates.length === 0) {
+      setError(t("adCreate.errorNoDates"));
+      setIsSubmitting(false);
+      return;
+    }
     if (
       formData.type === "short-term" &&
       formData.availability.startTime &&
@@ -239,23 +243,9 @@ export default function CreateAdvertisement() {
     ? t("adCreate.jobDescription")
     : t("adCreate.serviceDescription");
 
-  if (userType === "parent") {
-    return (
-      <div className="max-w-4xl mx-auto p-6">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
-          <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-          </div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">{t("adCreate.nannyOnly")}</h2>
-          <p className="text-gray-500 mb-6 max-w-sm mx-auto">{t("adCreate.nannyOnlyDesc")}</p>
-          <Link href="/" className="inline-flex items-center gap-2 px-6 py-2.5 bg-purple-600 text-white font-semibold rounded-xl hover:bg-purple-700 transition-colors text-sm">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-            {t("adCreate.browseNannies")}
-          </Link>
-        </div>
-      </div>
-    );
-  }
+
+  // Prevent flash of form for unauthenticated users — show nothing until auth resolves
+  if (isLoading || !user) return null;
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -284,7 +274,7 @@ export default function CreateAdvertisement() {
                     type: e.target.value as "short-term" | "long-term",
                   }))
                 }
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+                className="w-full h-[50px] px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
               >
                 <option value="short-term">
                   {isParent ? t("adCreate.shortTermNeed") : t("adCreate.shortTermCare")}

@@ -1,3 +1,6 @@
+// BookingService — wraps all booking-related Supabase RPC calls.
+// All mutations go through server-side RPCs so business rules (availability
+// checks, duplicate prevention, status transitions) are enforced in the DB.
 import { supabase } from "./supabase";
 
 export interface CreateBookingInput {
@@ -85,5 +88,3 @@ export class BookingService {
     return true;
   }
 }
-
-

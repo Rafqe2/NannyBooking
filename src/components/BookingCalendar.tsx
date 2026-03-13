@@ -65,8 +65,9 @@ export default function BookingCalendar({
 
     const pendingCount = items.filter((i) => i.status === "pending").length;
     const confirmedCount = items.filter((i) => i.status === "confirmed").length;
+    const completedCount = items.filter((i) => i.status === "completed").length;
     const otherCount = items.filter(
-      (i) => i.status && i.status !== "pending" && i.status !== "confirmed"
+      (i) => i.status && i.status !== "pending" && i.status !== "confirmed" && i.status !== "completed"
     ).length;
 
     days.push(
@@ -95,6 +96,9 @@ export default function BookingCalendar({
           )}
           {confirmedCount > 0 && (
             <span className="w-2 h-2 rounded-full bg-green-600" />
+          )}
+          {completedCount > 0 && (
+            <span className="w-2 h-2 rounded-full bg-blue-500" />
           )}
           {otherCount > 0 && (
             <span className="w-2 h-2 rounded-full bg-gray-400" />
@@ -145,7 +149,7 @@ export default function BookingCalendar({
           ))}
         </div>
         <div className="grid grid-cols-7 gap-2">{days}</div>
-        <div className="mt-4 flex items-center gap-4 text-xs text-gray-600">
+        <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-gray-600">
           <div className="flex items-center gap-1">
             <span className="w-2 h-2 rounded-full bg-yellow-500" /> {t("booking.pending")}
           </div>
@@ -153,7 +157,10 @@ export default function BookingCalendar({
             <span className="w-2 h-2 rounded-full bg-green-600" /> {t("booking.confirmed")}
           </div>
           <div className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-gray-400" /> {t("booking.declined")}
+            <span className="w-2 h-2 rounded-full bg-blue-500" /> {t("booking.completed")}
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="w-2 h-2 rounded-full bg-gray-400" /> {t("booking.cancelled")}
           </div>
         </div>
       </div>

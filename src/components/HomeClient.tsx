@@ -34,7 +34,7 @@ export default function HomeClient({
   initialShowResults?: boolean;
 }) {
   const { t } = useTranslation();
-  const { user } = useSupabaseUser();
+  const { user, isLoading: authLoading } = useSupabaseUser();
   const [searchParams, setSearchParams] = useState({
     location: initialLocation || "Location",
     startDate: (initialStartDate as Date | null) || null,
@@ -51,8 +51,10 @@ export default function HomeClient({
   });
 
   const [nearbyNannies, setNearbyNannies] = useState<NearbyNanny[]>([]);
+  const [nearbyParentAds, setNearbyParentAds] = useState<NearbyNanny[]>([]);
   const [userCity, setUserCity] = useState<string | null>(null);
   const [isParent, setIsParent] = useState(false);
+  const [isNanny, setIsNanny] = useState(false);
 
   useEffect(() => {
     try {
@@ -81,7 +83,7 @@ export default function HomeClient({
     };
   }, []);
 
-  // Load nearby nannies for parents
+  // Load nearby ads based on user type
   useEffect(() => {
     if (!user?.id) return;
     const load = async () => {
@@ -90,37 +92,68 @@ export default function HomeClient({
         .select("user_type, location")
         .eq("id", user.id)
         .single();
-      if (profile?.user_type !== "parent") return;
-      setIsParent(true);
-      const city = profile.location?.split(",")[0].trim() || null;
+      const city = profile?.location?.split(",")[0].trim() || null;
       setUserCity(city);
-
       const nearbyCities = city ? [city, ...getNearbyCities(city)] : [];
-      const { data } = await supabase.rpc("search_ads", {
-        p_location: city,
-        p_start_date: null,
-        p_end_date: null,
-        p_skills: null,
-        p_has_reviews: false,
-        p_verified_only: false,
-        p_ad_type: null,
-        p_viewer_type: "parent",
-        p_nearby_locations: nearbyCities.length > 1 ? nearbyCities : null,
-      });
-      if (data && Array.isArray(data)) {
-        setNearbyNannies(
-          data.slice(0, 8).map((ad: any) => ({
-            id: ad.id,
-            title: ad.title,
-            location_city: ad.location_city,
-            price_per_hour: Number(ad.price_per_hour) || 0,
-            owner_id: ad.owner_id,
-            owner_full_name: ad.owner_full_name || null,
-            owner_picture: ad.owner_picture || null,
-            owner_rating: Number(ad.owner_rating) || 0,
-            owner_reviews_count: Number(ad.owner_reviews_count) || 0,
-          }))
-        );
+
+      if (profile?.user_type === "parent") {
+        setIsParent(true);
+        // Parents see nearby nanny ads
+        const { data } = await supabase.rpc("search_ads", {
+          p_location: city,
+          p_start_date: null,
+          p_end_date: null,
+          p_skills: null,
+          p_has_reviews: false,
+          p_verified_only: false,
+          p_ad_type: null,
+          p_viewer_type: "parent",
+          p_nearby_locations: nearbyCities.length > 1 ? nearbyCities : null,
+        });
+        if (data && Array.isArray(data)) {
+          setNearbyNannies(
+            data.slice(0, 8).map((ad: any) => ({
+              id: ad.id,
+              title: ad.title,
+              location_city: ad.location_city,
+              price_per_hour: Number(ad.price_per_hour) || 0,
+              owner_id: ad.owner_id,
+              owner_full_name: ad.owner_full_name || null,
+              owner_picture: ad.owner_picture || null,
+              owner_rating: Number(ad.owner_rating) || 0,
+              owner_reviews_count: Number(ad.owner_reviews_count) || 0,
+            }))
+          );
+        }
+      } else if (profile?.user_type === "nanny") {
+        setIsNanny(true);
+        // Nannies see nearby parent job posts
+        const { data } = await supabase.rpc("search_ads", {
+          p_location: city,
+          p_start_date: null,
+          p_end_date: null,
+          p_skills: null,
+          p_has_reviews: false,
+          p_verified_only: false,
+          p_ad_type: null,
+          p_viewer_type: "nanny",
+          p_nearby_locations: nearbyCities.length > 1 ? nearbyCities : null,
+        });
+        if (data && Array.isArray(data)) {
+          setNearbyParentAds(
+            data.slice(0, 8).map((ad: any) => ({
+              id: ad.id,
+              title: ad.title,
+              location_city: ad.location_city,
+              price_per_hour: Number(ad.price_per_hour) || 0,
+              owner_id: ad.owner_id,
+              owner_full_name: ad.owner_full_name || null,
+              owner_picture: ad.owner_picture || null,
+              owner_rating: Number(ad.owner_rating) || 0,
+              owner_reviews_count: Number(ad.owner_reviews_count) || 0,
+            }))
+          );
+        }
       }
     };
     load();
@@ -144,8 +177,8 @@ export default function HomeClient({
       {/* Main Content */}
       {!showResults ? (
         <main className="flex-1">
-          {/* Hero — only shown to guests */}
-          {!user && (
+          {/* Hero — only shown to guests; hidden while auth resolves to prevent flash */}
+          {!authLoading && !user && (
             <section className="px-4 sm:px-6 md:px-8 pt-14 pb-16 bg-gradient-to-b from-purple-50/70 via-purple-50/20 to-white">
               <div className="text-center max-w-5xl mx-auto">
                 <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold mb-6 leading-tight tracking-tight">
@@ -230,6 +263,63 @@ export default function HomeClient({
                       <div className="mt-2 text-center">
                         <p className="text-xs text-gray-500 truncate">{nanny.location_city}</p>
                         <p className="text-sm font-bold text-purple-600 mt-1">€{nanny.price_per_hour}<span className="text-xs font-normal text-gray-400">/h</span></p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </section>
+          )}
+
+          {/* Parent Job Posts Near Nannies */}
+          {isNanny && nearbyParentAds.length > 0 && (
+            <section className="px-4 sm:px-6 md:px-8 py-10 bg-white">
+              <div className="max-w-6xl mx-auto">
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-900">
+                      {userCity ? t("home.jobsNear", { city: userCity }) : t("home.jobsNearYou")}
+                    </h2>
+                    <p className="text-sm text-gray-500 mt-0.5">{t("home.parentJobPosts")}</p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setSearchParams({ location: userCity || "Location", startDate: null, endDate: null });
+                      setShowResults(true);
+                    }}
+                    className="text-sm text-purple-600 font-medium hover:underline flex items-center gap-1"
+                  >
+                    {t("common.seeAll")}
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/></svg>
+                  </button>
+                </div>
+                <div className="flex gap-4 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide">
+                  {nearbyParentAds.map((ad) => (
+                    <Link
+                      key={ad.id}
+                      href={`/advertisement/${ad.id}`}
+                      className="flex-shrink-0 w-52 bg-white border border-gray-100 rounded-2xl p-4 shadow-sm hover:shadow-md hover:border-purple-200 hover:-translate-y-0.5 transition-all duration-200"
+                    >
+                      <div className="w-14 h-14 rounded-full overflow-hidden bg-purple-100 flex items-center justify-center mb-3 mx-auto">
+                        {ad.owner_picture ? (
+                          <img src={ad.owner_picture} alt={ad.owner_full_name || ""} className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-purple-600 font-bold text-xl">
+                            {(ad.owner_full_name || "?").charAt(0).toUpperCase()}
+                          </span>
+                        )}
+                      </div>
+                      <p className="font-semibold text-gray-900 text-sm text-center truncate">{ad.owner_full_name || "—"}</p>
+                      {ad.owner_rating > 0 && (
+                        <div className="flex items-center justify-center gap-1 mt-1">
+                          <svg className="w-3.5 h-3.5 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                          <span className="text-xs text-gray-600 font-medium">{ad.owner_rating.toFixed(1)}</span>
+                          <span className="text-xs text-gray-400">({ad.owner_reviews_count})</span>
+                        </div>
+                      )}
+                      <div className="mt-2 text-center">
+                        <p className="text-xs text-gray-500 truncate">{ad.location_city}</p>
+                        <p className="text-sm font-bold text-purple-600 mt-1">€{ad.price_per_hour}<span className="text-xs font-normal text-gray-400">/h</span></p>
                       </div>
                     </Link>
                   ))}

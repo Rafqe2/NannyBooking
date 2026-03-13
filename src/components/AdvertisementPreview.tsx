@@ -115,9 +115,7 @@ export default function AdvertisementPreview({
                   {ad.type === "short-term" && slots.length > 0 && (
                     <span className="inline-flex items-center gap-1">
                       <span>🗓️</span>
-                      <span>
-                        {slots.length} {t("ad.date", { count: slots.length })}
-                      </span>
+                      <span>{t("ad.date", { count: slots.length })}</span>
                     </span>
                   )}
                   {ad.type === "long-term" && ad.availability_start_time && ad.availability_end_time && (

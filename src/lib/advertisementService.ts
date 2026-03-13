@@ -1,3 +1,6 @@
+// AdvertisementService — CRUD for ads, availability slots, and locations.
+// All write operations (create/update/delete) verify the caller owns the ad
+// via Supabase RLS policies — no extra auth checks needed here.
 import { supabase } from "./supabase";
 import { Database } from "../types/database";
 
@@ -121,8 +124,6 @@ export class AdvertisementService {
       return [];
     }
   }
-
-  // duplicate removed
 
   static async replaceLocations(
     advertisementId: string,

@@ -1,3 +1,8 @@
+// MessageService — handles all in-app messaging between parents and nannies.
+// Conversations are created automatically when a booking is confirmed.
+// Uses simple polling (see profile page) instead of Supabase Realtime subscriptions.
+// Cross-user lookups use the `user_public_info` view (not users table) to avoid
+// exposing email/phone to other authenticated users.
 import { supabase } from "./supabase";
 
 export interface Conversation {
@@ -58,7 +63,7 @@ export class MessageService {
     const [usersRes, bookingsRes, lastMsgsRes, unreadRes] = await Promise.all([
       // All counterparty users in one query
       supabase
-        .from("users")
+        .from("user_public_info")
         .select("id, name, surname, picture")
         .in("id", Array.from(counterpartyIds)),
       // All bookings in one query
@@ -206,7 +211,10 @@ export class MessageService {
 
   static async getUnreadCount(): Promise<number> {
     const { data, error } = await supabase.rpc("get_unread_message_count");
-    if (error) return 0;
+    if (error) {
+      console.error("Error fetching unread count:", error);
+      return 0;
+    }
     return Number(data || 0);
   }
 }

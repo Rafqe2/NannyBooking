@@ -11,43 +11,24 @@ export function useSupabaseUser() {
   useEffect(() => {
     let isMounted = true;
 
-    const init = async () => {
-      try {
-        const { data } = await supabase.auth.getUser();
-        if (!isMounted) return;
-        setUser(data.user ?? null);
-      } finally {
-        if (isMounted) setIsLoading(false);
-      }
-    };
-
+    // onAuthStateChange fires INITIAL_SESSION synchronously from the localStorage
+    // cache — much faster than getUser() which makes a network request.
+    // We use it to clear isLoading immediately without waiting for the network.
     const { data: subscription } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         if (!isMounted) return;
-        
-        try {
-          setUser(session?.user ?? null);
-          
-          // Handle logout specifically
-          if (event === 'SIGNED_OUT') {
-            // Clear any cached data and ensure we're in a clean state
-            setUser(null);
-          }
-        } catch (error) {
-          console.error("Auth state change error:", error);
-          // Still update the user state even if there's an error
-          setUser(session?.user ?? null);
-        }
+        setUser(session?.user ?? null);
+        // INITIAL_SESSION fires on every page load from the cached session.
+        // Clear loading state as soon as we know the auth status.
+        if (isLoading) setIsLoading(false);
       }
     );
-
-    init();
 
     return () => {
       isMounted = false;
       subscription.subscription.unsubscribe();
     };
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return { user, isLoading };
 }

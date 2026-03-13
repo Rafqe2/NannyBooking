@@ -1,45 +1,57 @@
 # NannyBooking.lv - Platform Roadmap & Next Steps
 
+*Last updated: March 2026*
+
 ## Current State Summary
 
 The platform has core functionality working:
 - User registration & authentication (Google OAuth via Supabase)
-- Profile management (parent/nanny)
+- Profile management (parent/nanny) — split into 4 tab sub-components (JobAds, Bookings, Messages, Profile)
 - Advertisement creation & management (short-term + long-term)
-- Search with location, date, price, and skill filters
+- Search with location, date, and skill filters
 - Booking system (create, accept, decline, cancel with reasons)
-- In-app messaging between parents and nannies
+- In-app messaging between parents and nannies (polling-based, one conversation per participant pair)
+- Message flow control: template → contact sharing → contact shared state with re-engagement templates
 - Review/rating system after completed bookings
 - Multi-language support (EN, LV, RU)
+- Admin panel at `/admin` (users, ads, stats)
+- SEO: sitemap, robots.txt, OG images, JSON-LD structured data
+- PWA manifest (icons still needed)
+- Auth flash (FOUC) eliminated — `useSupabaseUser` uses `onAuthStateChange` for instant session resolution
 
 ---
 
-## Phase 1: Stability & Polish (1-2 weeks)
+## Phase 1: Stability & Polish ✅ Mostly Complete
 
-### Bug Fixes & Error Handling
-- [x] Fix booking limit error message display (BOOKING_LIMIT from Supabase)
-- [x] Add proper error boundaries around each page section
-  - Profile page tab content wrapped in ErrorBoundary
-  - SearchResults cards grid wrapped in ErrorBoundary
-- [x] Replace all hardcoded English strings with translation keys
-  - `ProfileCompletion.tsx`: all 30+ strings translated
-  - `ErrorBoundary.tsx`: translated via direct translation lookup (class component)
-  - `CancelBookingModal.tsx`: "No date" translated
-  - `LocationAutocomplete.tsx`: placeholder, searching, no matches translated
-  - `LoginPage`: title, subtitle, terms text, sign-in error translated
-- [x] Remove or mark debug `console.log` statements
-- [x] Fix `any` type usage - add proper TypeScript interfaces
-
-### Translation Completeness
-- [x] Audit all components for untranslated strings
+### Code Quality
+- [x] Fix booking limit error message display
+- [x] Add error boundaries (profile tabs, search results grid)
+- [x] Replace all hardcoded English strings with translation keys (full audit)
+- [x] Add comments to service/logic files
+- [x] Remove dead code (`disabled={false}`, stale comments, unused lib files)
+- [x] Profile page refactored from ~2200 lines into 4 tab sub-components
+- [x] Booking accept `relation "public.nannies" does not exist` error fixed (trigger chain rewrite)
+- [x] Duplicate messaging tabs fixed — one conversation per participant pair (schema + RPC)
+- [x] Auth flash (FOUC) fixed — `useSupabaseUser` now uses `onAuthStateChange`
 - [ ] Have native speakers review LV and RU translations for accuracy
-- [x] Add missing translation keys discovered during audit
 
-### Database Cleanup
-- [X] Remove `nannies` table (deprecated - all data now in `users` table)
-- [X] Remove `nanny_availability` table (replaced by `advertisement_availability`)
-- [x] Update `tablesInSB/` documentation to match current schema
-- [x] Add missing tables to docs: `conversations`, `messages`, `review_helpfulness`, `review_reports`
+### Security ✅ Done
+- [x] Remove `.env.local.backup` from git history
+- [x] Fix overly broad users RLS — created `user_public_info` view (email/phone no longer exposed)
+- [x] Fix error message leaking env var names in `/api/account/delete`
+- [x] Organized public assets into `public/icons/` and `public/images/`
+- [ ] **TODO**: Add PWA icons — use realfavicongenerator.net, place in `public/icons/`: `favicon.ico` (32×32), `apple-touch-icon.png` (180×180), `icon-192.png` (192×192), `icon-512.png` (512×512)
+
+### Database
+- [x] Remove `nannies` table (deprecated) — migration `20250830040000`
+- [x] Add `user_public_info` view — migration `20250829000000`
+- [x] Fix `auto_deactivate_fully_booked_ads()` trigger (removed `nannies` join) — migration `20250830020000`
+- [x] Consolidate conversations to one per participant pair — migration `20250830030000`
+- [ ] **TODO**: Run pending migrations in Supabase SQL editor (if not already applied):
+  - `20250829000000_restrict_users_rls_with_public_view.sql`
+  - `20250830020000_fix_auto_deactivate_nannies_ref.sql`
+  - `20250830030000_conversations_per_participant_pair.sql`
+  - `20250830040000_cleanup_legacy_nannies.sql`
 
 ---
 
@@ -213,14 +225,12 @@ The platform has core functionality working:
 
 | Area | Issue | Priority | Status |
 |------|-------|----------|--------|
-| Profile page | 2200 lines in single component | High | |
-| Type safety | Excessive `any` usage across codebase | High | Partially fixed |
-| Error handling | Empty catch blocks, swallowed errors | High | |
-| Nannies table | Deprecated but still in DB schema | Medium | |
-| Polling | Messages use 10-30s polling instead of realtime | Medium | |
-| Console logs | Debug logs without eslint-disable markers | Low | Fixed |
-| Notification UI | Toggle switches that don't do anything | Medium | |
-| Edit Ad modal | Disabled with `{false && ...}` - dead code | Low | |
+| Profile page | ~2200 lines in single component | High | ✅ Done — split into 4 tab components |
+| Type safety | Excessive `any` usage in service files | Medium | Partially fixed |
+| Polling | Messages use 10-30s polling instead of Supabase Realtime | Medium | Planned (Phase 3) |
+| Notification UI | Toggle switches in profile are UI-only (no backend) | Medium | Planned (Phase 3) |
+| Pending migrations | 4 migrations not yet applied to Supabase cloud | High | See Database section above |
+| PWA icons | Icon files missing from `public/icons/` | Low | See Go-Live Checklist |
 
 ---
 
@@ -270,11 +280,13 @@ Then visit `/admin` on the live site — the Admin Panel link will appear in the
 
 ### 3. Add PWA Icons
 
-The manifest references icon files that need to be created. Add these two files to the `public/` folder:
-- `public/icon-192.png` — 192×192px app icon
-- `public/icon-512.png` — 512×512px app icon
+The manifest references icon files that need to be created. Use **realfavicongenerator.net** and place files in `public/icons/`:
+- `public/icons/favicon.ico` — 32×32 browser tab icon
+- `public/icons/apple-touch-icon.png` — 180×180 iOS home screen icon
+- `public/icons/icon-192.png` — 192×192 Android PWA icon
+- `public/icons/icon-512.png` — 512×512 splash screen icon
 
-These are shown when users add the site to their home screen on mobile.
+These are referenced in `src/app/layout.tsx` and `public/manifest.json`.
 
 ### 4. Verify robots.txt and sitemap
 

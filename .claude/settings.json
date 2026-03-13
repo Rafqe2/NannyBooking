@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip3 install git-filter-repo --break-system-packages)",
+      "Bash(git filter-repo --path .env.local.backup --invert-paths --force)",
+      "Bash(git remote add origin https://github.com/Rafqe/Auklite1.0.git)",
+      "Bash(git push --force origin main)",
+      "Bash(ls /Users/rafa/Desktop/Projects/Auklite1/*.md)",
+      "Bash(ls /Users/rafa/Desktop/Projects/Auklite1/docs/*.md)",
+      "Bash(wc -l /Users/rafa/Desktop/Projects/Auklite1/src/components/*.tsx /Users/rafa/Desktop/Projects/Auklite1/src/components/profile/*.tsx)",
+      "Bash(wc -l /Users/rafa/Desktop/Projects/Auklite1/src/lib/*.ts)",
+      "Bash(npx tsc --noEmit)"
+    ]
+  }
+}

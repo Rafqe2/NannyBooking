@@ -32,6 +32,8 @@ export default function BookingModal({
   const [success, setSuccess] = useState<string | null>(null);
 
   const isLongTerm = adType === "long-term";
+  // When ownerType is "parent", the viewer is a nanny applying to the parent's job post
+  const viewerIsNanny = ownerType === "parent";
 
   const todayKey = useMemo(() => toLocalYYYYMMDD(new Date()), []);
   const futureSlots: Slot[] = useMemo(
@@ -78,7 +80,7 @@ export default function BookingModal({
     setSaving(false);
 
     if (result.success) {
-      setSuccess(t("booking.contactRequestSent"));
+      setSuccess(viewerIsNanny ? t("booking.contactRequestSentToFamily") : t("booking.contactRequestSent"));
     } else {
       const errLower = (result.error || "").toLowerCase();
       const isLimit = errLower.includes("booking_limit") || errLower.includes("maximum") || errLower.includes("5 active") || errLower.includes("reached");
@@ -133,7 +135,7 @@ export default function BookingModal({
             <div className="p-5 space-y-4">
               <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
                 <p className="text-sm text-purple-800">
-                  {t("booking.longTermDescription")}
+                  {viewerIsNanny ? t("booking.longTermDescriptionForNanny") : t("booking.longTermDescription")}
                 </p>
               </div>
               <div>
@@ -145,7 +147,7 @@ export default function BookingModal({
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   className="w-full px-3 py-2 border rounded-lg resize-none"
-                  placeholder={t("booking.longTermMessagePlaceholder")}
+                  placeholder={viewerIsNanny ? t("booking.longTermMessagePlaceholderForNanny") : t("booking.longTermMessagePlaceholder")}
                 />
               </div>
             </div>

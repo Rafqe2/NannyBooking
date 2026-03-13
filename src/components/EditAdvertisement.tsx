@@ -6,10 +6,11 @@ import { AdvertisementService } from "../lib/advertisementService";
 import LocationAutocomplete from "./LocationAutocomplete";
 import MultiDatePicker from "./MultiDatePicker";
 import { toLocalYYYYMMDD, formatDateDDMMYYYY } from "../lib/date";
-import { NANNY_SKILLS } from "../lib/constants/skills";
+import { NANNY_SKILLS, PARENT_SKILLS } from "../lib/constants/skills";
 import { useTranslation } from "./LanguageProvider";
 import { getTranslatedSkill } from "../lib/constants/skills";
 import { useSupabaseUser } from "../lib/useSupabaseUser";
+import { UserService } from "../lib/userService";
 
 export default function EditAdvertisement({
   advertisementId,
@@ -38,8 +39,10 @@ export default function EditAdvertisement({
   >({});
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [userType, setUserType] = useState<"parent" | "nanny" | null>(null);
 
-  const availableSkills = useMemo(() => NANNY_SKILLS, []);
+  const isParent = userType === "parent";
+  const availableSkills = useMemo(() => (isParent ? PARENT_SKILLS : NANNY_SKILLS), [isParent]);
 
   // Redirect unauthenticated users
   useEffect(() => {
@@ -62,6 +65,13 @@ export default function EditAdvertisement({
           return;
         }
         setAd(adData);
+        // Load user type to show correct skills list
+        if (user.email) {
+          const profile = await UserService.getUserByEmail(user.email);
+          if (profile?.user_type === "parent" || profile?.user_type === "nanny") {
+            setUserType(profile.user_type);
+          }
+        }
         setTitle(adData.title || "");
         setPricePerHour(Number(adData.price_per_hour) || 0);
         setDescription(adData.description || "");
@@ -156,31 +166,35 @@ export default function EditAdvertisement({
 
   return (
     <div className="max-w-3xl mx-auto bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
-      <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-purple-50 to-indigo-50/40 flex items-start justify-between gap-4">
+      <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-purple-50 to-indigo-50/40">
         <h1 className="text-xl font-bold text-gray-900">
           {t("createAd.editTitle")}
         </h1>
-        {isActive && (
-          <span className="text-xs text-gray-500 max-w-xs text-right leading-relaxed">
-            {t("adEdit.lockedWhileActive")}
-          </span>
-        )}
+        <p className="text-sm text-gray-500 mt-0.5">
+          {isParent ? t("adCreate.titlePlaceholderParent") : t("adCreate.subtitle")}
+        </p>
       </div>
+      {isActive && (
+        <div className="flex items-center gap-3 px-6 py-3 bg-amber-50 border-b border-amber-200 text-sm text-amber-800">
+          <svg className="w-4 h-4 flex-shrink-0 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+          {t("adEdit.lockedWhileActive")}
+        </div>
+      )}
       <div className="p-6">
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            {t("adCreate.serviceType")}
+            {isParent ? t("adCreate.careNeeded") : t("adCreate.serviceType")}
           </label>
           <select
             disabled={isActive}
             value={type}
             onChange={(e) => setType(e.target.value as any)}
-            className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-50"
+            className="w-full h-[42px] px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed"
           >
-            <option value="short-term">{t("profile.shortTerm")}</option>
-            <option value="long-term">{t("profile.longTerm")}</option>
+            <option value="short-term">{isParent ? t("adCreate.shortTermNeed") : t("adCreate.shortTermCare")}</option>
+            <option value="long-term">{isParent ? t("adCreate.longTermNeed") : t("adCreate.longTermCare")}</option>
           </select>
         </div>
         <div>
@@ -253,7 +267,7 @@ export default function EditAdvertisement({
         </div>
         <div className="md:col-span-2">
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            {t("adCreate.requirementsPreferences")}
+            {isParent ? t("adCreate.requirementsPreferences") : t("adCreate.experienceBackground")}
           </label>
           <textarea
             disabled={isActive}
@@ -464,9 +478,8 @@ export default function EditAdvertisement({
                 </div>
                 <button
                   type="button"
-                  disabled={false}
                   onClick={clearAllDates}
-                  className="text-red-600 hover:text-red-700 text-sm disabled:opacity-50"
+                  className="text-red-600 hover:text-red-700 text-sm"
                 >
                   {t("adEdit.clearAll")}
                 </button>
@@ -517,7 +530,6 @@ export default function EditAdvertisement({
                         </div>
                         <button
                           type="button"
-                          disabled={false}
                           onClick={() => removeDateCompletely(d)}
                           title={t("adCreate.removeDate")}
                           aria-label={t("adCreate.removeDate")}
@@ -560,14 +572,14 @@ export default function EditAdvertisement({
         </div>
       )}
 
-      <div className="mt-8 flex justify-end gap-3">
+      <div className="mt-8 flex items-center justify-between gap-3 pt-4 border-t border-gray-100">
         <button
           type="button"
           disabled={saving}
           onClick={async () => {
             history.back();
           }}
-          className="px-5 py-2 border rounded-lg"
+          className="px-5 py-2.5 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
         >
           {t("adEdit.cancel")}
         </button>
@@ -634,8 +646,9 @@ export default function EditAdvertisement({
               setSaving(false);
             }
           }}
-          className="px-5 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50"
+          className="inline-flex items-center gap-2 px-6 py-2.5 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
         >
+          {saving && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
           {saving ? t("adEdit.saving") : t("adEdit.save")}
         </button>
       </div>

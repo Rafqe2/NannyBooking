@@ -6,6 +6,8 @@ import Header from "../../../components/Header";
 import Footer from "../../../components/Footer";
 import BlockingLoader from "../../../components/BlockingLoader";
 import ReviewsList from "../../../components/ReviewsList";
+import ReportModal from "../../../components/ReportModal";
+import { useSupabaseUser } from "../../../lib/useSupabaseUser";
 import { useTranslation } from "../../../components/LanguageProvider";
 import { stripLatvianGada } from "../../../lib/date";
 
@@ -17,9 +19,11 @@ export default function UserProfile({
   const { id } = useUnwrap(params);
   const router = useRouter();
   const { t, language } = useTranslation();
+  const { user } = useSupabaseUser();
   const [profile, setProfile] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showReport, setShowReport] = useState(false);
 
   useEffect(() => {
     const run = async () => {
@@ -134,6 +138,16 @@ export default function UserProfile({
                 <p className="text-gray-700 whitespace-pre-wrap">
                   {profile.bio || t("profile.noBioProvided")}
                 </p>
+                {user && user.id !== id && (
+                  <div className="mt-4 text-right">
+                    <button
+                      onClick={() => setShowReport(true)}
+                      className="text-xs text-gray-400 hover:text-red-500 transition-colors"
+                    >
+                      {t("report.flag")}
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* Reviews Section */}
@@ -148,6 +162,13 @@ export default function UserProfile({
         </div>
       </main>
       <Footer />
+      {showReport && user && user.id !== id && (
+        <ReportModal
+          reportedType="user"
+          reportedId={id}
+          onClose={() => setShowReport(false)}
+        />
+      )}
     </div>
   );
 }
