@@ -6,6 +6,7 @@ import { useTranslation } from "../LanguageProvider";
 import { supabase } from "../../lib/supabase";
 import { BookingService } from "../../lib/bookingService";
 import { MessageService } from "../../lib/messageService";
+import { notifyBooking } from "../../lib/notifyService";
 import BookingCalendar from "../BookingCalendar";
 import CancelBookingModal from "../CancelBookingModal";
 import ReviewModal from "../ReviewModal";
@@ -220,6 +221,7 @@ export default function BookingsTab({
                                                 "confirm"
                                               );
                                             if (success) {
+                                              notifyBooking("booking_confirmed", b.id);
                                               try {
                                                 const convId = await MessageService.getOrCreateConversation(b.id);
                                                 if (convId) {
@@ -256,6 +258,7 @@ export default function BookingsTab({
                                                 "cancel"
                                               );
                                             if (success) {
+                                              notifyBooking("booking_cancelled", b.id);
                                               const { data: bdata } =
                                                 await supabase.rpc(
                                                   "get_my_bookings"
@@ -293,6 +296,7 @@ export default function BookingsTab({
                                                 "cancel"
                                               );
                                             if (success) {
+                                              notifyBooking("booking_cancelled", b.id);
                                               const { data: bdata } =
                                                 await supabase.rpc(
                                                   "get_my_bookings"
@@ -650,6 +654,7 @@ export default function BookingsTab({
           userType={userProfile?.user_type as any}
           onClose={() => setCancellingBooking(null)}
           onSuccess={async () => {
+            if (cancellingBooking) notifyBooking("booking_cancelled", cancellingBooking.id);
             // Reload bookings after successful cancellation
             try {
               const { data: bdata } = await supabase.rpc("get_my_bookings");

@@ -9,7 +9,12 @@
       "Bash(ls /Users/rafa/Desktop/Projects/Auklite1/docs/*.md)",
       "Bash(wc -l /Users/rafa/Desktop/Projects/Auklite1/src/components/*.tsx /Users/rafa/Desktop/Projects/Auklite1/src/components/profile/*.tsx)",
       "Bash(wc -l /Users/rafa/Desktop/Projects/Auklite1/src/lib/*.ts)",
-      "Bash(npx tsc --noEmit)"
+      "Bash(npx tsc --noEmit)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" -X POST http://localhost:3000/api/email/notify -H \"Content-Type: application/json\" -d '{}')",
+      "Bash(curl -s -X POST http://localhost:3000/api/email/notify -H \"Content-Type: application/json\" -d '{}' -w \"\\\\nHTTP: %{http_code}\")"
+    ],
+    "additionalDirectories": [
+      "/Users/rafa/Desktop/Projects/Auklite1/src/app/api/email"
     ]
   }
 }

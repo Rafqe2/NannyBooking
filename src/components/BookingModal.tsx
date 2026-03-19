@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { toLocalYYYYMMDD, formatDateDDMMYYYY } from "../lib/date";
 import { BookingService } from "../lib/bookingService";
+import { notifyBooking } from "../lib/notifyService";
 import MultiDatePicker from "./MultiDatePicker";
 import { useTranslation } from "./LanguageProvider";
 
@@ -80,6 +81,7 @@ export default function BookingModal({
     setSaving(false);
 
     if (result.success) {
+      notifyBooking("booking_created", result.id);
       setSuccess(viewerIsNanny ? t("booking.contactRequestSentToFamily") : t("booking.contactRequestSent"));
     } else {
       const errLower = (result.error || "").toLowerCase();
@@ -339,6 +341,7 @@ export default function BookingModal({
 
                   if (result.success) {
                     successCount++;
+                    notifyBooking("booking_created", result.id);
                   } else {
                     lastError = result.error || "";
                     console.error("Booking failed for slot:", s, "Error:", lastError);

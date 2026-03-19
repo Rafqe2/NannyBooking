@@ -2029,6 +2029,36 @@ export const translations = {
     lv: 'Jūsu kontakta pieprasījums ir apstiprināts! Tagad varat apspriest detaļas šeit.',
     ru: 'Ваш запрос на контакт принят! Теперь вы можете обсудить детали здесь.'
   },
+  'messages.waitingForReply': {
+    en: 'Your message has been sent. Once {name} replies, you\'ll be able to share contact details to continue the conversation.',
+    lv: 'Jūsu ziņojums ir nosūtīts. Kad {name} atbildēs, varēsiet dalīties ar kontaktiem, lai turpinātu sarunu.',
+    ru: 'Ваше сообщение отправлено. Когда {name} ответит, вы сможете обменяться контактами для продолжения общения.'
+  },
+  'messages.wordCount': {
+    en: '{count}/100 words',
+    lv: '{count}/100 vārdi',
+    ru: '{count}/100 слов'
+  },
+  'messages.wordLimitReached': {
+    en: 'Word limit reached',
+    lv: 'Vārdu limits sasniegts',
+    ru: 'Лимит слов достигнут'
+  },
+  'messages.connectFurther': {
+    en: 'Ready to take it further?',
+    lv: 'Gatavs turpināt?',
+    ru: 'Готовы продолжить?'
+  },
+  'messages.connectFurtherDesc': {
+    en: "You've each had a chance to introduce yourselves. To continue the conversation — by call, WhatsApp, or email — share your contact details below.",
+    lv: 'Jūs abi esat iepazinušies. Lai turpinātu sarunu — pa tālruni, WhatsApp vai e-pastu — dalieties ar kontaktinformāciju zemāk.',
+    ru: 'Вы оба познакомились. Чтобы продолжить общение — по телефону, WhatsApp или email — поделитесь контактами ниже.'
+  },
+  'messages.shareContactToggle': {
+    en: 'Share contact details',
+    lv: 'Dalīties ar kontaktiem',
+    ru: 'Поделиться контактами'
+  },
   'messages.template1': {
     en: "Hi! I'd like to connect. Please share your preferred contact method.",
     lv: 'Sveiki! Vēlētos sazināties. Lūdzu, dalieties ar savu vēlamo saziņas veidu.',
@@ -2085,9 +2115,9 @@ export const translations = {
     ru: 'Поделитесь контактной информацией'
   },
   'messages.shareContactDesc': {
-    en: "They've reached out — share your email or WhatsApp so you can connect directly.",
-    lv: 'Viņi ir sazinājušies — dalieties ar e-pastu vai WhatsApp, lai varētu tieši sazināties.',
-    ru: 'Они написали вам — поделитесь email или WhatsApp, чтобы связаться напрямую.'
+    en: 'Leave your email or phone number so the other person can reach you directly.',
+    lv: 'Atstājiet savu e-pastu vai tālruņa numuru, lai otra puse varētu sazināties ar jums tieši.',
+    ru: 'Оставьте свой email или номер телефона, чтобы другой человек мог связаться с вами напрямую.'
   },
   'messages.emailPlaceholder': {
     en: 'your@email.com',
