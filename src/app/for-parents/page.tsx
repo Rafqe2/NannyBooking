@@ -49,6 +49,7 @@ const content = {
     ctaTitle: "Ready to find your nanny?",
     ctaDesc: "Browse hundreds of listings from experienced childcare providers across Latvia.",
     ctaBtn: "Search nannies",
+    stepLabel: "Step",
   },
   lv: {
     title: "Vecākiem",
@@ -78,6 +79,7 @@ const content = {
     ctaTitle: "Gatavs atrast aukli?",
     ctaDesc: "Pārlūkojiet simtiem sludinājumu no pieredzējušiem bērnu aprūpes speciālistiem visā Latvijā.",
     ctaBtn: "Meklēt aukles",
+    stepLabel: "Solis",
   },
   ru: {
     title: "Для родителей",
@@ -107,6 +109,7 @@ const content = {
     ctaTitle: "Готовы найти няню?",
     ctaDesc: "Просматривайте сотни объявлений от опытных специалистов по уходу за детьми по всей Латвии.",
     ctaBtn: "Найти нянь",
+    stepLabel: "Шаг",
   },
 };
 
@@ -142,7 +145,7 @@ export default function ForParentsPage() {
             {c.steps.map((step, i) => (
               <div key={i} className="relative bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
                 <div className="mb-3">{stepIcons[i]}</div>
-                <div className="text-xs font-bold text-brand-500 uppercase tracking-wide mb-1">Step {i + 1}</div>
+                <div className="text-xs font-bold text-brand-500 uppercase tracking-wide mb-1">{c.stepLabel} {i + 1}</div>
                 <h3 className="text-base font-semibold text-gray-900 mb-2">{step.title}</h3>
                 <p className="text-sm text-gray-500 leading-relaxed">{step.desc}</p>
               </div>

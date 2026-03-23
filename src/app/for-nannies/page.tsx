@@ -78,6 +78,7 @@ const content = {
     ctaTitle: "Start earning on your terms",
     ctaDesc: "Create your free profile today and reach hundreds of families looking for experienced childcare.",
     ctaBtn: "Create a listing",
+    stepLabel: "Step",
   },
   lv: {
     title: "Auklēm",
@@ -122,6 +123,7 @@ const content = {
     ctaTitle: "Sāciet pelnīt pēc saviem noteikumiem",
     ctaDesc: "Šodien izveidojiet bezmaksas profilu un sasniedziet simtiem ģimeņu, kas meklē pieredzējušu bērnu aprūpi.",
     ctaBtn: "Izveidot sludinājumu",
+    stepLabel: "Solis",
   },
   ru: {
     title: "Для нянь",
@@ -166,6 +168,7 @@ const content = {
     ctaTitle: "Начните зарабатывать на своих условиях",
     ctaDesc: "Создайте бесплатный профиль сегодня и охватите сотни семей, ищущих опытный уход за детьми.",
     ctaBtn: "Создать объявление",
+    stepLabel: "Шаг",
   },
 };
 
@@ -201,7 +204,7 @@ export default function ForNanniesPage() {
             {c.steps.map((step, i) => (
               <div key={i} className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
                 <div className="mb-3">{stepIcons[i]}</div>
-                <div className="text-xs font-bold text-brand-500 uppercase tracking-wide mb-1">Step {i + 1}</div>
+                <div className="text-xs font-bold text-brand-500 uppercase tracking-wide mb-1">{c.stepLabel} {i + 1}</div>
                 <h3 className="text-base font-semibold text-gray-900 mb-2">{step.title}</h3>
                 <p className="text-sm text-gray-500 leading-relaxed">{step.desc}</p>
               </div>

@@ -12,7 +12,14 @@
       "Bash(npx tsc --noEmit)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" -X POST http://localhost:3000/api/email/notify -H \"Content-Type: application/json\" -d '{}')",
       "Bash(curl -s -X POST http://localhost:3000/api/email/notify -H \"Content-Type: application/json\" -d '{}' -w \"\\\\nHTTP: %{http_code}\")",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(node -e \"const p = require\\(''./package.json''\\); console.log\\(''next:'', p.dependencies.next, ''react:'', p.dependencies.react\\)\")",
+      "Bash(npm show:*)",
+      "Bash(node -e \"const v=JSON.parse\\(require\\(''''fs''''\\).readFileSync\\(''''/dev/stdin'''',''''utf8''''\\)\\); console.log\\(v.filter\\(x=>x.startsWith\\(''''15.''''\\)\\).slice\\(-5\\).join\\(''''\\\\n''''\\)\\)\")",
+      "Bash(node -e \"console.log\\(require\\(''./node_modules/next/package.json''\\).version\\)\")",
+      "Bash(node -e \"const v=JSON.parse\\(require\\(''''fs''''\\).readFileSync\\(''''/dev/stdin'''',''''utf8''''\\)\\); const stable=v.filter\\(x=>!x.includes\\(''''canary''''\\)&&!x.includes\\(''''rc''''\\)&&!x.includes\\(''''beta''''\\)\\); console.log\\(stable.slice\\(-10\\).join\\(''''\\\\n''''\\)\\)\")",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "additionalDirectories": [
       "/Users/rafa/Desktop/Projects/Auklite1/src/app/api/email",
