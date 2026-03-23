@@ -112,12 +112,12 @@ export default function AdminAdsPage() {
               placeholder="Search by title, location, owner…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="flex-1 border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="flex-1 border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value as typeof filterStatus)}
-              className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-500"
             >
               <option value="all">All status</option>
               <option value="active">Active</option>
@@ -126,7 +126,7 @@ export default function AdminAdsPage() {
             <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value as typeof filterType)}
-              className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-500"
             >
               <option value="all">All types</option>
               <option value="short-term">Short-term</option>
@@ -136,7 +136,7 @@ export default function AdminAdsPage() {
 
           {loading ? (
             <div className="flex justify-center py-20">
-              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-purple-600" />
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-brand-600" />
             </div>
           ) : error ? (
             <p className="text-red-600 text-center py-10">{error}</p>
@@ -169,7 +169,7 @@ export default function AdminAdsPage() {
                           <Link
                             href={`/advertisement/${ad.id}`}
                             target="_blank"
-                            className="font-medium text-gray-900 hover:text-purple-600 hover:underline line-clamp-1"
+                            className="font-medium text-gray-900 hover:text-brand-600 hover:underline line-clamp-1"
                           >
                             {ad.title || "Untitled"}
                           </Link>
@@ -180,7 +180,7 @@ export default function AdminAdsPage() {
                         <td className="px-4 py-3">
                           <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                             ad.type === "short-term"
-                              ? "bg-blue-100 text-blue-700"
+                              ? "bg-brand-100 text-brand-700"
                               : "bg-green-100 text-green-700"
                           }`}>
                             {ad.type || "—"}

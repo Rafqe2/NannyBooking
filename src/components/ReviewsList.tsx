@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Star } from "lucide-react";
 import { Review, ReviewService, RatingStats } from "../lib/reviewService";
 import { stripLatvianGada } from "../lib/date";
 import { useTranslation } from "./LanguageProvider";
@@ -128,7 +129,7 @@ export default function ReviewsList({
   if (loading && page === 1) {
     return (
       <div className="flex justify-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-600"></div>
       </div>
     );
   }
@@ -137,17 +138,17 @@ export default function ReviewsList({
     <div className="space-y-6">
       {/* Rating Statistics */}
       {showStats && stats && stats.total_reviews > 0 && (
-        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 border border-purple-200">
+        <div className="bg-gradient-to-br from-brand-50 to-brand-100 rounded-2xl p-6 border border-brand-200">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Average Rating */}
             <div className="text-center md:text-left">
               <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
-                <span className="text-5xl font-bold text-purple-900">
+                <span className="text-5xl font-bold text-brand-900">
                   {stats.average_rating.toFixed(1)}
                 </span>
                 <div>
                   {renderStars(stats.average_rating)}
-                  <p className="text-sm text-purple-700 mt-1">
+                  <p className="text-sm text-brand-700 mt-1">
                     {t("review.basedOn", { count: stats.total_reviews })}
                   </p>
                 </div>
@@ -173,7 +174,7 @@ export default function ReviewsList({
                     </span>
                     <div className="flex-1 bg-white rounded-full h-2 overflow-hidden">
                       <div
-                        className="bg-purple-600 h-full transition-all duration-300"
+                        className="bg-brand-600 h-full transition-all duration-300"
                         style={{ width: `${percentage}%` }}
                       />
                     </div>
@@ -191,7 +192,7 @@ export default function ReviewsList({
       {/* Reviews List */}
       {reviews.length === 0 ? (
         <div className="text-center py-12 bg-gray-50 rounded-2xl border border-gray-200">
-          <div className="text-6xl mb-4">⭐</div>
+          <div className="flex justify-center mb-4"><Star className="w-14 h-14 text-accent fill-accent" /></div>
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
             {t("review.noReviews")}
           </h3>
@@ -208,7 +209,7 @@ export default function ReviewsList({
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-start gap-3">
                   {/* Avatar */}
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white font-semibold flex-shrink-0">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white font-semibold flex-shrink-0">
                     {review.reviewer_picture ? (
                       <img
                         src={review.reviewer_picture}
@@ -281,7 +282,7 @@ export default function ReviewsList({
 
               {/* Response */}
               {review.response && (
-                <div className="bg-gray-50 border-l-4 border-purple-500 rounded-r-lg p-4 mt-4">
+                <div className="bg-gray-50 border-l-4 border-brand-500 rounded-r-lg p-4 mt-4">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-sm font-semibold text-gray-900">
                       {t("review.responseFromOwner")}
@@ -307,7 +308,7 @@ export default function ReviewsList({
                       onChange={(e) => setResponseText(e.target.value)}
                       placeholder={t("review.responsePlaceholder")}
                       rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent resize-none"
                     />
                     <div className="flex justify-end gap-2">
                       <button
@@ -322,7 +323,7 @@ export default function ReviewsList({
                       <button
                         onClick={() => handleRespond(review.id)}
                         disabled={!responseText.trim()}
-                        className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {t("review.postResponse")}
                       </button>
@@ -395,7 +396,7 @@ export default function ReviewsList({
                   respondingTo !== review.id && (
                     <button
                       onClick={() => setRespondingTo(review.id)}
-                      className="text-sm text-purple-600 font-medium hover:text-purple-700 transition-colors"
+                      className="text-sm text-brand-600 font-medium hover:text-brand-700 transition-colors"
                     >
                       {t("review.respond")}
                     </button>

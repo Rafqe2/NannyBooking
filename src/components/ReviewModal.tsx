@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Lightbulb } from "lucide-react";
 import { ReviewService } from "../lib/reviewService";
 import { useTranslation } from "./LanguageProvider";
 
@@ -67,7 +68,7 @@ export default function ReviewModal({
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
       <div className="relative bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gradient-to-r from-purple-50 to-purple-100">
+        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gradient-to-r from-brand-50 to-brand-100">
           <div>
             <h3 className="text-xl font-bold text-gray-900">
               {t("review.writeReview")}
@@ -118,7 +119,7 @@ export default function ReviewModal({
                   onClick={() => setRating(star)}
                   onMouseEnter={() => setHoveredRating(star)}
                   onMouseLeave={() => setHoveredRating(0)}
-                  className="transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 rounded"
+                  className="transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 rounded"
                 >
                   <svg
                     className={`w-10 h-10 transition-colors ${
@@ -145,11 +146,11 @@ export default function ReviewModal({
               ))}
               {rating > 0 && (
                 <span className="ml-3 text-lg font-semibold text-gray-700">
-                  {rating === 5 && "⭐ " + t("review.excellent")}
-                  {rating === 4 && "😊 " + t("review.veryGood")}
-                  {rating === 3 && "🙂 " + t("review.good")}
-                  {rating === 2 && "😕 " + t("review.fair")}
-                  {rating === 1 && "😞 " + t("review.poor")}
+                  {rating === 5 && t("review.excellent")}
+                  {rating === 4 && t("review.veryGood")}
+                  {rating === 3 && t("review.good")}
+                  {rating === 2 && t("review.fair")}
+                  {rating === 1 && t("review.poor")}
                 </span>
               )}
             </div>
@@ -169,7 +170,7 @@ export default function ReviewModal({
               onChange={(e) => setTitle(e.target.value)}
               placeholder={t("review.titlePlaceholder")}
               maxLength={100}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-shadow"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-shadow"
             />
             <p className="text-xs text-gray-500">{title.length}/100</p>
           </div>
@@ -185,7 +186,7 @@ export default function ReviewModal({
               placeholder={t("review.commentPlaceholder")}
               rows={6}
               maxLength={1000}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-shadow resize-none"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-shadow resize-none"
             />
             <div className="flex justify-between items-center">
               <p className="text-xs text-gray-500">
@@ -196,11 +197,11 @@ export default function ReviewModal({
           </div>
 
           {/* Tips */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h4 className="text-sm font-semibold text-blue-900 mb-2">
-              💡 {t("review.tips")}
+          <div className="bg-brand-50 border border-brand-200 rounded-lg p-4">
+            <h4 className="text-sm font-semibold text-brand-900 mb-2 flex items-center gap-1.5">
+              <Lightbulb className="w-4 h-4 text-accent" />{t("review.tips")}
             </h4>
-            <ul className="text-xs text-blue-800 space-y-1">
+            <ul className="text-xs text-brand-700 space-y-1">
               <li>• {t("review.tip1")}</li>
               <li>• {t("review.tip2")}</li>
               <li>• {t("review.tip3")}</li>
@@ -220,7 +221,7 @@ export default function ReviewModal({
           <button
             onClick={handleSubmit}
             disabled={saving || rating === 0 || comment.trim().length < 10}
-            className="px-6 py-2.5 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="px-6 py-2.5 bg-brand-600 text-white rounded-lg font-medium hover:bg-brand-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
             {saving ? (
               <>

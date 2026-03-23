@@ -177,7 +177,7 @@ export default function Header() {
               } catch {}
               router.push("/");
             }}
-            className="text-2xl font-bold text-purple-600 tracking-wide hover:text-purple-700 transition-colors"
+            className="text-2xl font-bold text-brand-600 tracking-wide hover:text-brand-700 transition-colors"
           >
             NannyBooking.org
           </button>
@@ -192,7 +192,7 @@ export default function Header() {
             >
               {user ? (
                 <div className="relative">
-                  <div className="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center text-white text-xs font-semibold">
+                  <div className="w-6 h-6 bg-brand-600 rounded-full flex items-center justify-center text-white text-xs font-semibold">
                     {(
                       ((user.user_metadata as any)?.name ||
                         (user.user_metadata as any)?.full_name ||
@@ -258,7 +258,7 @@ export default function Header() {
                     {isAdmin && (
                       <button
                         onClick={() => handleNavigation("/admin")}
-                        className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors duration-200 border-b border-gray-100 text-sm font-medium bg-white text-purple-700"
+                        className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors duration-200 border-b border-gray-100 text-sm font-medium bg-white text-brand-700"
                       >
                         Admin Panel
                       </button>

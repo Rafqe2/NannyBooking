@@ -211,7 +211,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
             {/* Search Button */}
             <button
               onClick={handleSearch}
-              className="w-full lg:w-auto bg-purple-600 text-white px-6 lg:px-8 py-4 rounded-xl lg:rounded-full text-lg font-semibold hover:bg-purple-700 transition-colors duration-200 shadow-lg hover:shadow-xl"
+              className="w-full lg:w-auto bg-brand-600 text-white px-6 lg:px-8 py-4 rounded-xl lg:rounded-full text-lg font-semibold hover:bg-brand-700 transition-colors duration-200 shadow-lg hover:shadow-xl"
             >
               {t("search.findMatch")}
             </button>

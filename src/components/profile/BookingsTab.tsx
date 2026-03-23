@@ -110,7 +110,7 @@ export default function BookingsTab({
                   <button
                     className={`px-4 py-2 text-sm font-medium ${
                       bookingView === "upcoming"
-                        ? "bg-purple-600 text-white"
+                        ? "bg-brand-600 text-white"
                         : "bg-white text-gray-700"
                     }`}
                     onClick={() => {
@@ -123,7 +123,7 @@ export default function BookingsTab({
                   <button
                     className={`px-4 py-2 text-sm font-medium border-l border-gray-200 ${
                       bookingView === "past"
-                        ? "bg-purple-600 text-white"
+                        ? "bg-brand-600 text-white"
                         : "bg-white text-gray-700"
                     }`}
                     onClick={() => {
@@ -134,7 +134,7 @@ export default function BookingsTab({
                     {t("profile.pastBookings")}
                   </button>
                 </div>
-                <div className="text-sm text-gray-600">
+                <div className={`text-sm ${pendingBookings > 0 ? "font-medium text-accent-dark" : "text-gray-600"}`}>
                   {pendingBookings > 0
                     ? `${pendingBookings} ${t("bookings.pending")}`
                     : t("profile.noPendingRequests")}
@@ -188,7 +188,7 @@ export default function BookingsTab({
                                       e.stopPropagation();
                                       setReviewingBooking(b);
                                     }}
-                                    className="text-xs px-2.5 py-1 rounded-full bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100"
+                                    className="text-xs px-2.5 py-1 rounded-full bg-brand-50 text-brand-700 border border-brand-200 hover:bg-brand-100"
                                   >
                                     {t("review.writeReview")}
                                   </button>
@@ -343,7 +343,7 @@ export default function BookingsTab({
                             onClick={() => setCurrentBookingPage(page)}
                             className={`px-2 py-1 text-xs rounded-md ${
                               currentBookingPage === page
-                                ? "bg-purple-600 text-white"
+                                ? "bg-brand-600 text-white"
                                 : "border hover:bg-gray-50"
                             }`}
                           >
@@ -378,7 +378,7 @@ export default function BookingsTab({
             onClick={() => setSelectedBooking(null)}
           />
           <div className="relative bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-purple-50 to-blue-50">
+            <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-brand-50 to-brand-50">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-xl font-semibold text-gray-900">
@@ -440,13 +440,13 @@ export default function BookingsTab({
               {/* Booking Details Grid */}
               <div className="grid grid-cols-1 gap-4">
                 {selectedBooking.ad_type === "long-term" ? (
-                  <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
+                  <div className="bg-brand-50 rounded-lg p-4 border border-brand-200">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium text-purple-900">
+                      <span className="font-medium text-brand-900">
                         {t("booking.contactRequest")}
                       </span>
                     </div>
-                    <span className="text-sm text-purple-700">
+                    <span className="text-sm text-brand-700">
                       {t("booking.longTermDescription")}
                     </span>
                   </div>
@@ -455,7 +455,7 @@ export default function BookingsTab({
                     <div className="bg-gray-50 rounded-lg p-4">
                       <div className="flex items-center gap-2 mb-2">
                         <svg
-                          className="w-5 h-5 text-purple-600"
+                          className="w-5 h-5 text-brand-600"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -484,7 +484,7 @@ export default function BookingsTab({
                       <div className="bg-gray-50 rounded-lg p-4">
                         <div className="flex items-center gap-2 mb-2">
                           <svg
-                            className="w-5 h-5 text-purple-600"
+                            className="w-5 h-5 text-brand-600"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -534,7 +534,7 @@ export default function BookingsTab({
                         e.stopPropagation();
                         router.push(`/user/${selectedBooking.counterparty_id}`);
                       }}
-                      className="font-medium text-purple-700 hover:text-purple-900 hover:underline transition-colors"
+                      className="font-medium text-brand-700 hover:text-brand-900 hover:underline transition-colors"
                     >
                       {selectedBooking.counterparty_full_name || "User"}
                     </button>
@@ -587,7 +587,7 @@ export default function BookingsTab({
               {selectedBooking?.status === "completed" &&
                 !selectedBooking.has_review && (
                   <button
-                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                    className="px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700"
                     onClick={() => {
                       setReviewingBooking(selectedBooking);
                       setSelectedBooking(null);

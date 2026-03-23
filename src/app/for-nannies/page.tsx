@@ -4,6 +4,35 @@ import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { useTranslation } from "../../components/LanguageProvider";
 import Link from "next/link";
+import { User, FileText, Inbox, MessageCircle, Clock, Euro, Star, MapPin, BarChart2, Baby, Moon, Lightbulb, Camera, Tag, CalendarDays, Pencil } from "lucide-react";
+
+const stepIcons = [
+  <User key="user" className="w-7 h-7 text-brand-600" />,
+  <FileText key="file" className="w-7 h-7 text-brand-600" />,
+  <Inbox key="inbox" className="w-7 h-7 text-brand-600" />,
+  <MessageCircle key="msg" className="w-7 h-7 text-brand-600" />,
+];
+
+const whyIcons = [
+  <Clock key="clock" className="w-6 h-6 text-brand-600" />,
+  <Euro key="euro" className="w-6 h-6 text-brand-600" />,
+  <Star key="star" className="w-6 h-6 text-brand-600" />,
+  <MapPin key="map" className="w-6 h-6 text-brand-600" />,
+];
+
+const rateIcons = [
+  <BarChart2 key="bar" className="w-6 h-6 text-brand-600" />,
+  <Baby key="baby" className="w-6 h-6 text-brand-600" />,
+  <Moon key="moon" className="w-6 h-6 text-brand-600" />,
+  <Lightbulb key="bulb" className="w-6 h-6 text-brand-600" />,
+];
+
+const tipIcons = [
+  <Camera key="camera" className="w-6 h-6 text-brand-600" />,
+  <Pencil key="pencil" className="w-6 h-6 text-brand-600" />,
+  <Tag key="tag" className="w-6 h-6 text-brand-600" />,
+  <CalendarDays key="cal" className="w-6 h-6 text-brand-600" />,
+];
 
 const content = {
   en: {
@@ -11,32 +40,32 @@ const content = {
     subtitle: "Turn your childcare experience into a flexible career",
     howTitle: "How to get started",
     steps: [
-      { icon: "👤", title: "Create your profile", desc: "Sign up, complete your profile with your experience, skills and a short bio that families will see." },
-      { icon: "📝", title: "Post a listing", desc: "Create a listing — short-term for specific dates, or long-term for ongoing availability. Set your hourly rate." },
-      { icon: "📬", title: "Receive requests", desc: "Families find your listing and send booking requests. You review and accept or decline at your own pace." },
-      { icon: "💬", title: "Coordinate & earn", desc: "Exchange contact details once the booking is confirmed and arrange the details directly with the family." },
+      { title: "Create your profile", desc: "Sign up, complete your profile with your experience, skills and a short bio that families will see." },
+      { title: "Post a listing", desc: "Create a listing — short-term for specific dates, or long-term for ongoing availability. Set your hourly rate." },
+      { title: "Receive requests", desc: "Families find your listing and send booking requests. You review and accept or decline at your own pace." },
+      { title: "Coordinate & earn", desc: "Exchange contact details once the booking is confirmed and arrange the details directly with the family." },
     ],
     whyTitle: "Why join NannyBooking.org?",
     whyItems: [
-      { icon: "🕐", title: "Flexible schedule", desc: "You set your available dates and hours. Take bookings only when it suits you — no obligation." },
-      { icon: "💶", title: "You set the rate", desc: "Define your own hourly rate. No platform commission — what you agree with the family is what you earn." },
-      { icon: "⭐", title: "Build your reputation", desc: "Collect verified reviews from families you've worked with. A strong profile brings more bookings organically." },
-      { icon: "📍", title: "Local & targeted", desc: "Listings are filtered by city, so you only get requests from families in areas where you're willing to work." },
+      { title: "Flexible schedule", desc: "You set your available dates and hours. Take bookings only when it suits you — no obligation." },
+      { title: "You set the rate", desc: "Define your own hourly rate. No platform commission — what you agree with the family is what you earn." },
+      { title: "Build your reputation", desc: "Collect verified reviews from families you've worked with. A strong profile brings more bookings organically." },
+      { title: "Local & targeted", desc: "Listings are filtered by city, so you only get requests from families in areas where you're willing to work." },
     ],
     ratesTitle: "How to set your rates",
     ratesIntro: "Your hourly rate is visible on your listing and is one of the first things families check. Here's how to approach it.",
     rateItems: [
-      { icon: "📊", title: "Market range in Latvia", desc: "Most nannies in Latvia charge between €5–€12/h. Experienced nannies or those with formal education, first aid certification, or language skills typically charge €8–€15/h." },
-      { icon: "🧒", title: "Factor in the number of children", desc: "If a family has multiple children, consider setting a higher rate or negotiating a per-child supplement directly with the family after booking." },
-      { icon: "🌙", title: "Evening & weekend rates", desc: "Evening, overnight or weekend care is typically priced 20–40% higher than daytime rates. You can mention this in your listing description." },
-      { icon: "💡", title: "Start competitive, then raise it", desc: "New to the platform? Start at a rate that's easy to book and build up reviews. Once you have 3–5 positive reviews, gradually increase your rate." },
+      { title: "Market range in Latvia", desc: "Most nannies in Latvia charge between €5–€12/h. Experienced nannies or those with formal education, first aid certification, or language skills typically charge €8–€15/h." },
+      { title: "Factor in the number of children", desc: "If a family has multiple children, consider setting a higher rate or negotiating a per-child supplement directly with the family after booking." },
+      { title: "Evening & weekend rates", desc: "Evening, overnight or weekend care is typically priced 20–40% higher than daytime rates. You can mention this in your listing description." },
+      { title: "Start competitive, then raise it", desc: "New to the platform? Start at a rate that's easy to book and build up reviews. Once you have 3–5 positive reviews, gradually increase your rate." },
     ],
     tipsTitle: "Tips for a great profile",
     tips: [
-      { icon: "📸", title: "Add a clear photo", desc: "Profiles with a friendly, professional photo receive significantly more attention from parents." },
-      { icon: "✍️", title: "Write a detailed bio", desc: "Mention your experience with different age groups, any certifications (first aid, education), and your childcare approach." },
-      { icon: "🏷️", title: "Select relevant skills", desc: "Tick all the skills that apply — cooking, tutoring, special needs, swimming, etc. Parents filter by these." },
-      { icon: "📅", title: "Keep dates current", desc: "Short-term listings auto-deactivate after 7 days. Re-activate with fresh dates to stay visible in search results." },
+      { title: "Add a clear photo", desc: "Profiles with a friendly, professional photo receive significantly more attention from parents." },
+      { title: "Write a detailed bio", desc: "Mention your experience with different age groups, any certifications (first aid, education), and your childcare approach." },
+      { title: "Select relevant skills", desc: "Tick all the skills that apply — cooking, tutoring, special needs, swimming, etc. Parents filter by these." },
+      { title: "Keep dates current", desc: "Short-term listings auto-deactivate after 7 days. Re-activate with fresh dates to stay visible in search results." },
     ],
     faqTitle: "Frequently asked questions",
     faqs: [
@@ -55,32 +84,32 @@ const content = {
     subtitle: "Pārvērtiet savu bērnu aprūpes pieredzi elastīgā karjerā",
     howTitle: "Kā sākt",
     steps: [
-      { icon: "👤", title: "Izveidot profilu", desc: "Reģistrējieties, aizpildiet profilu ar savu pieredzi, prasmēm un īsu bio, ko redzēs ģimenes." },
-      { icon: "📝", title: "Publicēt sludinājumu", desc: "Izveidojiet sludinājumu — īstermiņa konkrētiem datumiem vai ilgtermiņa pastāvīgai pieejamībai. Nosakiet stundu tarifu." },
-      { icon: "📬", title: "Saņemt pieprasījumus", desc: "Ģimenes atrod jūsu sludinājumu un nosūta rezervācijas pieprasījumus. Jūs pārskatāt un pieņemat vai noraidāt pēc saviem ieskatiem." },
-      { icon: "💬", title: "Koordinēt un nopelnīt", desc: "Apmainiet kontaktinformāciju pēc rezervācijas apstiprināšanas un saskaņojiet detaļas tieši ar ģimeni." },
+      { title: "Izveidot profilu", desc: "Reģistrējieties, aizpildiet profilu ar savu pieredzi, prasmēm un īsu bio, ko redzēs ģimenes." },
+      { title: "Publicēt sludinājumu", desc: "Izveidojiet sludinājumu — īstermiņa konkrētiem datumiem vai ilgtermiņa pastāvīgai pieejamībai. Nosakiet stundu tarifu." },
+      { title: "Saņemt pieprasījumus", desc: "Ģimenes atrod jūsu sludinājumu un nosūta rezervācijas pieprasījumus. Jūs pārskatāt un pieņemat vai noraidāt pēc saviem ieskatiem." },
+      { title: "Koordinēt un nopelnīt", desc: "Apmainiet kontaktinformāciju pēc rezervācijas apstiprināšanas un saskaņojiet detaļas tieši ar ģimeni." },
     ],
     whyTitle: "Kāpēc pievienoties NannyBooking.org?",
     whyItems: [
-      { icon: "🕐", title: "Elastīgs grafiks", desc: "Jūs nosakāt savus pieejamos datumus un stundas. Pieņemiet rezervācijas tikai tad, kad jums ērti — bez pienākuma." },
-      { icon: "💶", title: "Jūs nosakāt tarifu", desc: "Definējiet savu stundas tarifu. Nav platformas komisijas — tas, par ko vienojaties ar ģimeni, ir jūsu pelņa." },
-      { icon: "⭐", title: "Veidojiet reputāciju", desc: "Vāciet pārbaudītas atsauksmes no ģimenēm, ar kurām esat strādājuši. Spēcīgs profils piesaista vairāk rezervāciju." },
-      { icon: "📍", title: "Lokāls un mērķtiecīgs", desc: "Sludinājumi tiek filtrēti pēc pilsētas, tāpēc pieprasījumus saņemat tikai no ģimenēm jūsu vēlamajā reģionā." },
+      { title: "Elastīgs grafiks", desc: "Jūs nosakāt savus pieejamos datumus un stundas. Pieņemiet rezervācijas tikai tad, kad jums ērti — bez pienākuma." },
+      { title: "Jūs nosakāt tarifu", desc: "Definējiet savu stundas tarifu. Nav platformas komisijas — tas, par ko vienojaties ar ģimeni, ir jūsu pelņa." },
+      { title: "Veidojiet reputāciju", desc: "Vāciet pārbaudītas atsauksmes no ģimenēm, ar kurām esat strādājuši. Spēcīgs profils piesaista vairāk rezervāciju." },
+      { title: "Lokāls un mērķtiecīgs", desc: "Sludinājumi tiek filtrēti pēc pilsētas, tāpēc pieprasījumus saņemat tikai no ģimenēm jūsu vēlamajā reģionā." },
     ],
     ratesTitle: "Kā noteikt savu tarifu",
     ratesIntro: "Jūsu stundas tarifs ir redzams sludinājumā un ir viens no pirmajiem, ko ģimenes pārbauda. Lūk, kā tam pieiet.",
     rateItems: [
-      { icon: "📊", title: "Tirgus diapazons Latvijā", desc: "Lielākā daļa aukļu Latvijā iekasē €5–€12/h. Pieredzējušas aukles vai tās ar formālo izglītību, pirmās palīdzības sertifikātu vai valodu prasmēm parasti iekasē €8–€15/h." },
-      { icon: "🧒", title: "Ņemiet vērā bērnu skaitu", desc: "Ja ģimenei ir vairāki bērni, apsveriet augstāku tarifu vai vienojieties par papildu maksu par katru bērnu tieši ar ģimeni pēc rezervācijas." },
-      { icon: "🌙", title: "Vakara un nedēļas nogales tarifi", desc: "Vakara, nakts vai nedēļas nogales aprūpe parasti tiek novērtēta par 20–40% augstāk nekā dienas laikā. To varat pieminēt sludinājuma aprakstā." },
-      { icon: "💡", title: "Sāciet konkurētspējīgi, tad paaugstiniet", desc: "Jauns platformā? Sāciet ar tarifu, ar kuru viegli iegūt rezervācijas, un veidojiet atsauksmes. Kad jums būs 3–5 pozitīvas atsauksmes, pakāpeniski palieliniet tarifu." },
+      { title: "Tirgus diapazons Latvijā", desc: "Lielākā daļa aukļu Latvijā iekasē €5–€12/h. Pieredzējušas aukles vai tās ar formālo izglītību, pirmās palīdzības sertifikātu vai valodu prasmēm parasti iekasē €8–€15/h." },
+      { title: "Ņemiet vērā bērnu skaitu", desc: "Ja ģimenei ir vairāki bērni, apsveriet augstāku tarifu vai vienojieties par papildu maksu par katru bērnu tieši ar ģimeni pēc rezervācijas." },
+      { title: "Vakara un nedēļas nogales tarifi", desc: "Vakara, nakts vai nedēļas nogales aprūpe parasti tiek novērtēta par 20–40% augstāk nekā dienas laikā. To varat pieminēt sludinājuma aprakstā." },
+      { title: "Sāciet konkurētspējīgi, tad paaugstiniet", desc: "Jauns platformā? Sāciet ar tarifu, ar kuru viegli iegūt rezervācijas, un veidojiet atsauksmes. Kad jums būs 3–5 pozitīvas atsauksmes, pakāpeniski palieliniet tarifu." },
     ],
     tipsTitle: "Padomi lieliskam profilam",
     tips: [
-      { icon: "📸", title: "Pievienojiet skaidru fotogrāfiju", desc: "Profili ar draudzīgu, profesionālu fotogrāfiju saņem ievērojami vairāk uzmanības no vecākiem." },
-      { icon: "✍️", title: "Uzrakstiet detalizētu bio", desc: "Miniet savu pieredzi ar dažādām vecuma grupām, sertifikātus (pirmā palīdzība, izglītība) un pieeju bērnu aprūpei." },
-      { icon: "🏷️", title: "Izvēlieties atbilstošas prasmes", desc: "Atzīmējiet visas atbilstošās prasmes — gatavošana, mācīšana, speciālās vajadzības, peldēšana u.c. Vecāki filtrē pēc tām." },
-      { icon: "📅", title: "Uzturiet datumus aktuālus", desc: "Īstermiņa sludinājumi automātiski deaktivējas pēc 7 dienām. Aktivizējiet atkārtoti ar jauniem datumiem, lai paliktu redzams." },
+      { title: "Pievienojiet skaidru fotogrāfiju", desc: "Profili ar draudzīgu, profesionālu fotogrāfiju saņem ievērojami vairāk uzmanības no vecākiem." },
+      { title: "Uzrakstiet detalizētu bio", desc: "Miniet savu pieredzi ar dažādām vecuma grupām, sertifikātus (pirmā palīdzība, izglītība) un pieeju bērnu aprūpei." },
+      { title: "Izvēlieties atbilstošas prasmes", desc: "Atzīmējiet visas atbilstošās prasmes — gatavošana, mācīšana, speciālās vajadzības, peldēšana u.c. Vecāki filtrē pēc tām." },
+      { title: "Uzturiet datumus aktuālus", desc: "Īstermiņa sludinājumi automātiski deaktivējas pēc 7 dienām. Aktivizējiet atkārtoti ar jauniem datumiem, lai paliktu redzams." },
     ],
     faqTitle: "Biežāk uzdotie jautājumi",
     faqs: [
@@ -99,32 +128,32 @@ const content = {
     subtitle: "Превратите свой опыт ухода за детьми в гибкую карьеру",
     howTitle: "Как начать",
     steps: [
-      { icon: "👤", title: "Создать профиль", desc: "Зарегистрируйтесь, заполните профиль своим опытом, навыками и кратким описанием, которое увидят семьи." },
-      { icon: "📝", title: "Разместить объявление", desc: "Создайте объявление — краткосрочное на конкретные даты или долгосрочное для постоянной доступности. Установите почасовую ставку." },
-      { icon: "📬", title: "Получать запросы", desc: "Семьи находят ваше объявление и отправляют запросы на бронирование. Вы рассматриваете и принимаете или отклоняете в удобном темпе." },
-      { icon: "💬", title: "Координировать и зарабатывать", desc: "Обменяйтесь контактами после подтверждения бронирования и согласуйте детали напрямую с семьёй." },
+      { title: "Создать профиль", desc: "Зарегистрируйтесь, заполните профиль своим опытом, навыками и кратким описанием, которое увидят семьи." },
+      { title: "Разместить объявление", desc: "Создайте объявление — краткосрочное на конкретные даты или долгосрочное для постоянной доступности. Установите почасовую ставку." },
+      { title: "Получать запросы", desc: "Семьи находят ваше объявление и отправляют запросы на бронирование. Вы рассматриваете и принимаете или отклоняете в удобном темпе." },
+      { title: "Координировать и зарабатывать", desc: "Обменяйтесь контактами после подтверждения бронирования и согласуйте детали напрямую с семьёй." },
     ],
     whyTitle: "Почему стоит присоединиться к NannyBooking.org?",
     whyItems: [
-      { icon: "🕐", title: "Гибкий график", desc: "Вы сами устанавливаете доступные даты и часы. Принимайте бронирования только тогда, когда вам удобно — никаких обязательств." },
-      { icon: "💶", title: "Вы устанавливаете ставку", desc: "Определите свою почасовую ставку. Никакой комиссии платформы — то, о чём вы договорились с семьёй, и есть ваш заработок." },
-      { icon: "⭐", title: "Создайте репутацию", desc: "Собирайте проверенные отзывы от семей, с которыми вы работали. Сильный профиль привлекает больше бронирований." },
-      { icon: "📍", title: "Локально и целенаправленно", desc: "Объявления фильтруются по городу, поэтому вы получаете запросы только от семей в нужных вам районах." },
+      { title: "Гибкий график", desc: "Вы сами устанавливаете доступные даты и часы. Принимайте бронирования только тогда, когда вам удобно — никаких обязательств." },
+      { title: "Вы устанавливаете ставку", desc: "Определите свою почасовую ставку. Никакой комиссии платформы — то, о чём вы договорились с семьёй, и есть ваш заработок." },
+      { title: "Создайте репутацию", desc: "Собирайте проверенные отзывы от семей, с которыми вы работали. Сильный профиль привлекает больше бронирований." },
+      { title: "Локально и целенаправленно", desc: "Объявления фильтруются по городу, поэтому вы получаете запросы только от семей в нужных вам районах." },
     ],
     ratesTitle: "Как установить ставку",
     ratesIntro: "Ваша почасовая ставка видна в объявлении и является одним из первых, что проверяют семьи. Вот как к этому подойти.",
     rateItems: [
-      { icon: "📊", title: "Рыночный диапазон в Латвии", desc: "Большинство нянь в Латвии берут €5–€12/ч. Опытные няни или с профессиональным образованием, сертификатом первой помощи или языковыми навыками обычно берут €8–€15/ч." },
-      { icon: "🧒", title: "Учитывайте количество детей", desc: "Если в семье несколько детей, рассмотрите более высокую ставку или договоритесь о доплате за каждого ребёнка напрямую с семьёй после бронирования." },
-      { icon: "🌙", title: "Вечерние и выходные ставки", desc: "Вечерний, ночной или уход в выходные дни обычно оцениваются на 20–40% выше дневных. Можно упомянуть это в описании объявления." },
-      { icon: "💡", title: "Начните конкурентоспособно, затем повышайте", desc: "Новичок на платформе? Начните со ставки, с которой легко получить бронирования, и накапливайте отзывы. Когда у вас будет 3–5 положительных отзывов, постепенно повышайте ставку." },
+      { title: "Рыночный диапазон в Латвии", desc: "Большинство нянь в Латвии берут €5–€12/ч. Опытные няни или с профессиональным образованием, сертификатом первой помощи или языковыми навыками обычно берут €8–€15/ч." },
+      { title: "Учитывайте количество детей", desc: "Если в семье несколько детей, рассмотрите более высокую ставку или договоритесь о доплате за каждого ребёнка напрямую с семьёй после бронирования." },
+      { title: "Вечерние и выходные ставки", desc: "Вечерний, ночной или уход в выходные дни обычно оцениваются на 20–40% выше дневных. Можно упомянуть это в описании объявления." },
+      { title: "Начните конкурентоспособно, затем повышайте", desc: "Новичок на платформе? Начните со ставки, с которой легко получить бронирования, и накапливайте отзывы. Когда у вас будет 3–5 положительных отзывов, постепенно повышайте ставку." },
     ],
     tipsTitle: "Советы для отличного профиля",
     tips: [
-      { icon: "📸", title: "Добавьте чёткое фото", desc: "Профили с дружелюбным, профессиональным фото получают значительно больше внимания от родителей." },
-      { icon: "✍️", title: "Напишите подробное описание", desc: "Упомяните опыт с разными возрастными группами, сертификаты (первая помощь, образование) и ваш подход к уходу." },
-      { icon: "🏷️", title: "Выберите актуальные навыки", desc: "Отметьте все подходящие навыки — готовка, обучение, особые потребности, плавание и т.д. Родители фильтруют по ним." },
-      { icon: "📅", title: "Актуализируйте даты", desc: "Краткосрочные объявления автоматически деактивируются через 7 дней. Повторно активируйте с новыми датами, чтобы оставаться в поиске." },
+      { title: "Добавьте чёткое фото", desc: "Профили с дружелюбным, профессиональным фото получают значительно больше внимания от родителей." },
+      { title: "Напишите подробное описание", desc: "Упомяните опыт с разными возрастными группами, сертификаты (первая помощь, образование) и ваш подход к уходу." },
+      { title: "Выберите актуальные навыки", desc: "Отметьте все подходящие навыки — готовка, обучение, особые потребности, плавание и т.д. Родители фильтруют по ним." },
+      { title: "Актуализируйте даты", desc: "Краткосрочные объявления автоматически деактивируются через 7 дней. Повторно активируйте с новыми датами, чтобы оставаться в поиске." },
     ],
     faqTitle: "Часто задаваемые вопросы",
     faqs: [
@@ -149,15 +178,15 @@ export default function ForNanniesPage() {
       <Header />
 
       {/* Hero */}
-      <section className="bg-gradient-to-br from-indigo-50 to-purple-50/40 pt-14 pb-16 px-4">
+      <section className="bg-gradient-to-br from-brand-50 to-brand-50/40 pt-14 pb-16 px-4">
         <div className="max-w-3xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-indigo-100 text-indigo-700 text-sm font-medium px-4 py-1.5 rounded-full mb-6">
-            🧒 {c.title}
+          <div className="inline-flex items-center gap-2 bg-brand-100 text-brand-700 text-sm font-medium px-4 py-1.5 rounded-full mb-6">
+            <Baby className="w-4 h-4" />{c.title}
           </div>
           <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 leading-tight">{c.subtitle}</h1>
           <Link
             href="/create-advertisement"
-            className="inline-block mt-4 px-8 py-3 bg-purple-600 text-white font-semibold rounded-xl hover:bg-purple-700 transition-colors shadow-sm"
+            className="inline-block mt-4 px-8 py-3 bg-brand-600 text-white font-semibold rounded-xl hover:bg-brand-700 transition-colors shadow-sm"
           >
             {c.ctaBtn}
           </Link>
@@ -171,8 +200,8 @@ export default function ForNanniesPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {c.steps.map((step, i) => (
               <div key={i} className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
-                <div className="text-3xl mb-3">{step.icon}</div>
-                <div className="text-xs font-bold text-indigo-500 uppercase tracking-wide mb-1">Step {i + 1}</div>
+                <div className="mb-3">{stepIcons[i]}</div>
+                <div className="text-xs font-bold text-brand-500 uppercase tracking-wide mb-1">Step {i + 1}</div>
                 <h3 className="text-base font-semibold text-gray-900 mb-2">{step.title}</h3>
                 <p className="text-sm text-gray-500 leading-relaxed">{step.desc}</p>
               </div>
@@ -188,7 +217,7 @@ export default function ForNanniesPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {c.whyItems.map((item, i) => (
               <div key={i} className="flex gap-4 bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-                <div className="text-2xl flex-shrink-0">{item.icon}</div>
+                <div className="flex-shrink-0 mt-0.5">{whyIcons[i]}</div>
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-1">{item.title}</h3>
                   <p className="text-sm text-gray-500 leading-relaxed">{item.desc}</p>
@@ -207,7 +236,7 @@ export default function ForNanniesPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {c.rateItems.map((item, i) => (
               <div key={i} className="flex gap-4 bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-                <div className="text-2xl flex-shrink-0">{item.icon}</div>
+                <div className="flex-shrink-0 mt-0.5">{rateIcons[i]}</div>
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-1">{item.title}</h3>
                   <p className="text-sm text-gray-500 leading-relaxed">{item.desc}</p>
@@ -225,7 +254,7 @@ export default function ForNanniesPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {c.tips.map((tip, i) => (
               <div key={i} className="flex gap-4 border border-gray-100 rounded-2xl p-6 bg-white shadow-sm">
-                <div className="text-2xl flex-shrink-0">{tip.icon}</div>
+                <div className="flex-shrink-0 mt-0.5">{tipIcons[i]}</div>
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-1">{tip.title}</h3>
                   <p className="text-sm text-gray-500 leading-relaxed">{tip.desc}</p>
@@ -245,7 +274,7 @@ export default function ForNanniesPage() {
               <details key={i} className="group border border-gray-100 rounded-2xl bg-white shadow-sm overflow-hidden">
                 <summary className="flex items-center justify-between px-6 py-4 cursor-pointer font-medium text-gray-900 select-none list-none">
                   {faq.q}
-                  <span className="text-purple-400 group-open:rotate-180 transition-transform duration-200 ml-4 flex-shrink-0">
+                  <span className="text-brand-400 group-open:rotate-180 transition-transform duration-200 ml-4 flex-shrink-0">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
@@ -261,13 +290,13 @@ export default function ForNanniesPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 px-4 bg-gradient-to-r from-indigo-600 to-purple-600">
+      <section className="py-16 px-4 bg-gradient-to-r from-brand-600 to-brand-600">
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-3xl font-bold text-white mb-3">{c.ctaTitle}</h2>
-          <p className="text-indigo-200 mb-8 text-lg">{c.ctaDesc}</p>
+          <p className="text-brand-200 mb-8 text-lg">{c.ctaDesc}</p>
           <Link
             href="/create-advertisement"
-            className="inline-block px-10 py-3 bg-white text-indigo-700 font-bold rounded-xl hover:bg-indigo-50 transition-colors shadow-lg"
+            className="inline-block px-10 py-3 bg-white text-brand-700 font-bold rounded-xl hover:bg-brand-50 transition-colors shadow-lg"
           >
             {c.ctaBtn}
           </Link>

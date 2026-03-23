@@ -179,11 +179,11 @@ export default function HomeClient({
         <main className="flex-1">
           {/* Hero — only shown to guests; hidden while auth resolves to prevent flash */}
           {!authLoading && !user && (
-            <section className="px-4 sm:px-6 md:px-8 pt-14 pb-16 bg-gradient-to-b from-purple-50/70 via-purple-50/20 to-white">
+            <section className="px-4 sm:px-6 md:px-8 pt-14 pb-16 bg-gradient-to-b from-brand-50/70 via-brand-50/20 to-white">
               <div className="text-center max-w-5xl mx-auto">
                 <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold mb-6 leading-tight tracking-tight">
                   <span className="text-gray-900">{t("home.heroTitle")}</span>
-                  <span className="block bg-gradient-to-r from-purple-600 to-indigo-500 bg-clip-text text-transparent">
+                  <span className="block bg-gradient-to-r from-brand-600 to-brand-500 bg-clip-text text-transparent">
                     {t("home.heroSubtitle")}
                   </span>
                 </h1>
@@ -193,14 +193,14 @@ export default function HomeClient({
                 <div className="flex flex-wrap justify-center gap-4 mb-10">
                   <Link
                     href="/for-parents"
-                    className="inline-flex items-center gap-2 px-7 py-3 bg-purple-600 text-white font-semibold rounded-xl hover:bg-purple-700 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 text-sm"
+                    className="inline-flex items-center gap-2 px-7 py-3 bg-brand-600 text-white font-semibold rounded-xl hover:bg-brand-700 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 text-sm"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                     {t("home.forParents")}
                   </Link>
                   <Link
                     href="/for-nannies"
-                    className="inline-flex items-center gap-2 px-7 py-3 bg-white text-purple-700 font-semibold rounded-xl hover:bg-purple-50 border border-purple-200 hover:border-purple-400 shadow-sm hover:-translate-y-0.5 transition-all duration-200 text-sm"
+                    className="inline-flex items-center gap-2 px-7 py-3 bg-white text-brand-700 font-semibold rounded-xl hover:bg-brand-50 border border-brand-200 hover:border-brand-400 shadow-sm hover:-translate-y-0.5 transition-all duration-200 text-sm"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4"/></svg>
                     {t("home.forNannies")}
@@ -226,7 +226,7 @@ export default function HomeClient({
                       setSearchParams({ location: userCity || "Location", startDate: null, endDate: null });
                       setShowResults(true);
                     }}
-                    className="text-sm text-purple-600 font-medium hover:underline flex items-center gap-1"
+                    className="text-sm text-brand-600 font-medium hover:underline flex items-center gap-1"
                   >
                     {t("common.seeAll")}
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/></svg>
@@ -237,14 +237,14 @@ export default function HomeClient({
                     <Link
                       key={nanny.id}
                       href={`/advertisement/${nanny.id}`}
-                      className="flex-shrink-0 w-52 bg-white border border-gray-100 rounded-2xl p-4 shadow-sm hover:shadow-md hover:border-purple-200 hover:-translate-y-0.5 transition-all duration-200"
+                      className="flex-shrink-0 w-52 bg-white border border-gray-100 rounded-2xl p-4 shadow-sm hover:shadow-md hover:border-brand-200 hover:-translate-y-0.5 transition-all duration-200"
                     >
                       {/* Avatar */}
-                      <div className="w-14 h-14 rounded-full overflow-hidden bg-purple-100 flex items-center justify-center mb-3 mx-auto">
+                      <div className="w-14 h-14 rounded-full overflow-hidden bg-brand-100 flex items-center justify-center mb-3 mx-auto">
                         {nanny.owner_picture ? (
                           <img src={nanny.owner_picture} alt={nanny.owner_full_name || ""} className="w-full h-full object-cover" />
                         ) : (
-                          <span className="text-purple-600 font-bold text-xl">
+                          <span className="text-brand-600 font-bold text-xl">
                             {(nanny.owner_full_name || "?").charAt(0).toUpperCase()}
                           </span>
                         )}
@@ -262,7 +262,7 @@ export default function HomeClient({
                       {/* Location & Price */}
                       <div className="mt-2 text-center">
                         <p className="text-xs text-gray-500 truncate">{nanny.location_city}</p>
-                        <p className="text-sm font-bold text-purple-600 mt-1">€{nanny.price_per_hour}<span className="text-xs font-normal text-gray-400">/h</span></p>
+                        <p className="text-sm font-bold text-brand-600 mt-1">€{nanny.price_per_hour}<span className="text-xs font-normal text-gray-400">/h</span></p>
                       </div>
                     </Link>
                   ))}
@@ -287,7 +287,7 @@ export default function HomeClient({
                       setSearchParams({ location: userCity || "Location", startDate: null, endDate: null });
                       setShowResults(true);
                     }}
-                    className="text-sm text-purple-600 font-medium hover:underline flex items-center gap-1"
+                    className="text-sm text-brand-600 font-medium hover:underline flex items-center gap-1"
                   >
                     {t("common.seeAll")}
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/></svg>
@@ -298,13 +298,13 @@ export default function HomeClient({
                     <Link
                       key={ad.id}
                       href={`/advertisement/${ad.id}`}
-                      className="flex-shrink-0 w-52 bg-white border border-gray-100 rounded-2xl p-4 shadow-sm hover:shadow-md hover:border-purple-200 hover:-translate-y-0.5 transition-all duration-200"
+                      className="flex-shrink-0 w-52 bg-white border border-gray-100 rounded-2xl p-4 shadow-sm hover:shadow-md hover:border-brand-200 hover:-translate-y-0.5 transition-all duration-200"
                     >
-                      <div className="w-14 h-14 rounded-full overflow-hidden bg-purple-100 flex items-center justify-center mb-3 mx-auto">
+                      <div className="w-14 h-14 rounded-full overflow-hidden bg-brand-100 flex items-center justify-center mb-3 mx-auto">
                         {ad.owner_picture ? (
                           <img src={ad.owner_picture} alt={ad.owner_full_name || ""} className="w-full h-full object-cover" />
                         ) : (
-                          <span className="text-purple-600 font-bold text-xl">
+                          <span className="text-brand-600 font-bold text-xl">
                             {(ad.owner_full_name || "?").charAt(0).toUpperCase()}
                           </span>
                         )}
@@ -319,7 +319,7 @@ export default function HomeClient({
                       )}
                       <div className="mt-2 text-center">
                         <p className="text-xs text-gray-500 truncate">{ad.location_city}</p>
-                        <p className="text-sm font-bold text-purple-600 mt-1">€{ad.price_per_hour}<span className="text-xs font-normal text-gray-400">/h</span></p>
+                        <p className="text-sm font-bold text-brand-600 mt-1">€{ad.price_per_hour}<span className="text-xs font-normal text-gray-400">/h</span></p>
                       </div>
                     </Link>
                   ))}
@@ -337,7 +337,7 @@ export default function HomeClient({
                   {
                     href: "/for-parents",
                     icon: (
-                      <svg className="w-7 h-7 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                      <svg className="w-7 h-7 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                     ),
                     title: t("home.forParents"),
                     desc: t("home.forParentsDesc"),
@@ -345,7 +345,7 @@ export default function HomeClient({
                   {
                     href: "/for-nannies",
                     icon: (
-                      <svg className="w-7 h-7 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                      <svg className="w-7 h-7 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
                     ),
                     title: t("home.forNannies"),
                     desc: t("home.forNanniesDesc"),
@@ -353,7 +353,7 @@ export default function HomeClient({
                   {
                     href: "/support",
                     icon: (
-                      <svg className="w-7 h-7 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                      <svg className="w-7 h-7 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                     ),
                     title: t("home.safeSecure"),
                     desc: t("home.safeSecureDesc"),
@@ -362,18 +362,18 @@ export default function HomeClient({
                   <Link
                     key={card.title}
                     href={card.href}
-                    className="group bg-white rounded-2xl p-7 shadow-sm border border-gray-100 hover:shadow-md hover:border-purple-200 hover:-translate-y-0.5 transition-all duration-200 block"
+                    className="group bg-white rounded-2xl p-7 shadow-sm border border-gray-100 hover:shadow-md hover:border-brand-200 hover:-translate-y-0.5 transition-all duration-200 block"
                   >
-                    <div className="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center mb-4 group-hover:bg-purple-100 transition-colors">
+                    <div className="w-12 h-12 rounded-xl bg-brand-50 flex items-center justify-center mb-4 group-hover:bg-brand-100 transition-colors">
                       {card.icon}
                     </div>
-                    <h3 className="text-lg font-semibold mb-2 text-gray-900 group-hover:text-purple-700 transition-colors">
+                    <h3 className="text-lg font-semibold mb-2 text-gray-900 group-hover:text-brand-700 transition-colors">
                       {card.title}
                     </h3>
                     <p className="text-gray-500 text-sm leading-relaxed">
                       {card.desc}
                     </p>
-                    <span className="inline-flex items-center gap-1 text-purple-600 text-xs font-medium mt-4 group-hover:gap-2 transition-all">
+                    <span className="inline-flex items-center gap-1 text-brand-600 text-xs font-medium mt-4 group-hover:gap-2 transition-all">
                       {t("common.learnMore")}
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/></svg>
                     </span>

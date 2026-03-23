@@ -198,7 +198,7 @@ export default function AdvertisementDetails({
             <p className="text-gray-600 mb-6">{t("ad.notAvailable")}</p>
             <button
               onClick={() => router.back()}
-              className="px-6 py-3 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700"
+              className="px-6 py-3 bg-brand-600 text-white rounded-lg font-medium hover:bg-brand-700"
             >
               {t("common.goBack")}
             </button>
@@ -232,7 +232,7 @@ export default function AdvertisementDetails({
                 router.push("/");
               }
             }}
-            className="inline-flex items-center gap-2 mb-6 text-sm text-gray-600 hover:text-purple-600 transition-colors group"
+            className="inline-flex items-center gap-2 mb-6 text-sm text-gray-600 hover:text-brand-600 transition-colors group"
           >
             <svg className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
             {t("ad.backToResults")}
@@ -244,7 +244,7 @@ export default function AdvertisementDetails({
             <div className="flex-1 min-w-0 space-y-5">
               {/* Hero banner */}
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div className="px-7 py-6 bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-600 text-white">
+                <div className="px-7 py-6 bg-gradient-to-r from-brand-600 via-brand-700 to-brand-600 text-white">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
                       <div className="flex items-center gap-2 mb-2">
@@ -265,7 +265,7 @@ export default function AdvertisementDetails({
                       </Link>
                     )}
                   </div>
-                  <div className="mt-4 flex flex-wrap gap-4 text-sm text-purple-100">
+                  <div className="mt-4 flex flex-wrap gap-4 text-sm text-brand-100">
                     <span className="flex items-center gap-1.5">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                       {ad.location_city}
@@ -293,7 +293,7 @@ export default function AdvertisementDetails({
               {/* Description */}
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                 <h2 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                  <svg className="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                  <svg className="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                   {t("ad.description")}
                 </h2>
                 <p className="text-gray-700 leading-relaxed whitespace-pre-wrap text-sm">{ad.description}</p>
@@ -303,20 +303,20 @@ export default function AdvertisementDetails({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                   <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                    <svg className="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                    <svg className="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                     {ad.type === "short-term" ? t("ad.requirements") : t("ad.experience")}
                   </h3>
                   <p className="text-gray-700 leading-relaxed whitespace-pre-wrap text-sm">{ad.experience || "—"}</p>
                 </div>
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                   <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                    <svg className="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+                    <svg className="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
                     {t("ad.skills")}
                   </h3>
                   {ad.skills && ad.skills.length > 0 ? (
                     <div className="flex flex-wrap gap-2">
                       {ad.skills.map((s: string) => (
-                        <span key={s} className="px-3 py-1 bg-purple-50 text-purple-700 text-xs rounded-full border border-purple-100 font-medium">
+                        <span key={s} className="px-3 py-1 bg-brand-50 text-brand-700 text-xs rounded-full border border-brand-100 font-medium">
                           {getTranslatedSkill(s, language)}
                         </span>
                       ))}
@@ -329,7 +329,7 @@ export default function AdvertisementDetails({
               {groupedSlots.length > 0 && (
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                   <h3 className="text-base font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                    <svg className="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    <svg className="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                     {owner?.userType === "parent" ? t("ad.requiredDates") : t("search.availability")}
                   </h3>
                   <div className="space-y-2">
@@ -352,7 +352,7 @@ export default function AdvertisementDetails({
               {/* Location */}
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                 <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                  <svg className="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                  <svg className="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                   {t("adCreate.location")}
                 </h3>
                 <p className="text-gray-700 text-sm leading-relaxed">
@@ -379,9 +379,9 @@ export default function AdvertisementDetails({
             <div className="w-full lg:w-80 flex-shrink-0 lg:sticky lg:top-6 space-y-4">
               {/* Owner card */}
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div className="bg-gradient-to-br from-purple-50 to-indigo-50 px-6 py-5 text-center border-b border-gray-100">
+                <div className="bg-gradient-to-br from-brand-50 to-brand-50 px-6 py-5 text-center border-b border-gray-100">
                   <div
-                    className={`w-20 h-20 rounded-full mx-auto mb-3 border-4 border-white shadow-md overflow-hidden bg-purple-100 flex items-center justify-center relative group/owneravatar ${owner?.picture ? "cursor-pointer" : ""}`}
+                    className={`w-20 h-20 rounded-full mx-auto mb-3 border-4 border-white shadow-md overflow-hidden bg-brand-100 flex items-center justify-center relative group/owneravatar ${owner?.picture ? "cursor-pointer" : ""}`}
                     onClick={() => owner?.picture && setShowOwnerPhoto(true)}
                   >
                     {owner?.picture ? (
@@ -392,10 +392,10 @@ export default function AdvertisementDetails({
                         </div>
                       </>
                     ) : (
-                      <svg className="w-10 h-10 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                      <svg className="w-10 h-10 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                     )}
                   </div>
-                  <Link href={`/user/${ad.user_id}`} className="font-bold text-gray-900 text-lg hover:text-purple-600 transition-colors">
+                  <Link href={`/user/${ad.user_id}`} className="font-bold text-gray-900 text-lg hover:text-brand-600 transition-colors">
                     {owner?.fullName || "—"}
                   </Link>
                   {owner && owner.rating > 0 && (
@@ -419,7 +419,7 @@ export default function AdvertisementDetails({
                 <div className="p-5 space-y-3">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-500">{t("ad.perHour")}</span>
-                    <span className="font-bold text-purple-600 text-lg">€{Number(ad.price_per_hour)}</span>
+                    <span className="font-bold text-brand-600 text-lg">€{Number(ad.price_per_hour)}</span>
                   </div>
                   {(() => {
                     if (canBook) {
@@ -427,7 +427,7 @@ export default function AdvertisementDetails({
                         <button
                           type="button"
                           onClick={() => setShowBooking(true)}
-                          className="w-full py-3 bg-purple-600 text-white font-semibold rounded-xl hover:bg-purple-700 shadow-sm hover:shadow-md transition-all"
+                          className="w-full py-3 bg-brand-600 text-white font-semibold rounded-xl hover:bg-brand-700 shadow-sm hover:shadow-md transition-all"
                         >
                           {t("ad.book")}
                         </button>
@@ -437,7 +437,7 @@ export default function AdvertisementDetails({
                       return (
                         <Link
                           href={`/user/${ad.user_id}`}
-                          className="w-full py-3 border border-purple-300 text-purple-700 font-semibold rounded-xl hover:bg-purple-50 transition-colors block text-center"
+                          className="w-full py-3 border border-brand-300 text-brand-700 font-semibold rounded-xl hover:bg-brand-50 transition-colors block text-center"
                         >
                           {t("ad.viewProfile")}
                         </Link>
@@ -446,7 +446,7 @@ export default function AdvertisementDetails({
                     return (
                       <Link
                         href="/login"
-                        className="w-full py-3 bg-purple-600 text-white font-semibold rounded-xl hover:bg-purple-700 transition-colors block text-center"
+                        className="w-full py-3 bg-brand-600 text-white font-semibold rounded-xl hover:bg-brand-700 transition-colors block text-center"
                       >
                         {t("ad.contact")}
                       </Link>

@@ -95,7 +95,7 @@ export default function AdminReports() {
               <h1 className="text-2xl font-bold text-gray-900">Reports</h1>
               <p className="text-gray-500 text-sm mt-0.5">{total} {status} report{total !== 1 ? "s" : ""}</p>
             </div>
-            <Link href="/admin" className="text-sm text-gray-500 hover:text-purple-600 transition-colors">
+            <Link href="/admin" className="text-sm text-gray-500 hover:text-brand-600 transition-colors">
               ← Back to Admin
             </Link>
           </div>
@@ -108,7 +108,7 @@ export default function AdminReports() {
                 onClick={() => setStatus(s)}
                 className={`px-4 py-1.5 rounded-lg text-sm font-medium capitalize transition-colors ${
                   status === s
-                    ? "bg-purple-600 text-white shadow-sm"
+                    ? "bg-brand-600 text-white shadow-sm"
                     : "text-gray-600 hover:text-gray-900"
                 }`}
               >
@@ -119,7 +119,7 @@ export default function AdminReports() {
 
           {loading ? (
             <div className="flex justify-center py-16">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600" />
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-600" />
             </div>
           ) : error ? (
             <p className="text-red-600 text-center py-8">{error}</p>
@@ -136,7 +136,7 @@ export default function AdminReports() {
                       <div className="flex items-center gap-2 mb-2 flex-wrap">
                         <span className={`text-xs px-2 py-0.5 rounded-full font-medium border ${
                           r.reported_type === "user"
-                            ? "bg-blue-50 text-blue-700 border-blue-200"
+                            ? "bg-brand-50 text-brand-700 border-brand-200"
                             : "bg-orange-50 text-orange-700 border-orange-200"
                         }`}>
                           {r.reported_type === "user" ? "User" : "Ad"}
@@ -148,7 +148,7 @@ export default function AdminReports() {
                           <Link
                             href={`/user/${r.reported_id}`}
                             target="_blank"
-                            className="text-xs text-purple-600 hover:underline flex-shrink-0"
+                            className="text-xs text-brand-600 hover:underline flex-shrink-0"
                           >
                             View profile →
                           </Link>
@@ -156,7 +156,7 @@ export default function AdminReports() {
                           <Link
                             href={`/advertisement/${r.reported_id}`}
                             target="_blank"
-                            className="text-xs text-purple-600 hover:underline flex-shrink-0"
+                            className="text-xs text-brand-600 hover:underline flex-shrink-0"
                           >
                             View listing →
                           </Link>

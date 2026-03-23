@@ -237,7 +237,7 @@ export default function ProfilePage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
         <div className="text-center">
-          <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-8 h-8 border-4 border-brand-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Loading profile...</p>
         </div>
       </div>
@@ -249,7 +249,7 @@ export default function ProfilePage() {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
         <div className="text-center">
           <p className="text-gray-700 mb-4">Redirecting to login…</p>
-          <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <div className="w-8 h-8 border-4 border-brand-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
         </div>
       </div>
     );
@@ -260,7 +260,7 @@ export default function ProfilePage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
         <div className="text-center">
-          <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-8 h-8 border-4 border-brand-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Loading your profile…</p>
         </div>
       </div>
@@ -358,15 +358,13 @@ export default function ProfilePage() {
     {
       id: "job-ads",
       label: t("profile.yourAdvertisement"),
-      icon: isParent ? "📋" : "💼",
     },
     {
       id: "bookings",
       label: t("profile.bookings") + (pendingBookings > 0 ? ` (${pendingBookings})` : ""),
-      icon: pendingBookings > 0 ? "⚠️" : "📅",
     },
-    { id: "messages", label: t("profile.messages") + (unreadMessageCount > 0 ? ` (${unreadMessageCount})` : ""), icon: "💬" },
-    { id: "profile", label: t("profile.profile"), icon: "👤" },
+    { id: "messages", label: t("profile.messages") + (unreadMessageCount > 0 ? ` (${unreadMessageCount})` : "") },
+    { id: "profile", label: t("profile.profile") },
   ] as const;
 
   const renderTabContent = () => {
@@ -409,7 +407,7 @@ export default function ProfilePage() {
         <div className="max-w-7xl mx-auto">
 
           {/* Persistent profile banner */}
-          <div className="bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-600 rounded-2xl px-6 py-5 mb-6 shadow-md">
+          <div className="bg-gradient-to-r from-brand-600 via-brand-700 to-brand-600 rounded-2xl px-6 py-5 mb-6 shadow-md">
             <div className="flex items-center gap-4">
               <div className="relative w-14 h-14 flex-shrink-0 group/avatar">
                 <div className="w-14 h-14 rounded-full border-2 border-white/40 overflow-hidden bg-white/20 shadow-inner">
@@ -460,7 +458,7 @@ export default function ProfilePage() {
                 <div className="flex flex-wrap items-center gap-2 mt-1">
                   <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${
                     userProfile?.user_type === "parent"
-                      ? "bg-blue-400/30 text-blue-100"
+                      ? "bg-brand-700/30 text-brand-100"
                       : userProfile?.user_type === "nanny"
                       ? "bg-green-400/30 text-green-100"
                       : "bg-yellow-400/30 text-yellow-100"
@@ -472,19 +470,19 @@ export default function ProfilePage() {
                       : t("userType.pending")}
                   </span>
                   {(userProfile as any)?.average_rating && Number((userProfile as any).average_rating) > 0 && (
-                    <span className="text-xs text-purple-200 flex items-center gap-1">
-                      <svg className="w-3.5 h-3.5 text-yellow-300 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                    <span className="text-xs text-brand-200 flex items-center gap-1">
+                      <svg className="w-3.5 h-3.5 text-accent fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
                       {Number((userProfile as any).average_rating).toFixed(1)} ({(userProfile as any).total_reviews || 0})
                     </span>
                   )}
                   {userProfile?.location && (
-                    <span className="text-xs text-purple-200 flex items-center gap-1">
+                    <span className="text-xs text-brand-200 flex items-center gap-1">
                       <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                       {userProfile.location}
                     </span>
                   )}
                   {userProfile?.created_at && (
-                    <span className="text-xs text-purple-200 flex items-center gap-1">
+                    <span className="text-xs text-brand-200 flex items-center gap-1">
                       <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                       {t("profile.memberSince")} {formatMonthYear(userProfile.created_at, language)}
                     </span>
@@ -493,7 +491,7 @@ export default function ProfilePage() {
               </div>
               <button
                 onClick={() => { setActiveTab("profile"); setIsEditing(true); }}
-                className="hidden sm:flex items-center gap-1.5 text-xs text-purple-200 hover:text-white border border-white/20 hover:border-white/40 px-3 py-1.5 rounded-lg transition-colors flex-shrink-0"
+                className="hidden sm:flex items-center gap-1.5 text-xs text-brand-200 hover:text-white border border-white/20 hover:border-white/40 px-3 py-1.5 rounded-lg transition-colors flex-shrink-0"
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                 {t("profile.editProfile")}
@@ -515,7 +513,7 @@ export default function ProfilePage() {
                   }}
                   className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-150 text-sm ${
                     activeTab === tab.id
-                      ? "bg-purple-600 text-white shadow-sm"
+                      ? "bg-brand-600 text-white shadow-sm"
                       : "text-gray-500 hover:text-gray-800 hover:bg-gray-50"
                   }`}
                 >

@@ -67,7 +67,7 @@ export default function CookieConsent() {
             <div className="flex flex-col sm:flex-row gap-2">
               <button
                 onClick={handleAllowAll}
-                className="flex-1 px-4 py-2.5 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors text-sm"
+                className="flex-1 px-4 py-2.5 bg-brand-600 text-white rounded-lg font-medium hover:bg-brand-700 transition-colors text-sm"
               >
                 {t("cookie.allowAll")}
               </button>
@@ -102,7 +102,7 @@ export default function CookieConsent() {
                   </div>
                 </div>
                 <div className="relative flex-shrink-0">
-                  <div className="w-10 h-6 bg-purple-600 rounded-full opacity-60 cursor-not-allowed">
+                  <div className="w-10 h-6 bg-brand-600 rounded-full opacity-60 cursor-not-allowed">
                     <div className="absolute top-1 right-1 w-4 h-4 bg-white rounded-full" />
                   </div>
                 </div>
@@ -124,7 +124,7 @@ export default function CookieConsent() {
                     setPreferences((p) => ({ ...p, analytics: !p.analytics }))
                   }
                   className={`relative flex-shrink-0 w-10 h-6 rounded-full transition-colors ${
-                    preferences.analytics ? "bg-purple-600" : "bg-gray-300"
+                    preferences.analytics ? "bg-brand-600" : "bg-gray-300"
                   }`}
                 >
                   <div
@@ -151,7 +151,7 @@ export default function CookieConsent() {
                     setPreferences((p) => ({ ...p, marketing: !p.marketing }))
                   }
                   className={`relative flex-shrink-0 w-10 h-6 rounded-full transition-colors ${
-                    preferences.marketing ? "bg-purple-600" : "bg-gray-300"
+                    preferences.marketing ? "bg-brand-600" : "bg-gray-300"
                   }`}
                 >
                   <div
@@ -172,7 +172,7 @@ export default function CookieConsent() {
               </button>
               <button
                 onClick={handleSavePreferences}
-                className="flex-1 px-4 py-2.5 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors text-sm"
+                className="flex-1 px-4 py-2.5 bg-brand-600 text-white rounded-lg font-medium hover:bg-brand-700 transition-colors text-sm"
               >
                 {t("cookie.savePreferences")}
               </button>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { MapPin, Banknote, Calendar, Clock } from "lucide-react";
 import { AdvertisementService } from "../lib/advertisementService";
 import { useTranslation } from "./LanguageProvider";
 import { getTranslatedSkill } from "../lib/constants/skills";
@@ -81,7 +82,7 @@ export default function AdvertisementPreview({
         <div className="p-6 max-h-[80vh] overflow-auto">
           {loading ? (
             <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-purple-600 mx-auto mb-3" />
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-brand-600 mx-auto mb-3" />
               <p className="text-gray-600">{t("ad.loading")}</p>
             </div>
           ) : error || !ad ? (
@@ -91,7 +92,7 @@ export default function AdvertisementPreview({
           ) : (
             <div className="space-y-6">
               {/* Header matching actual ad page */}
-              <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-xl p-5">
+              <div className="bg-gradient-to-r from-brand-600 to-brand-700 text-white rounded-xl p-5">
                 <div className="flex items-center justify-between">
                   <h1 className="text-2xl sm:text-3xl font-bold">{ad.title}</h1>
                   <span className="px-4 py-2 bg-white/20 rounded-full text-sm">
@@ -100,13 +101,13 @@ export default function AdvertisementPreview({
                       : t("profile.longTerm")}
                   </span>
                 </div>
-                <div className="mt-3 flex flex-wrap gap-3 text-sm text-purple-100">
+                <div className="mt-3 flex flex-wrap gap-3 text-sm text-brand-100">
                   <span className="inline-flex items-center gap-1">
-                    <span>📍</span>
+                    <MapPin className="w-4 h-4" />
                     <span>{ad.location_city}</span>
                   </span>
                   <span className="inline-flex items-center gap-1">
-                    <span>💰</span>
+                    <Banknote className="w-4 h-4" />
                     <span>
                       €{Number(ad.price_per_hour)}
                       {t("ad.perHour")}
@@ -114,13 +115,13 @@ export default function AdvertisementPreview({
                   </span>
                   {ad.type === "short-term" && slots.length > 0 && (
                     <span className="inline-flex items-center gap-1">
-                      <span>🗓️</span>
+                      <Calendar className="w-4 h-4" />
                       <span>{t("ad.date", { count: slots.length })}</span>
                     </span>
                   )}
                   {ad.type === "long-term" && ad.availability_start_time && ad.availability_end_time && (
                     <span className="inline-flex items-center gap-1">
-                      <span>⏰</span>
+                      <Clock className="w-4 h-4" />
                       <span>
                         {ad.availability_start_time} - {ad.availability_end_time}
                       </span>
@@ -167,7 +168,7 @@ export default function AdvertisementPreview({
                       {ad.skills.map((s: string) => (
                         <span
                           key={s}
-                          className="px-3 py-1 bg-purple-100 text-purple-700 text-xs rounded-full"
+                          className="px-3 py-1 bg-brand-100 text-brand-700 text-xs rounded-full"
                         >
                           {getTranslatedSkill(s, language)}
                         </span>

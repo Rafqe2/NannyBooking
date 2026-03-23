@@ -18,8 +18,8 @@ interface AdminUser {
 }
 
 const TYPE_COLORS: Record<string, string> = {
-  parent: "bg-blue-100 text-blue-700",
-  nanny: "bg-purple-100 text-purple-700",
+  parent: "bg-brand-100 text-brand-700",
+  nanny: "bg-brand-100 text-brand-700",
   admin: "bg-red-100 text-red-700",
   pending: "bg-gray-100 text-gray-700",
 };
@@ -114,12 +114,12 @@ export default function AdminUsersPage() {
               placeholder="Search by name, email, location…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="flex-1 border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="flex-1 border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
             <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
-              className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-500"
             >
               <option value="all">All types</option>
               <option value="parent">Parents</option>
@@ -131,7 +131,7 @@ export default function AdminUsersPage() {
 
           {loading ? (
             <div className="flex justify-center py-20">
-              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-purple-600" />
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-brand-600" />
             </div>
           ) : error ? (
             <p className="text-red-600 text-center py-10">{error}</p>

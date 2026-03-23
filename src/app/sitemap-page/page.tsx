@@ -137,7 +137,7 @@ export default function SitemapPage() {
     <div className="min-h-screen flex flex-col bg-white">
       <Header />
 
-      <section className="bg-gradient-to-br from-purple-50 to-indigo-50/40 pt-14 pb-12 px-4">
+      <section className="bg-gradient-to-br from-brand-50 to-brand-50/40 pt-14 pb-12 px-4">
         <div className="max-w-3xl mx-auto text-center">
           <h1 className="text-4xl font-extrabold text-gray-900">{title}</h1>
         </div>
@@ -147,7 +147,7 @@ export default function SitemapPage() {
         <div className="max-w-3xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-10">
           {sections.map((section, i) => (
             <div key={i}>
-              <h2 className="text-sm font-bold text-purple-600 uppercase tracking-widest mb-4">
+              <h2 className="text-sm font-bold text-brand-600 uppercase tracking-widest mb-4">
                 {section.category}
               </h2>
               <ul className="space-y-2">
@@ -155,7 +155,7 @@ export default function SitemapPage() {
                   <li key={j}>
                     <Link
                       href={link.href}
-                      className="text-gray-700 hover:text-purple-600 transition-colors duration-200 text-sm"
+                      className="text-gray-700 hover:text-brand-600 transition-colors duration-200 text-sm"
                     >
                       {link.label}
                     </Link>

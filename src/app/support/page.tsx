@@ -4,6 +4,16 @@ import { useState } from "react";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { useTranslation } from "../../components/LanguageProvider";
+import { Handshake, Phone, ClipboardList, Lock, Star, AlertTriangle, LifeBuoy } from "lucide-react";
+
+const safetyIcons = [
+  <Handshake key="handshake" className="w-6 h-6 text-amber-600" />,
+  <Phone key="phone" className="w-6 h-6 text-amber-600" />,
+  <ClipboardList key="clipboard" className="w-6 h-6 text-amber-600" />,
+  <Lock key="lock" className="w-6 h-6 text-amber-600" />,
+  <Star key="star" className="w-6 h-6 text-amber-600" />,
+  <AlertTriangle key="alert" className="w-6 h-6 text-amber-600" />,
+];
 
 const content = {
   en: {
@@ -37,12 +47,12 @@ const content = {
     ],
     safetyTitle: "Safety guidelines",
     safetyItems: [
-      { icon: "🤝", title: "Meet before the first booking", desc: "Arrange a short video or in-person introduction before the first session. This helps both parties feel comfortable and confirm expectations." },
-      { icon: "📞", title: "Verify contact info", desc: "After exchanging contact details through the platform, confirm via a quick call before meeting in person." },
-      { icon: "📋", title: "Discuss expectations clearly", desc: "Agree on the schedule, tasks, emergency contacts, house rules, and payment before the first session." },
-      { icon: "🔒", title: "Keep initial contact on-platform", desc: "Use the in-app messaging to initiate contact. Share personal contact details only after a booking is confirmed." },
-      { icon: "⭐", title: "Leave honest reviews", desc: "After a completed booking, your review helps the community. Be factual and constructive — it builds trust for everyone." },
-      { icon: "🚨", title: "Report concerns", desc: "If you encounter inappropriate content or behaviour, contact us immediately using the form below." },
+      { title: "Meet before the first booking", desc: "Arrange a short video or in-person introduction before the first session. This helps both parties feel comfortable and confirm expectations." },
+      { title: "Verify contact info", desc: "After exchanging contact details through the platform, confirm via a quick call before meeting in person." },
+      { title: "Discuss expectations clearly", desc: "Agree on the schedule, tasks, emergency contacts, house rules, and payment before the first session." },
+      { title: "Keep initial contact on-platform", desc: "Use the in-app messaging to initiate contact. Share personal contact details only after a booking is confirmed." },
+      { title: "Leave honest reviews", desc: "After a completed booking, your review helps the community. Be factual and constructive — it builds trust for everyone." },
+      { title: "Report concerns", desc: "If you encounter inappropriate content or behaviour, contact us immediately using the form below." },
     ],
     contactTitle: "Contact us",
     contactDesc: "Have a question not covered above, or need to report an issue? Send us a message and we'll get back to you within 1 business day.",
@@ -84,12 +94,12 @@ const content = {
     ],
     safetyTitle: "Drošības vadlīnijas",
     safetyItems: [
-      { icon: "🤝", title: "Tikieties pirms pirmās rezervācijas", desc: "Pirms pirmās sesijas rīkojiet īsu video vai klātienes iepazīšanos. Tas palīdz abām pusēm justies ērti un apstiprināt cerības." },
-      { icon: "📞", title: "Pārbaudiet kontaktinformāciju", desc: "Pēc kontaktinformācijas apmaiņas caur platformu, pirms personīgās tikšanās apstipriniet to ar ātru zvanu." },
-      { icon: "📋", title: "Skaidri apspriediet cerības", desc: "Vienojieties par grafiku, uzdevumiem, ārkārtas kontaktiem, mājas noteikumiem un maksājumu pirms pirmās sesijas." },
-      { icon: "🔒", title: "Saglabājiet sākotnējo kontaktu platformā", desc: "Izmantojiet platformas ziņojumapmaiņu, lai sāktu kontaktu. Kopīgojiet personīgo kontaktinformāciju tikai pēc rezervācijas apstiprināšanas." },
-      { icon: "⭐", title: "Atstājiet godīgas atsauksmes", desc: "Pēc pabeigtas rezervācijas jūsu atsauksme palīdz kopienai. Esiet faktiski un konstruktīvi — tas veido uzticamību visiem." },
-      { icon: "🚨", title: "Ziņojiet par bažām", desc: "Ja sastopaties ar nepiemērotu saturu vai uzvedību, nekavējoties sazinieties ar mums, izmantojot zemāk esošo formu." },
+      { title: "Tikieties pirms pirmās rezervācijas", desc: "Pirms pirmās sesijas rīkojiet īsu video vai klātienes iepazīšanos. Tas palīdz abām pusēm justies ērti un apstiprināt cerības." },
+      { title: "Pārbaudiet kontaktinformāciju", desc: "Pēc kontaktinformācijas apmaiņas caur platformu, pirms personīgās tikšanās apstipriniet to ar ātru zvanu." },
+      { title: "Skaidri apspriediet cerības", desc: "Vienojieties par grafiku, uzdevumiem, ārkārtas kontaktiem, mājas noteikumiem un maksājumu pirms pirmās sesijas." },
+      { title: "Saglabājiet sākotnējo kontaktu platformā", desc: "Izmantojiet platformas ziņojumapmaiņu, lai sāktu kontaktu. Kopīgojiet personīgo kontaktinformāciju tikai pēc rezervācijas apstiprināšanas." },
+      { title: "Atstājiet godīgas atsauksmes", desc: "Pēc pabeigtas rezervācijas jūsu atsauksme palīdz kopienai. Esiet faktiski un konstruktīvi — tas veido uzticamību visiem." },
+      { title: "Ziņojiet par bažām", desc: "Ja sastopaties ar nepiemērotu saturu vai uzvedību, nekavējoties sazinieties ar mums, izmantojot zemāk esošo formu." },
     ],
     contactTitle: "Sazinieties ar mums",
     contactDesc: "Vai jums ir jautājums, kas nav apskatīts iepriekš, vai jums jāziņo par problēmu? Nosūtiet mums ziņojumu, un mēs atbildēsim 1 darba dienas laikā.",
@@ -131,12 +141,12 @@ const content = {
     ],
     safetyTitle: "Рекомендации по безопасности",
     safetyItems: [
-      { icon: "🤝", title: "Встретьтесь перед первым бронированием", desc: "Организуйте короткое видео или личное знакомство перед первым сеансом. Это помогает обеим сторонам чувствовать себя комфортно и уточнить ожидания." },
-      { icon: "📞", title: "Проверьте контактные данные", desc: "После обмена контактами через платформу подтвердите их коротким звонком перед личной встречей." },
-      { icon: "📋", title: "Чётко обговорите ожидания", desc: "Согласуйте расписание, задачи, экстренные контакты, правила дома и оплату перед первым сеансом." },
-      { icon: "🔒", title: "Сохраняйте начальный контакт на платформе", desc: "Используйте внутренние сообщения для инициирования контакта. Делитесь личными данными только после подтверждения бронирования." },
-      { icon: "⭐", title: "Оставляйте честные отзывы", desc: "После завершённого бронирования ваш отзыв помогает сообществу. Будьте объективны и конструктивны — это строит доверие для всех." },
-      { icon: "🚨", title: "Сообщайте об инцидентах", desc: "Если вы столкнулись с неприемлемым контентом или поведением, немедленно свяжитесь с нами через форму ниже." },
+      { title: "Встретьтесь перед первым бронированием", desc: "Организуйте короткое видео или личное знакомство перед первым сеансом. Это помогает обеим сторонам чувствовать себя комфортно и уточнить ожидания." },
+      { title: "Проверьте контактные данные", desc: "После обмена контактами через платформу подтвердите их коротким звонком перед личной встречей." },
+      { title: "Чётко обговорите ожидания", desc: "Согласуйте расписание, задачи, экстренные контакты, правила дома и оплату перед первым сеансом." },
+      { title: "Сохраняйте начальный контакт на платформе", desc: "Используйте внутренние сообщения для инициирования контакта. Делитесь личными данными только после подтверждения бронирования." },
+      { title: "Оставляйте честные отзывы", desc: "После завершённого бронирования ваш отзыв помогает сообществу. Будьте объективны и конструктивны — это строит доверие для всех." },
+      { title: "Сообщайте об инцидентах", desc: "Если вы столкнулись с неприемлемым контентом или поведением, немедленно свяжитесь с нами через форму ниже." },
     ],
     contactTitle: "Свяжитесь с нами",
     contactDesc: "Есть вопрос, не описанный выше, или нужно сообщить о проблеме? Напишите нам, и мы ответим в течение 1 рабочего дня.",
@@ -165,10 +175,10 @@ export default function SupportPage() {
       <Header />
 
       {/* Hero */}
-      <section className="bg-gradient-to-br from-gray-50 to-purple-50/30 pt-14 pb-14 px-4">
+      <section className="bg-gradient-to-br from-gray-50 to-brand-50/30 pt-14 pb-14 px-4">
         <div className="max-w-3xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-gray-100 text-gray-700 text-sm font-medium px-4 py-1.5 rounded-full mb-6">
-            🛟 {c.title}
+            <LifeBuoy className="w-4 h-4" />{c.title}
           </div>
           <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-3 leading-tight">{c.title}</h1>
           <p className="text-gray-500 text-lg">{c.subtitle}</p>
@@ -185,7 +195,7 @@ export default function SupportPage() {
                 <details key={i} className="group border border-gray-100 rounded-2xl bg-white shadow-sm overflow-hidden">
                   <summary className="flex items-center justify-between px-6 py-4 cursor-pointer font-medium text-gray-900 select-none list-none">
                     {item.q}
-                    <span className="text-purple-400 group-open:rotate-180 transition-transform duration-200 ml-4 flex-shrink-0">
+                    <span className="text-brand-400 group-open:rotate-180 transition-transform duration-200 ml-4 flex-shrink-0">
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                       </svg>
@@ -208,7 +218,7 @@ export default function SupportPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {c.safetyItems.map((item, i) => (
               <div key={i} className="bg-white border border-amber-100 rounded-2xl p-5 shadow-sm">
-                <div className="text-2xl mb-3">{item.icon}</div>
+                <div className="mb-3">{safetyIcons[i]}</div>
                 <h3 className="font-semibold text-gray-900 mb-1 text-sm">{item.title}</h3>
                 <p className="text-xs text-gray-500 leading-relaxed">{item.desc}</p>
               </div>
@@ -279,7 +289,7 @@ function ContactForm({ c }: { c: typeof content["en"] }) {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder={c.contactEmailPlaceholder}
-          className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
+          className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
         />
       </div>
       <div>
@@ -290,7 +300,7 @@ function ContactForm({ c }: { c: typeof content["en"] }) {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder={c.contactMessagePlaceholder}
-          className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 resize-none"
+          className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 resize-none"
         />
       </div>
       {error && (
@@ -299,7 +309,7 @@ function ContactForm({ c }: { c: typeof content["en"] }) {
       <button
         type="submit"
         disabled={sending}
-        className="w-full py-3 bg-purple-600 text-white font-semibold rounded-xl hover:bg-purple-700 transition-colors shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
+        className="w-full py-3 bg-brand-600 text-white font-semibold rounded-xl hover:bg-brand-700 transition-colors shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
       >
         {sending ? "Sending…" : c.contactSendBtn}
       </button>

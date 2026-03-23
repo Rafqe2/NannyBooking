@@ -77,15 +77,15 @@ export default function BookingCalendar({
         className={`group w-full aspect-square rounded-xl border transition-all text-sm flex flex-col items-center justify-center select-none ${
           items.length > 0
             ? isSelected
-              ? "border-purple-600 bg-purple-50"
-              : "border-gray-200 hover:border-purple-300 hover:bg-purple-50"
+              ? "border-brand-600 bg-brand-50"
+              : "border-gray-200 hover:border-brand-300 hover:bg-brand-50"
             : "border-gray-100 hover:border-gray-200"
         }`}
         title={items.length > 0 ? `${items.length} booking(s)` : undefined}
       >
         <div
           className={`font-semibold ${
-            isSelected ? "text-purple-700" : "text-gray-800"
+            isSelected ? "text-brand-700" : "text-gray-800"
           }`}
         >
           {day}

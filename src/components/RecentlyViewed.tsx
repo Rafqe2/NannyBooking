@@ -41,10 +41,10 @@ export default function RecentlyViewed() {
           <Link
             key={ad.id}
             href={user ? `/advertisement/${ad.id}` : "/login"}
-            className="flex-shrink-0 w-52 bg-white rounded-xl border border-gray-200 hover:border-purple-300 hover:shadow-md transition-all duration-200 overflow-hidden"
+            className="flex-shrink-0 w-52 bg-white rounded-xl border border-gray-200 hover:border-brand-300 hover:shadow-md transition-all duration-200 overflow-hidden"
           >
             {/* Owner avatar */}
-            <div className="h-24 bg-gradient-to-br from-purple-100 to-purple-50 flex items-center justify-center">
+            <div className="h-24 bg-gradient-to-br from-brand-100 to-brand-50 flex items-center justify-center">
               {ad.ownerPicture ? (
                 <img
                   src={ad.ownerPicture}
@@ -52,7 +52,7 @@ export default function RecentlyViewed() {
                   className="w-14 h-14 rounded-full object-cover border-2 border-white shadow"
                 />
               ) : (
-                <div className="w-14 h-14 rounded-full bg-purple-200 flex items-center justify-center text-purple-700 text-xl font-bold">
+                <div className="w-14 h-14 rounded-full bg-brand-200 flex items-center justify-center text-brand-700 text-xl font-bold">
                   {(ad.ownerFullName || ad.title || "?")[0].toUpperCase()}
                 </div>
               )}
@@ -63,7 +63,7 @@ export default function RecentlyViewed() {
                 <p className="text-xs text-gray-500 truncate mt-0.5">{ad.location}</p>
               )}
               {ad.hourlyRate > 0 && (
-                <p className="text-xs font-medium text-purple-600 mt-1">
+                <p className="text-xs font-medium text-brand-600 mt-1">
                   €{ad.hourlyRate}/h
                 </p>
               )}

@@ -63,7 +63,7 @@ export default function AdminDashboard() {
       <div className="min-h-screen flex flex-col bg-gray-50">
         <Header />
         <main className="flex-1 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600" />
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-600" />
         </main>
       </div>
     );
@@ -81,9 +81,9 @@ export default function AdminDashboard() {
   }
 
   const statCards = [
-    { label: "Total Users", value: stats?.users.total ?? 0, sub: `+${stats?.users.newLast7Days ?? 0} this week`, color: "bg-blue-50 border-blue-200", textColor: "text-blue-700" },
+    { label: "Total Users", value: stats?.users.total ?? 0, sub: `+${stats?.users.newLast7Days ?? 0} this week`, color: "bg-brand-50 border-brand-200", textColor: "text-brand-700" },
     { label: "Parents", value: stats?.users.parents ?? 0, sub: "registered parents", color: "bg-green-50 border-green-200", textColor: "text-green-700" },
-    { label: "Nannies", value: stats?.users.nannies ?? 0, sub: "registered nannies", color: "bg-purple-50 border-purple-200", textColor: "text-purple-700" },
+    { label: "Nannies", value: stats?.users.nannies ?? 0, sub: "registered nannies", color: "bg-brand-50 border-brand-200", textColor: "text-brand-700" },
     { label: "Active Ads", value: stats?.ads.active ?? 0, sub: `${stats?.ads.total ?? 0} total ads`, color: "bg-yellow-50 border-yellow-200", textColor: "text-yellow-700" },
     { label: "Bookings", value: stats?.bookings.total ?? 0, sub: `${stats?.bookings.confirmed ?? 0} confirmed`, color: "bg-orange-50 border-orange-200", textColor: "text-orange-700" },
     { label: "Completed", value: stats?.bookings.completed ?? 0, sub: `${stats?.bookings.cancelled ?? 0} cancelled`, color: "bg-emerald-50 border-emerald-200", textColor: "text-emerald-700" },
@@ -103,7 +103,7 @@ export default function AdminDashboard() {
             <div className="flex gap-3">
               <Link
                 href="/admin/users"
-                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
+                className="px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors text-sm font-medium"
               >
                 Manage Users
               </Link>
@@ -151,7 +151,7 @@ export default function AdminDashboard() {
                   </div>
                 ))}
               </div>
-              <Link href="/admin/users" className="mt-4 block text-sm text-purple-600 hover:underline">
+              <Link href="/admin/users" className="mt-4 block text-sm text-brand-600 hover:underline">
                 View all users →
               </Link>
             </div>
@@ -172,7 +172,7 @@ export default function AdminDashboard() {
                   </div>
                 ))}
               </div>
-              <Link href="/admin/ads" className="mt-4 block text-sm text-purple-600 hover:underline">
+              <Link href="/admin/ads" className="mt-4 block text-sm text-brand-600 hover:underline">
                 View all ads →
               </Link>
             </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Banknote, MapPin } from "lucide-react";
 import { useTranslation } from "../LanguageProvider";
 import { supabase } from "../../lib/supabase";
 import { AdvertisementService, } from "../../lib/advertisementService";
@@ -63,7 +64,7 @@ export default function JobAdsTab({
                   className={`px-6 py-3 rounded-lg font-medium transition-colors duration-200 shadow-sm ${
                     hasActive || inactiveCount >= 3
                       ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                      : "bg-purple-600 text-white hover:bg-purple-700"
+                      : "bg-brand-600 text-white hover:bg-brand-700"
                   }`}
                   title={
                     hasActive
@@ -93,7 +94,7 @@ export default function JobAdsTab({
                   key={ad.id}
                   className={`border rounded-2xl p-6 transition-all duration-200 cursor-pointer ${
                     ad.is_active
-                      ? "bg-white border-purple-100 shadow-sm hover:shadow-md hover:border-purple-200"
+                      ? "bg-white border-brand-100 shadow-sm hover:shadow-md hover:border-brand-200"
                       : "bg-gray-50/70 border-gray-200 hover:bg-gray-50"
                   }`}
                   onClick={(e) => {
@@ -116,12 +117,12 @@ export default function JobAdsTab({
                             ? t("profile.shortTerm")
                             : t("profile.longTerm")}
                         </span>
-                        <span className="flex items-center">
-                          <span className="mr-1">💰</span>${ad.price_per_hour}
+                        <span className="flex items-center gap-1">
+                          <Banknote className="w-4 h-4 text-brand-400" />€{ad.price_per_hour}
                           {t("ad.perHour")}
                         </span>
-                        <span className="flex items-center">
-                          <span className="mr-1">📍</span>
+                        <span className="flex items-center gap-1">
+                          <MapPin className="w-4 h-4 text-brand-400" />
                           {ad.location_city}
                         </span>
                       </div>
@@ -144,7 +145,7 @@ export default function JobAdsTab({
                         </span>
                       ) : (
                         <a
-                          className="inline-flex items-center px-3 py-1.5 rounded-lg border border-purple-600 text-purple-600 text-sm font-medium hover:bg-purple-50"
+                          className="inline-flex items-center px-3 py-1.5 rounded-lg border border-brand-600 text-brand-600 text-sm font-medium hover:bg-brand-50"
                           href={`/edit-advertisement/${ad.id}`}
                           title={t("ad.edit")}
                         >
@@ -268,7 +269,7 @@ export default function JobAdsTab({
                       const daysSince = (Date.now() - new Date(ad.updated_at).getTime()) / (1000 * 60 * 60 * 24);
                       if (daysSince >= 7) {
                         return (
-                          <div className="text-xs text-blue-600 mt-1 text-right">
+                          <div className="text-xs text-brand-600 mt-1 text-right">
                             {t("ad.longTermReactivate")}
                           </div>
                         );
@@ -291,7 +292,7 @@ export default function JobAdsTab({
                         {ad.skills.slice(0, 5).map((skill) => (
                           <span
                             key={skill}
-                            className="px-3 py-1 bg-purple-100 text-purple-700 text-xs rounded-full"
+                            className="px-3 py-1 bg-brand-100 text-brand-700 text-xs rounded-full"
                           >
                             {getTranslatedSkill(skill, language)}
                           </span>
@@ -331,9 +332,9 @@ export default function JobAdsTab({
           ) : (
             /* Empty State */
             <div className="text-center py-12">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-brand-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg
-                  className="w-8 h-8 text-purple-600"
+                  className="w-8 h-8 text-brand-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"

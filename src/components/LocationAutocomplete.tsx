@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { MapPin, Building2, Route } from "lucide-react";
 import { useTranslation } from "./LanguageProvider";
 
 interface LocationAutocompleteProps {
@@ -129,15 +130,13 @@ export default function LocationAutocomplete({
       case "city":
       case "town":
       case "village":
-        return "🏙️";
-      case "country":
-        return "🌍";
+        return <Building2 className="w-4 h-4 text-brand-400 flex-shrink-0 mt-0.5" />;
       case "road":
       case "street":
       case "residential":
-        return "🛣️";
+        return <Route className="w-4 h-4 text-brand-400 flex-shrink-0 mt-0.5" />;
       default:
-        return "📍";
+        return <MapPin className="w-4 h-4 text-brand-400 flex-shrink-0 mt-0.5" />;
     }
   };
 
@@ -156,7 +155,7 @@ export default function LocationAutocomplete({
         className={
           variant === "borderless"
             ? "w-full px-0 lg:px-0 py-3 lg:py-4 bg-transparent border-0 outline-none focus:outline-none focus:ring-0"
-            : "w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            : "w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
         }
         aria-autocomplete="list"
         aria-expanded={open}
@@ -187,7 +186,7 @@ export default function LocationAutocomplete({
                   (highlight === idx ? "bg-gray-50" : "")
                 }
               >
-                <span className="text-lg leading-5">{iconFor(s.type)}</span>
+                {iconFor(s.type)}
                 <span className="text-sm text-gray-800">{s.label}</span>
               </button>
             ))}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Target, ClipboardList, BookOpen } from "lucide-react";
 import { NANNY_SKILLS, getTranslatedSkill } from "../lib/constants/skills";
 import { useTranslation } from "./LanguageProvider";
 
@@ -100,7 +101,7 @@ export default function AdvancedSearchFilters({
         </svg>
         <span className="font-medium text-gray-700">{t("search.filters")}</span>
         {count > 0 && (
-          <span className="absolute -top-2 -right-2 bg-purple-600 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
+          <span className="absolute -top-2 -right-2 bg-brand-600 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
             {count}
           </span>
         )}
@@ -118,7 +119,7 @@ export default function AdvancedSearchFilters({
           {/* Panel */}
           <div className="absolute top-full right-0 mt-2 w-96 bg-white rounded-2xl shadow-2xl border border-gray-200 z-50 max-h-[80vh] overflow-hidden flex flex-col">
             {/* Header */}
-            <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-purple-100">
+            <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-brand-50 to-brand-100">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-bold text-gray-900">
                   {t("search.advancedFilters")}
@@ -149,7 +150,7 @@ export default function AdvancedSearchFilters({
               {/* Skills */}
               <div>
                 <label className="block text-sm font-semibold text-gray-900 mb-3">
-                  🎯 {t("search.skillsFilter")}
+                  <Target className="inline w-4 h-4 mr-1.5 text-brand-500" />{t("search.skillsFilter")}
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {NANNY_SKILLS.map((skill) => (
@@ -158,7 +159,7 @@ export default function AdvancedSearchFilters({
                       onClick={() => handleSkillToggle(skill)}
                       className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
                         localFilters.skills.includes(skill)
-                          ? "bg-purple-600 text-white shadow-md"
+                          ? "bg-brand-600 text-white shadow-md"
                           : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                       }`}
                     >
@@ -167,7 +168,7 @@ export default function AdvancedSearchFilters({
                   ))}
                 </div>
                 {localFilters.skills.length > 0 && (
-                  <p className="text-xs text-purple-600 mt-2 font-medium">
+                  <p className="text-xs text-brand-600 mt-2 font-medium">
                     {t("search.skillsSelected", {
                       count: localFilters.skills.length,
                     })}
@@ -178,7 +179,7 @@ export default function AdvancedSearchFilters({
               {/* Ad Type */}
               <div>
                 <label className="block text-sm font-semibold text-gray-900 mb-3">
-                  📋 {t("search.adTypeFilter")}
+                  <ClipboardList className="inline w-4 h-4 mr-1.5 text-brand-500" />{t("search.adTypeFilter")}
                 </label>
                 <div className="grid grid-cols-3 gap-2">
                   {([null, "short-term", "long-term"] as const).map((type) => (
@@ -189,7 +190,7 @@ export default function AdvancedSearchFilters({
                       }
                       className={`px-3 py-2 rounded-lg border-2 transition-all text-sm whitespace-nowrap ${
                         localFilters.adType === type
-                          ? "border-purple-600 bg-purple-50 text-purple-700 font-semibold"
+                          ? "border-brand-600 bg-brand-50 text-brand-700 font-semibold"
                           : "border-gray-200 hover:border-gray-300"
                       }`}
                     >
@@ -206,7 +207,7 @@ export default function AdvancedSearchFilters({
               {/* Experience Years */}
               <div>
                 <label className="block text-sm font-semibold text-gray-900 mb-3">
-                  📚 {t("search.minimumExperience")}
+                  <BookOpen className="inline w-4 h-4 mr-1.5 text-brand-500" />{t("search.minimumExperience")}
                 </label>
                 <div className="grid grid-cols-2 gap-2">
                   {[null, 1, 3, 5].map((years) => (
@@ -217,7 +218,7 @@ export default function AdvancedSearchFilters({
                       }
                       className={`px-3 py-2 rounded-lg border-2 transition-all text-sm whitespace-nowrap ${
                         localFilters.experienceYears === years
-                          ? "border-purple-600 bg-purple-50 text-purple-700 font-semibold"
+                          ? "border-brand-600 bg-brand-50 text-brand-700 font-semibold"
                           : "border-gray-200 hover:border-gray-300"
                       }`}
                     >
@@ -238,7 +239,7 @@ export default function AdvancedSearchFilters({
                     onChange={(e) =>
                       handleLocalChange("hasReviews", e.target.checked)
                     }
-                    className="w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
+                    className="w-5 h-5 text-brand-600 border-gray-300 rounded focus:ring-2 focus:ring-brand-500"
                   />
                   <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900">
                     {t("search.hasReviews")}
@@ -252,7 +253,7 @@ export default function AdvancedSearchFilters({
                     onChange={(e) =>
                       handleLocalChange("verifiedOnly", e.target.checked)
                     }
-                    className="w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
+                    className="w-5 h-5 text-brand-600 border-gray-300 rounded focus:ring-2 focus:ring-brand-500"
                   />
                   <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900">
                     ✓ {t("search.verifiedOnly")}
@@ -271,7 +272,7 @@ export default function AdvancedSearchFilters({
               </button>
               <button
                 onClick={handleApply}
-                className="flex-1 px-4 py-2.5 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors shadow-md"
+                className="flex-1 px-4 py-2.5 bg-brand-600 text-white rounded-lg font-medium hover:bg-brand-700 transition-colors shadow-md"
               >
                 {t("search.applyFilters")}
               </button>

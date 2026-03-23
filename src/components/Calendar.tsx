@@ -136,11 +136,11 @@ export default function Calendar({
     }
 
     if (isSelected) {
-      className += " bg-purple-600 text-white shadow-lg scale-110";
+      className += " bg-brand-600 text-white shadow-lg scale-110";
     } else if (isRange) {
-      className += " bg-purple-100 text-purple-800";
+      className += " bg-brand-100 text-brand-800";
     } else if (isToday) {
-      className += " border-2 border-purple-600 hover:bg-gray-100";
+      className += " border-2 border-brand-600 hover:bg-gray-100";
     } else if (!isPast) {
       className += " hover:bg-gray-100 hover:scale-105";
     }

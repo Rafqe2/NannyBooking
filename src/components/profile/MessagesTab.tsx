@@ -171,8 +171,8 @@ export default function MessagesTab({ userProfile, user }: MessagesTabProps) {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
         {conversations.length === 0 ? (
           <div className="text-center py-16 px-8">
-            <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-16 h-16 bg-brand-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
             </div>
@@ -188,15 +188,15 @@ export default function MessagesTab({ userProfile, user }: MessagesTabProps) {
                   key={conv.id}
                   onClick={() => setActiveConversation(conv.id)}
                   className={`w-full text-left px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition-colors ${
-                    activeConversation === conv.id ? "bg-purple-50 border-l-4 border-l-purple-600" : ""
+                    activeConversation === conv.id ? "bg-brand-50 border-l-4 border-l-brand-600" : ""
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     {conv.counterparty_picture ? (
                       <img src={conv.counterparty_picture} alt="" className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
                     ) : (
-                      <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
-                        <span className="text-purple-600 font-semibold text-sm">
+                      <div className="w-10 h-10 rounded-full bg-brand-100 flex items-center justify-center flex-shrink-0">
+                        <span className="text-brand-600 font-semibold text-sm">
                           {(conv.counterparty_name || "?")[0].toUpperCase()}
                         </span>
                       </div>
@@ -205,7 +205,7 @@ export default function MessagesTab({ userProfile, user }: MessagesTabProps) {
                       <div className="flex items-center justify-between">
                         <span className="font-medium text-gray-900 text-sm truncate">{conv.counterparty_name}</span>
                         {conv.unread_count > 0 && (
-                          <span className="bg-purple-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0">
+                          <span className="bg-accent text-white text-xs rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0">
                             {conv.unread_count}
                           </span>
                         )}
@@ -241,8 +241,8 @@ export default function MessagesTab({ userProfile, user }: MessagesTabProps) {
                       {activeConvData.counterparty_picture ? (
                         <img src={activeConvData.counterparty_picture} alt="" className="w-8 h-8 rounded-full object-cover" />
                       ) : (
-                        <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
-                          <span className="text-purple-600 font-semibold text-xs">
+                        <div className="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center">
+                          <span className="text-brand-600 font-semibold text-xs">
                             {(activeConvData.counterparty_name || "?")[0].toUpperCase()}
                           </span>
                         </div>
@@ -273,12 +273,12 @@ export default function MessagesTab({ userProfile, user }: MessagesTabProps) {
                           <div
                             className={`max-w-[72%] px-4 py-3 rounded-2xl ${
                               isOwn
-                                ? "bg-purple-600 text-white rounded-br-md"
+                                ? "bg-brand-600 text-white rounded-br-md"
                                 : "bg-gray-100 text-gray-900 rounded-bl-md"
                             }`}
                           >
                             <p className="text-sm whitespace-pre-wrap break-words leading-relaxed">{msg.content}</p>
-                            <p className={`text-xs mt-1.5 ${isOwn ? "text-purple-200" : "text-gray-400"}`}>
+                            <p className={`text-xs mt-1.5 ${isOwn ? "text-brand-200" : "text-gray-400"}`}>
                               {formatMessageTime(msg.created_at)}
                             </p>
                           </div>
@@ -373,7 +373,7 @@ export default function MessagesTab({ userProfile, user }: MessagesTabProps) {
                             className={`w-full px-3 py-2.5 text-sm border rounded-xl resize-none focus:outline-none focus:ring-2 transition-colors ${
                               overLimit
                                 ? "border-red-300 focus:ring-red-300 bg-red-50"
-                                : "border-gray-200 focus:ring-purple-400 bg-white"
+                                : "border-gray-200 focus:ring-brand-400 bg-white"
                             }`}
                           />
                           <div className="flex items-center justify-between mt-2">
@@ -384,7 +384,7 @@ export default function MessagesTab({ userProfile, user }: MessagesTabProps) {
                             <button
                               onClick={handleSendMessage}
                               disabled={sendingMessage || overLimit || draft.trim() === ""}
-                              className="px-4 py-1.5 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                              className="px-4 py-1.5 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                             >
                               {sendingMessage ? "..." : t("messages.send")}
                             </button>
@@ -395,8 +395,8 @@ export default function MessagesTab({ userProfile, user }: MessagesTabProps) {
                         </div>
                       ) : (
                         <div className="p-4 bg-gray-50 flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
-                            <svg className="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <div className="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center flex-shrink-0">
+                            <svg className="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                           </div>

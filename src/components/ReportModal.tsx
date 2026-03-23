@@ -88,7 +88,7 @@ export default function ReportModal({ reportedType, reportedId, onClose }: Repor
                 </svg>
               </div>
               <p className="text-sm text-gray-700">{t("report.success")}</p>
-              <button onClick={onClose} className="mt-4 text-xs text-purple-600 hover:underline">
+              <button onClick={onClose} className="mt-4 text-xs text-brand-600 hover:underline">
                 {t("common.close")}
               </button>
             </div>
@@ -107,7 +107,7 @@ export default function ReportModal({ reportedType, reportedId, onClose }: Repor
                 <select
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
-                  className="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent"
                 >
                   <option value="">{t("report.reasonPlaceholder")}</option>
                   {reasons.map((r) => (
@@ -127,7 +127,7 @@ export default function ReportModal({ reportedType, reportedId, onClose }: Repor
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                   placeholder={t("report.notePlaceholder")}
-                  className="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                  className="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent resize-none"
                 />
               </div>
 

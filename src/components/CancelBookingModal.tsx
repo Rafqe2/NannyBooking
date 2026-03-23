@@ -154,7 +154,7 @@ export default function CancelBookingModal({
             <select
               value={selectedReason}
               onChange={(e) => setSelectedReason(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent"
             >
               <option value="">
                 {t("cancelBooking.selectReasonPlaceholder")}
@@ -175,7 +175,7 @@ export default function CancelBookingModal({
               rows={4}
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent resize-none"
               placeholder={t("cancelBooking.explanationPlaceholder")}
             />
             <div className="text-xs text-gray-500 mt-1">

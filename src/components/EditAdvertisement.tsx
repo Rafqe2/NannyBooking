@@ -147,7 +147,7 @@ export default function EditAdvertisement({
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4" />
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-600 mx-auto mb-4" />
           <p className="text-gray-600">{t("adEdit.loading")}</p>
         </div>
       </div>
@@ -166,7 +166,7 @@ export default function EditAdvertisement({
 
   return (
     <div className="max-w-3xl mx-auto bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
-      <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-purple-50 to-indigo-50/40">
+      <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-brand-50 to-brand-50/40">
         <h1 className="text-xl font-bold text-gray-900">
           {t("createAd.editTitle")}
         </h1>
@@ -191,7 +191,7 @@ export default function EditAdvertisement({
             disabled={isActive}
             value={type}
             onChange={(e) => setType(e.target.value as any)}
-            className="w-full h-[42px] px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed"
+            className="w-full h-[42px] px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed"
           >
             <option value="short-term">{isParent ? t("adCreate.shortTermNeed") : t("adCreate.shortTermCare")}</option>
             <option value="long-term">{isParent ? t("adCreate.longTermNeed") : t("adCreate.longTermCare")}</option>
@@ -331,7 +331,7 @@ export default function EditAdvertisement({
                 className={
                   "px-3 py-1 rounded-full text-xs border " +
                   (skills.includes(s)
-                    ? "bg-purple-100 text-purple-700 border-purple-200"
+                    ? "bg-brand-100 text-brand-700 border-brand-200"
                     : "bg-white text-gray-700 border-gray-300") +
                   (isActive ? " opacity-60 cursor-not-allowed" : "")
                 }
@@ -512,7 +512,7 @@ export default function EditAdvertisement({
                                   [key]: { start: e.target.value, end },
                                 }));
                               }}
-                              className="px-1.5 py-0.5 border border-gray-300 rounded text-xs font-mono bg-white focus:ring-1 focus:ring-purple-500 focus:border-purple-500"
+                              className="px-1.5 py-0.5 border border-gray-300 rounded text-xs font-mono bg-white focus:ring-1 focus:ring-brand-500 focus:border-brand-500"
                             />
                             <span className="text-xs text-gray-400">-</span>
                             <input
@@ -524,7 +524,7 @@ export default function EditAdvertisement({
                                   [key]: { start, end: e.target.value },
                                 }));
                               }}
-                              className="px-1.5 py-0.5 border border-gray-300 rounded text-xs font-mono bg-white focus:ring-1 focus:ring-purple-500 focus:border-purple-500"
+                              className="px-1.5 py-0.5 border border-gray-300 rounded text-xs font-mono bg-white focus:ring-1 focus:ring-brand-500 focus:border-brand-500"
                             />
                           </div>
                         </div>
@@ -646,7 +646,7 @@ export default function EditAdvertisement({
               setSaving(false);
             }
           }}
-          className="inline-flex items-center gap-2 px-6 py-2.5 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex items-center gap-2 px-6 py-2.5 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {saving && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
           {saving ? t("adEdit.saving") : t("adEdit.save")}

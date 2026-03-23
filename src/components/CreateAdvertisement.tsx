@@ -251,7 +251,7 @@ export default function CreateAdvertisement() {
     <div className="max-w-4xl mx-auto p-6">
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         {/* Header */}
-        <div className="px-8 py-7 border-b border-gray-100 bg-gradient-to-r from-purple-50 to-indigo-50/50">
+        <div className="px-8 py-7 border-b border-gray-100 bg-gradient-to-r from-brand-50 to-brand-50/50">
           <h1 className="text-2xl font-bold text-gray-900">
             {t("adCreate.title")}
           </h1>
@@ -274,7 +274,7 @@ export default function CreateAdvertisement() {
                     type: e.target.value as "short-term" | "long-term",
                   }))
                 }
-                className="w-full h-[50px] px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+                className="w-full h-[50px] px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent bg-white"
               >
                 <option value="short-term">
                   {isParent ? t("adCreate.shortTermNeed") : t("adCreate.shortTermCare")}
@@ -300,7 +300,7 @@ export default function CreateAdvertisement() {
                 placeholder={titlePlaceholder}
                 minLength={6}
                 maxLength={100}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
                 required
               />
               <p className="text-xs text-gray-500 mt-1">
@@ -333,7 +333,7 @@ export default function CreateAdvertisement() {
                   }
                 }}
                 placeholder="25"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
                 required
               />
               <p className="text-xs text-gray-500 mt-1">
@@ -453,7 +453,7 @@ export default function CreateAdvertisement() {
                                       [key]: { ...times, start: e.target.value },
                                     }));
                                   }}
-                                  className="px-1.5 py-0.5 border border-gray-300 rounded text-xs font-mono bg-white focus:ring-1 focus:ring-purple-500 focus:border-purple-500"
+                                  className="px-1.5 py-0.5 border border-gray-300 rounded text-xs font-mono bg-white focus:ring-1 focus:ring-brand-500 focus:border-brand-500"
                                 />
                                 <span className="text-xs text-gray-400">-</span>
                                 <input
@@ -465,7 +465,7 @@ export default function CreateAdvertisement() {
                                       [key]: { ...times, end: e.target.value },
                                     }));
                                   }}
-                                  className="px-1.5 py-0.5 border border-gray-300 rounded text-xs font-mono bg-white focus:ring-1 focus:ring-purple-500 focus:border-purple-500"
+                                  className="px-1.5 py-0.5 border border-gray-300 rounded text-xs font-mono bg-white focus:ring-1 focus:ring-brand-500 focus:border-brand-500"
                                 />
                               </div>
                             </div>
@@ -617,8 +617,8 @@ export default function CreateAdvertisement() {
                     onClick={() => handleSkillToggle(skill)}
                     className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-all duration-150 ${
                       selected
-                        ? "bg-purple-600 text-white border-purple-600 shadow-sm"
-                        : "bg-white text-gray-600 border-gray-200 hover:border-purple-300 hover:text-purple-700"
+                        ? "bg-brand-600 text-white border-brand-600 shadow-sm"
+                        : "bg-white text-gray-600 border-gray-200 hover:border-brand-300 hover:text-brand-700"
                     }`}
                   >
                     {getTranslatedSkill(skill, language)}
@@ -651,7 +651,7 @@ export default function CreateAdvertisement() {
                   ? t("adCreate.descriptionPlaceholderParent")
                   : t("adCreate.descriptionPlaceholderNanny")
               }
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent resize-none"
               required
             />
             <p className="text-xs text-gray-500 mt-1">
@@ -680,7 +680,7 @@ export default function CreateAdvertisement() {
                   ? t("adCreate.experiencePlaceholderParent")
                   : t("adCreate.experiencePlaceholderNanny")
               }
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent resize-none"
             />
             <p className="text-xs text-gray-500 mt-1">
               {formData.experience.length}/1000 {t("adCreate.characters")}
@@ -717,7 +717,7 @@ export default function CreateAdvertisement() {
                   rows={3}
                   maxLength={500}
                   placeholder={t("adCreate.additionalInfoPlaceholder")}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent resize-none"
                   autoFocus
                 />
                 <p className="text-xs text-gray-500 mt-1">
@@ -752,7 +752,7 @@ export default function CreateAdvertisement() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-8 py-3 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+              className="px-8 py-3 bg-brand-600 text-white rounded-lg font-medium hover:bg-brand-700 transition-colors duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
             >
               {isSubmitting ? (
                 <>

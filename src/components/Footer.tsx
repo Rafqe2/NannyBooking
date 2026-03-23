@@ -29,22 +29,22 @@ export default function Footer() {
             </h4>
             <ul className="space-y-4">
               <li>
-                <a href="/" className="text-gray-600 hover:text-purple-600 transition-colors duration-200">
+                <a href="/" className="text-gray-600 hover:text-brand-600 transition-colors duration-200">
                   {t("footer.findNanny")}
                 </a>
               </li>
               <li>
-                <a href="/support#safety" className="text-gray-600 hover:text-purple-600 transition-colors duration-200">
+                <a href="/support#safety" className="text-gray-600 hover:text-brand-600 transition-colors duration-200">
                   {t("footer.safetyGuidelines")}
                 </a>
               </li>
               <li>
-                <a href="/for-parents" className="text-gray-600 hover:text-purple-600 transition-colors duration-200">
+                <a href="/for-parents" className="text-gray-600 hover:text-brand-600 transition-colors duration-200">
                   {t("footer.backgroundChecks")}
                 </a>
               </li>
               <li>
-                <a href="/for-parents" className="text-gray-600 hover:text-purple-600 transition-colors duration-200">
+                <a href="/for-parents" className="text-gray-600 hover:text-brand-600 transition-colors duration-200">
                   {t("footer.pricing")}
                 </a>
               </li>
@@ -58,22 +58,22 @@ export default function Footer() {
             </h4>
             <ul className="space-y-4">
               <li>
-                <a href="/create-advertisement" className="text-gray-600 hover:text-purple-600 transition-colors duration-200">
+                <a href="/create-advertisement" className="text-gray-600 hover:text-brand-600 transition-colors duration-200">
                   {t("footer.findFamilies")}
                 </a>
               </li>
               <li>
-                <a href="/for-nannies" className="text-gray-600 hover:text-purple-600 transition-colors duration-200">
+                <a href="/for-nannies" className="text-gray-600 hover:text-brand-600 transition-colors duration-200">
                   {t("footer.setRates")}
                 </a>
               </li>
               <li>
-                <a href="/support#safety" className="text-gray-600 hover:text-purple-600 transition-colors duration-200">
+                <a href="/support#safety" className="text-gray-600 hover:text-brand-600 transition-colors duration-200">
                   {t("footer.safetyTips")}
                 </a>
               </li>
               <li>
-                <a href="/for-nannies" className="text-gray-600 hover:text-purple-600 transition-colors duration-200">
+                <a href="/for-nannies" className="text-gray-600 hover:text-brand-600 transition-colors duration-200">
                   {t("footer.successStories")}
                 </a>
               </li>
@@ -87,22 +87,22 @@ export default function Footer() {
             </h4>
             <ul className="space-y-4">
               <li>
-                <a href="/support" className="text-gray-600 hover:text-purple-600 transition-colors duration-200">
+                <a href="/support" className="text-gray-600 hover:text-brand-600 transition-colors duration-200">
                   {t("footer.helpCenter")}
                 </a>
               </li>
               <li>
-                <a href="/support#contact" className="text-gray-600 hover:text-purple-600 transition-colors duration-200">
+                <a href="/support#contact" className="text-gray-600 hover:text-brand-600 transition-colors duration-200">
                   {t("footer.contact")}
                 </a>
               </li>
               <li>
-                <a href="/support#safety" className="text-gray-600 hover:text-purple-600 transition-colors duration-200">
+                <a href="/support#safety" className="text-gray-600 hover:text-brand-600 transition-colors duration-200">
                   {t("footer.safetyGuidelines")}
                 </a>
               </li>
               <li>
-                <a href="/for-parents" className="text-gray-600 hover:text-purple-600 transition-colors duration-200">
+                <a href="/for-parents" className="text-gray-600 hover:text-brand-600 transition-colors duration-200">
                   {t("footer.backgroundChecks")}
                 </a>
               </li>
@@ -119,19 +119,19 @@ export default function Footer() {
               </span>
               <a
                 href="/privacy"
-                className="text-gray-600 hover:text-purple-600 transition-colors duration-200"
+                className="text-gray-600 hover:text-brand-600 transition-colors duration-200"
               >
                 {t("footer.privacy")}
               </a>
               <a
                 href="/terms"
-                className="text-gray-600 hover:text-purple-600 transition-colors duration-200"
+                className="text-gray-600 hover:text-brand-600 transition-colors duration-200"
               >
                 {t("footer.terms")}
               </a>
               <a
                 href="/sitemap-page"
-                className="text-gray-600 hover:text-purple-600 transition-colors duration-200"
+                className="text-gray-600 hover:text-brand-600 transition-colors duration-200"
               >
                 {t("footer.sitemap")}
               </a>

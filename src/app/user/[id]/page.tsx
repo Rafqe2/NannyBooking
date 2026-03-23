@@ -10,6 +10,7 @@ import ReportModal from "../../../components/ReportModal";
 import { useSupabaseUser } from "../../../lib/useSupabaseUser";
 import { useTranslation } from "../../../components/LanguageProvider";
 import { stripLatvianGada } from "../../../lib/date";
+import { User } from "lucide-react";
 
 export default function UserProfile({
   params,
@@ -69,7 +70,7 @@ export default function UserProfile({
             </div>
           ) : (
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-              <div className="px-8 py-8 bg-gradient-to-r from-purple-600 to-purple-700 text-white flex items-center gap-6">
+              <div className="px-8 py-8 bg-gradient-to-r from-brand-600 to-brand-700 text-white flex items-center gap-6">
                 <div className="w-20 h-20 rounded-full overflow-hidden bg-white/20 flex items-center justify-center text-2xl font-bold">
                   {profile.picture ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -84,9 +85,9 @@ export default function UserProfile({
                 </div>
                 <div>
                   <h1 className="text-3xl font-bold">{profile.full_name}</h1>
-                  <div className="mt-2 text-purple-100 text-sm flex items-center gap-4">
-                    <span>
-                      👤{" "}
+                  <div className="mt-2 text-brand-100 text-sm flex items-center gap-4">
+                    <span className="flex items-center gap-1">
+                      <User className="w-4 h-4" />
                       {profile.user_type === "nanny"
                         ? t("common.nanny")
                         : profile.user_type === "parent"

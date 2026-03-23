@@ -191,7 +191,7 @@ export default function MultiDatePicker({
                     : allowedSet && !isAvailable
                     ? "text-gray-400 cursor-not-allowed"
                     : selected
-                    ? "bg-purple-600 text-white hover:bg-purple-700"
+                    ? "bg-brand-600 text-white hover:bg-brand-700"
                     : isAvailable
                     ? "border-2 border-green-400 text-green-700 hover:bg-green-50"
                     : "hover:bg-gray-100")

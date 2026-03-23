@@ -141,7 +141,7 @@ export default function PrivacyPage() {
     <div className="min-h-screen flex flex-col bg-white">
       <Header />
 
-      <section className="bg-gradient-to-br from-purple-50 to-indigo-50/40 pt-14 pb-12 px-4">
+      <section className="bg-gradient-to-br from-brand-50 to-brand-50/40 pt-14 pb-12 px-4">
         <div className="max-w-3xl mx-auto text-center">
           <h1 className="text-4xl font-extrabold text-gray-900 mb-2">{c.title}</h1>
           <p className="text-sm text-gray-500">{c.updated}</p>

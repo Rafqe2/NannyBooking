@@ -135,8 +135,8 @@ export default function BookingModal({
           {isLongTerm ? (
             /* Long-term: contact request without dates */
             <div className="p-5 space-y-4">
-              <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                <p className="text-sm text-purple-800">
+              <div className="bg-brand-50 border border-brand-200 rounded-lg p-4">
+                <p className="text-sm text-brand-800">
                   {viewerIsNanny ? t("booking.longTermDescriptionForNanny") : t("booking.longTermDescription")}
                 </p>
               </div>
@@ -220,7 +220,7 @@ export default function BookingModal({
                                     [key]: { ...times, start: e.target.value },
                                   }))
                                 }
-                                className="px-1.5 py-0.5 border border-gray-300 rounded text-xs font-mono bg-white focus:ring-1 focus:ring-purple-500 focus:border-purple-500"
+                                className="px-1.5 py-0.5 border border-gray-300 rounded text-xs font-mono bg-white focus:ring-1 focus:ring-brand-500 focus:border-brand-500"
                               />
                               <span className="text-xs text-gray-400">-</span>
                               <input
@@ -234,7 +234,7 @@ export default function BookingModal({
                                     [key]: { ...times, end: e.target.value },
                                   }))
                                 }
-                                className="px-1.5 py-0.5 border border-gray-300 rounded text-xs font-mono bg-white focus:ring-1 focus:ring-purple-500 focus:border-purple-500"
+                                className="px-1.5 py-0.5 border border-gray-300 rounded text-xs font-mono bg-white focus:ring-1 focus:ring-brand-500 focus:border-brand-500"
                               />
                             </div>
                           </div>
@@ -275,7 +275,7 @@ export default function BookingModal({
           </button>
           {isLongTerm ? (
             <button
-              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50"
+              className="px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 disabled:opacity-50"
               disabled={saving}
               onClick={handleLongTermRequest}
             >
@@ -283,7 +283,7 @@ export default function BookingModal({
             </button>
           ) : (
             <button
-              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50"
+              className="px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 disabled:opacity-50"
               disabled={saving || selectedDates.length === 0}
               onClick={async () => {
                 setError(null);

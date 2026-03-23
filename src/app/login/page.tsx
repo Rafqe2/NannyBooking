@@ -59,22 +59,22 @@ export default function LoginPage() {
     }
   };
 
-
   if (user) {
     if (typeof window !== "undefined") window.location.href = "/";
     return null;
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-white to-indigo-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-brand-50 via-white to-brand-50 px-4">
       <div className="w-full max-w-md">
         <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-600 transition-colors mb-6">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
           {t("common.back")}
         </Link>
+
         <div className="text-center mb-8">
-          <div className="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-600 text-white flex items-center justify-center text-3xl font-bold shadow-lg mb-4">
-            A
+          <div className="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-600 to-brand-600 text-white flex items-center justify-center text-3xl font-bold shadow-lg mb-4">
+            NB
           </div>
           <h1 className="text-2xl font-bold text-gray-900">{t("login.title")}</h1>
           <p className="mt-1 text-gray-500 text-sm">{t("login.subtitle")}</p>

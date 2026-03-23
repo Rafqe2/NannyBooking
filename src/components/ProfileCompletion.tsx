@@ -132,7 +132,7 @@ export default function ProfileCompletion() {
         <Header />
         <main className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-600 mx-auto"></div>
             <p className="mt-4 text-gray-600">{t("common.loading")}...</p>
           </div>
         </main>
@@ -150,7 +150,7 @@ export default function ProfileCompletion() {
             <p className="text-red-600">{t("profileComplete.userNotFound")}</p>
             <a
               href="/login"
-              className="mt-4 inline-block bg-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-purple-700 transition-colors duration-200"
+              className="mt-4 inline-block bg-brand-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-brand-700 transition-colors duration-200"
             >
               {t("profileComplete.signInAgain")}
             </a>
@@ -169,7 +169,7 @@ export default function ProfileCompletion() {
         <div className="max-w-2xl mx-auto">
           <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
             <div className="text-center mb-8">
-              <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-20 h-20 bg-brand-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 {(auth0User.user_metadata as Record<string, string | undefined>)?.avatar_url ||
                 (auth0User.user_metadata as Record<string, string | undefined>)?.picture ? (
                   <img
@@ -182,7 +182,7 @@ export default function ProfileCompletion() {
                   />
                 ) : (
                   <svg
-                    className="w-10 h-10 text-purple-600"
+                    className="w-10 h-10 text-brand-600"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -225,7 +225,7 @@ export default function ProfileCompletion() {
                         }
                       }}
                       maxLength={50}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
                       placeholder={t("profileComplete.enterName")}
                     />
                     <p className="text-xs text-gray-500 mt-1">
@@ -246,7 +246,7 @@ export default function ProfileCompletion() {
                         }
                       }}
                       maxLength={50}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
                       placeholder={t("profileComplete.enterSurname")}
                     />
                     <p className="text-xs text-gray-500 mt-1">
@@ -280,13 +280,13 @@ export default function ProfileCompletion() {
                     onClick={() => setUserType("parent")}
                     className={`flex-1 p-4 rounded-xl border-2 transition-all duration-200 ${
                       userType === "parent"
-                        ? "border-purple-600 bg-purple-50 text-purple-900"
+                        ? "border-brand-600 bg-brand-50 text-brand-900"
                         : "border-gray-200 bg-white text-gray-700 hover:border-gray-300"
                     }`}
                   >
                     <div className="text-center">
                       <svg
-                        className="w-8 h-8 mx-auto mb-2 text-purple-600"
+                        className="w-8 h-8 mx-auto mb-2 text-brand-600"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -306,13 +306,13 @@ export default function ProfileCompletion() {
                     onClick={() => setUserType("nanny")}
                     className={`flex-1 p-4 rounded-xl border-2 transition-all duration-200 ${
                       userType === "nanny"
-                        ? "border-purple-600 bg-purple-50 text-purple-900"
+                        ? "border-brand-600 bg-brand-50 text-brand-900"
                         : "border-gray-200 bg-white text-gray-700 hover:border-gray-300"
                     }`}
                   >
                     <div className="text-center">
                       <svg
-                        className="w-8 h-8 mx-auto mb-2 text-purple-600"
+                        className="w-8 h-8 mx-auto mb-2 text-brand-600"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -348,7 +348,7 @@ export default function ProfileCompletion() {
                   rows={5}
                   maxLength={1000}
                   minLength={10}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent resize-none"
                   placeholder={
                     userType === "parent"
                       ? t("profileComplete.parentBioPlaceholder")
@@ -376,7 +376,7 @@ export default function ProfileCompletion() {
                   disabled={
                     isSubmitting || !firstName.trim() || !lastName.trim() || !bio.trim()
                   }
-                  className="bg-purple-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-purple-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-brand-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-brand-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? t("profileComplete.completing") : t("profileComplete.completeProfile")}
                 </button>
