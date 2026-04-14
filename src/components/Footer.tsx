@@ -26,7 +26,7 @@ export default function Footer() {
           {/* Company Info */}
           <div className="space-y-4">
             <h3 className="text-2xl font-bold text-white">
-              NannyBooking.org
+              NannyBooking
             </h3>
             <p className="text-brand-200 leading-relaxed text-sm">
               {t("footer.description")}
@@ -41,22 +41,22 @@ export default function Footer() {
               </h4>
               <ul className="space-y-3">
                 <li>
-                  <a href="/" className="text-brand-200 hover:text-white transition-colors duration-200 text-sm">
+                  <a href="/" className="text-brand-200 hover:text-white hover:translate-x-1 transition-all duration-200 text-sm inline-block">
                     {t("footer.findNanny")}
                   </a>
                 </li>
                 <li>
-                  <a href="/support#safety" className="text-brand-200 hover:text-white transition-colors duration-200 text-sm">
+                  <a href="/support#safety" className="text-brand-200 hover:text-white hover:translate-x-1 transition-all duration-200 text-sm inline-block">
                     {t("footer.safetyGuidelines")}
                   </a>
                 </li>
                 <li>
-                  <a href="/for-parents" className="text-brand-200 hover:text-white transition-colors duration-200 text-sm">
+                  <a href="/for-parents" className="text-brand-200 hover:text-white hover:translate-x-1 transition-all duration-200 text-sm inline-block">
                     {t("footer.backgroundChecks")}
                   </a>
                 </li>
                 <li>
-                  <a href="/for-parents" className="text-brand-200 hover:text-white transition-colors duration-200 text-sm">
+                  <a href="/for-parents" className="text-brand-200 hover:text-white hover:translate-x-1 transition-all duration-200 text-sm inline-block">
                     {t("footer.pricing")}
                   </a>
                 </li>
@@ -72,22 +72,22 @@ export default function Footer() {
               </h4>
               <ul className="space-y-3">
                 <li>
-                  <a href="/create-advertisement" className="text-brand-200 hover:text-white transition-colors duration-200 text-sm">
+                  <a href="/create-advertisement" className="text-brand-200 hover:text-white hover:translate-x-1 transition-all duration-200 text-sm inline-block">
                     {t("footer.findFamilies")}
                   </a>
                 </li>
                 <li>
-                  <a href="/for-nannies" className="text-brand-200 hover:text-white transition-colors duration-200 text-sm">
+                  <a href="/for-nannies" className="text-brand-200 hover:text-white hover:translate-x-1 transition-all duration-200 text-sm inline-block">
                     {t("footer.setRates")}
                   </a>
                 </li>
                 <li>
-                  <a href="/support#safety" className="text-brand-200 hover:text-white transition-colors duration-200 text-sm">
+                  <a href="/support#safety" className="text-brand-200 hover:text-white hover:translate-x-1 transition-all duration-200 text-sm inline-block">
                     {t("footer.safetyTips")}
                   </a>
                 </li>
                 <li>
-                  <a href="/for-nannies" className="text-brand-200 hover:text-white transition-colors duration-200 text-sm">
+                  <a href="/for-nannies" className="text-brand-200 hover:text-white hover:translate-x-1 transition-all duration-200 text-sm inline-block">
                     {t("footer.successStories")}
                   </a>
                 </li>
@@ -102,22 +102,22 @@ export default function Footer() {
             </h4>
             <ul className="space-y-3">
               <li>
-                <a href="/support" className="text-brand-200 hover:text-white transition-colors duration-200 text-sm">
+                <a href="/support" className="text-brand-200 hover:text-white hover:translate-x-1 transition-all duration-200 text-sm inline-block">
                   {t("footer.helpCenter")}
                 </a>
               </li>
               <li>
-                <a href="/support#contact" className="text-brand-200 hover:text-white transition-colors duration-200 text-sm">
+                <a href="/support#contact" className="text-brand-200 hover:text-white hover:translate-x-1 transition-all duration-200 text-sm inline-block">
                   {t("footer.contact")}
                 </a>
               </li>
               <li>
-                <a href="/support#safety" className="text-brand-200 hover:text-white transition-colors duration-200 text-sm">
+                <a href="/support#safety" className="text-brand-200 hover:text-white hover:translate-x-1 transition-all duration-200 text-sm inline-block">
                   {t("footer.safetyGuidelines")}
                 </a>
               </li>
               <li>
-                <a href="/for-parents" className="text-brand-200 hover:text-white transition-colors duration-200 text-sm">
+                <a href="/for-parents" className="text-brand-200 hover:text-white hover:translate-x-1 transition-all duration-200 text-sm inline-block">
                   {t("footer.backgroundChecks")}
                 </a>
               </li>

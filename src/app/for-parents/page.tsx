@@ -31,7 +31,7 @@ const content = {
       { title: "Request a booking", desc: "Select the dates you need and send a booking request. The nanny reviews and accepts it." },
       { title: "Connect directly", desc: "Once accepted, exchange contact details through the secure messaging system and coordinate the details." },
     ],
-    whyTitle: "Why NannyBooking.org?",
+    whyTitle: "Why NannyBooking?",
     whyItems: [
       { title: "Verified listings", desc: "Every nanny profile is reviewed. You see honest ratings and reviews from real families." },
       { title: "Latvia-focused", desc: "Built specifically for Latvia. All listings are in Latvian cities and regions you actually live in." },
@@ -40,7 +40,7 @@ const content = {
     ],
     faqTitle: "Frequently asked questions",
     faqs: [
-      { q: "Is it free to use?", a: "Browsing and booking are free for parents. You pay the nanny directly at the agreed rate — NannyBooking.org charges no commission." },
+      { q: "Is it free to use?", a: "Browsing and booking are free for parents. You pay the nanny directly at the agreed rate — NannyBooking charges no commission." },
       { q: "How do I know a nanny is trustworthy?", a: "Read reviews left by other families, check their skills and experience section, and always arrange a brief introductory call or meeting before the first booking." },
       { q: "What if the nanny cancels last minute?", a: "You can cancel a booking and rebook with another nanny. We recommend confirming the arrangement at least 24 hours in advance." },
       { q: "Can I post a listing as a parent?", a: "Yes. Post a 'seeking nanny' listing describing your needs — experienced nannies in your area can then contact you directly." },
@@ -61,7 +61,7 @@ const content = {
       { title: "Pieprasīt rezervāciju", desc: "Izvēlieties nepieciešamos datumus un nosūtiet rezervācijas pieprasījumu. Aukle pārskata un apstiprina to." },
       { title: "Sazināties tieši", desc: "Pēc apstiprināšanas apmainiet kontaktinformāciju drošajā ziņojumu sistēmā un vienojieties par detaļām." },
     ],
-    whyTitle: "Kāpēc NannyBooking.org?",
+    whyTitle: "Kāpēc NannyBooking?",
     whyItems: [
       { title: "Pārbaudīti sludinājumi", desc: "Katrs aukles profils tiek pārskatīts. Redzat godīgas vērtējumus un atsauksmes no reālām ģimenēm." },
       { title: "Latvija fokuss", desc: "Izveidots tieši Latvijai. Visi sludinājumi ir Latvijas pilsētās un reģionos, kur jūs dzīvojat." },
@@ -70,7 +70,7 @@ const content = {
     ],
     faqTitle: "Biežāk uzdotie jautājumi",
     faqs: [
-      { q: "Vai tas ir bezmaksas?", a: "Pārlūkošana un rezervācija vecākiem ir bezmaksas. Jūs maksājat auklei tieši par vienoto tarifu — NannyBooking.org neiekasē komisiju." },
+      { q: "Vai tas ir bezmaksas?", a: "Pārlūkošana un rezervācija vecākiem ir bezmaksas. Jūs maksājat auklei tieši par vienoto tarifu — NannyBooking neiekasē komisiju." },
       { q: "Kā zināt, vai aukle ir uzticama?", a: "Izlasiet citu ģimeņu atsauksmes, pārbaudiet prasmju un pieredzes sadaļu, un vienmēr rīkojiet īsu iepazīšanās zvanu vai tikšanos pirms pirmās rezervācijas." },
       { q: "Ko darīt, ja aukle atceļ pēdējā brīdī?", a: "Varat atcelt rezervāciju un rezervēt citu aukli. Iesakām apstiprināt vienošanos vismaz 24 stundas iepriekš." },
       { q: "Vai vecāki var publicēt sludinājumu?", a: "Jā. Publicējiet sludinājumu 'meklēju aukli', aprakstot savas vajadzības — pieredzējušas aukles jūsu apkaimē var ar jums sazināties tieši." },
@@ -91,7 +91,7 @@ const content = {
       { title: "Запрос бронирования", desc: "Выберите нужные даты и отправьте запрос на бронирование. Няня рассматривает и принимает его." },
       { title: "Связаться напрямую", desc: "После подтверждения обменяйтесь контактными данными через защищённую систему сообщений и согласуйте детали." },
     ],
-    whyTitle: "Почему NannyBooking.org?",
+    whyTitle: "Почему NannyBooking?",
     whyItems: [
       { title: "Проверенные объявления", desc: "Каждый профиль няни проверяется. Вы видите честные оценки и отзывы от реальных семей." },
       { title: "Фокус на Латвию", desc: "Создано специально для Латвии. Все объявления находятся в городах и регионах, где вы живёте." },
@@ -100,7 +100,7 @@ const content = {
     ],
     faqTitle: "Часто задаваемые вопросы",
     faqs: [
-      { q: "Это бесплатно?", a: "Просмотр и бронирование бесплатны для родителей. Вы платите няне напрямую по согласованной ставке — NannyBooking.org не берёт комиссию." },
+      { q: "Это бесплатно?", a: "Просмотр и бронирование бесплатны для родителей. Вы платите няне напрямую по согласованной ставке — NannyBooking не берёт комиссию." },
       { q: "Как убедиться, что няня надёжна?", a: "Читайте отзывы других семей, проверяйте раздел навыков и опыта, и всегда устраивайте короткое знакомство по звонку или лично перед первым бронированием." },
       { q: "Что делать, если няня отменяет в последний момент?", a: "Вы можете отменить бронирование и выбрать другую няню. Рекомендуем подтверждать договорённость минимум за 24 часа." },
       { q: "Может ли родитель разместить объявление?", a: "Да. Разместите объявление 'ищу няню', описав свои потребности — опытные няни в вашем районе смогут связаться с вами напрямую." },
@@ -154,7 +154,7 @@ export default function ForParentsPage() {
         </div>
       </section>
 
-      {/* Why NannyBooking.org */}
+      {/* Why NannyBooking */}
       <section className="py-16 px-4 bg-gray-50/60">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-2xl font-bold text-gray-900 mb-10 text-center">{c.whyTitle}</h2>

@@ -73,7 +73,7 @@ export default function LoginPage() {
         </Link>
 
         <div className="text-center mb-8">
-          <div className="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-600 to-brand-600 text-white flex items-center justify-center text-3xl font-bold shadow-lg mb-4">
+          <div className="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 text-white flex items-center justify-center text-3xl font-bold shadow-lg mb-4">
             NB
           </div>
           <h1 className="text-2xl font-bold text-gray-900">{t("login.title")}</h1>
@@ -87,7 +87,7 @@ export default function LoginPage() {
                 key={p.id}
                 onClick={() => handleOAuth(p.id)}
                 disabled={isLoading}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 transition-all duration-150 disabled:opacity-50 shadow-sm"
+                className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 active:scale-95 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-sm"
               >
                 {providerIcons[p.id]}
                 <span className="text-sm font-medium text-gray-800">

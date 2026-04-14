@@ -6,6 +6,7 @@ import { MessageService, Conversation, Message as ChatMessage } from "../../lib/
 import { formatDateDDMMYYYY } from "../../lib/date";
 import { UserProfile } from "../../lib/userService";
 import { User } from "@supabase/supabase-js";
+import { notifyBooking } from "../../lib/notifyService";
 
 const WORD_LIMIT = 100;
 
@@ -113,9 +114,13 @@ export default function MessagesTab({ userProfile, user }: MessagesTabProps) {
     if (msg) {
       setConversationMessages(prev => [...prev, msg]);
       setDraft("");
+      const conv = conversations.find(c => c.id === activeConversation);
+      if (conv?.booking_id) {
+        notifyBooking("new_message", conv.booking_id, { conversationId: activeConversation });
+      }
     }
     setSendingMessage(false);
-  }, [activeConversation, sendingMessage, canSend, overLimit, draft]);
+  }, [activeConversation, sendingMessage, canSend, overLimit, draft, conversations]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {

@@ -575,9 +575,9 @@ export const translations = {
     ru: 'Карта Сайта'
   },
   'footer.copyright': {
-    en: '© 2026 NannyBooking.org',
-    lv: '© 2026 NannyBooking.org',
-    ru: '© 2026 NannyBooking.org'
+    en: '© 2026 NannyBooking',
+    lv: '© 2026 NannyBooking',
+    ru: '© 2026 NannyBooking'
   },
 
   // Common
@@ -1940,12 +1940,17 @@ export const translations = {
     lv: 'stunda',
     ru: 'час'
   },
+  'common.cmdEnterToSend': {
+    en: '⌘ Enter to send',
+    lv: '⌘ Enter, lai nosūtītu',
+    ru: '⌘ Enter для отправки'
+  },
 
   // Login Page
   'login.title': {
-    en: 'Sign in to NannyBooking.org',
-    lv: 'Ieiet NannyBooking.org',
-    ru: 'Войти в NannyBooking.org'
+    en: 'Sign in to NannyBooking',
+    lv: 'Ieiet NannyBooking',
+    ru: 'Войти в NannyBooking'
   },
   'login.subtitle': {
     en: 'Connect with trusted childcare providers in the Baltic region',

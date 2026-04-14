@@ -45,7 +45,7 @@ const content = {
       { title: "Receive requests", desc: "Families find your listing and send booking requests. You review and accept or decline at your own pace." },
       { title: "Coordinate & earn", desc: "Exchange contact details once the booking is confirmed and arrange the details directly with the family." },
     ],
-    whyTitle: "Why join NannyBooking.org?",
+    whyTitle: "Why join NannyBooking?",
     whyItems: [
       { title: "Flexible schedule", desc: "You set your available dates and hours. Take bookings only when it suits you — no obligation." },
       { title: "You set the rate", desc: "Define your own hourly rate. No platform commission — what you agree with the family is what you earn." },
@@ -69,8 +69,8 @@ const content = {
     ],
     faqTitle: "Frequently asked questions",
     faqs: [
-      { q: "Is it free to join?", a: "Yes — creating a profile and posting listings is completely free. NannyBooking.org charges no registration or listing fees." },
-      { q: "How do I get paid?", a: "You agree on payment terms directly with the family. Most arrange cash or bank transfer. NannyBooking.org does not process payments." },
+      { q: "Is it free to join?", a: "Yes — creating a profile and posting listings is completely free. NannyBooking charges no registration or listing fees." },
+      { q: "How do I get paid?", a: "You agree on payment terms directly with the family. Most arrange cash or bank transfer. NannyBooking does not process payments." },
       { q: "Can I set my own hours?", a: "Absolutely. For short-term listings you pick specific dates and times. For long-term you describe general availability." },
       { q: "What if a family cancels?", a: "Families can cancel bookings before they are confirmed. Always agree on a cancellation policy with the family for confirmed bookings." },
       { q: "How do reviews work?", a: "After a completed booking, the family can leave a star rating and written review on your profile. Honest reviews help you build trust." },
@@ -90,7 +90,7 @@ const content = {
       { title: "Saņemt pieprasījumus", desc: "Ģimenes atrod jūsu sludinājumu un nosūta rezervācijas pieprasījumus. Jūs pārskatāt un pieņemat vai noraidāt pēc saviem ieskatiem." },
       { title: "Koordinēt un nopelnīt", desc: "Apmainiet kontaktinformāciju pēc rezervācijas apstiprināšanas un saskaņojiet detaļas tieši ar ģimeni." },
     ],
-    whyTitle: "Kāpēc pievienoties NannyBooking.org?",
+    whyTitle: "Kāpēc pievienoties NannyBooking?",
     whyItems: [
       { title: "Elastīgs grafiks", desc: "Jūs nosakāt savus pieejamos datumus un stundas. Pieņemiet rezervācijas tikai tad, kad jums ērti — bez pienākuma." },
       { title: "Jūs nosakāt tarifu", desc: "Definējiet savu stundas tarifu. Nav platformas komisijas — tas, par ko vienojaties ar ģimeni, ir jūsu pelņa." },
@@ -114,8 +114,8 @@ const content = {
     ],
     faqTitle: "Biežāk uzdotie jautājumi",
     faqs: [
-      { q: "Vai pievienošanās ir bezmaksas?", a: "Jā — profila izveide un sludinājumu publicēšana ir pilnīgi bezmaksas. NannyBooking.org neiekasē reģistrācijas vai sludinājumu maksas." },
-      { q: "Kā tiek veikts maksājums?", a: "Maksājuma nosacījumus vienojas tieši ar ģimeni. Lielākā daļa izmanto skaidru naudu vai bankas pārskaitījumu. NannyBooking.org neapstrādā maksājumus." },
+      { q: "Vai pievienošanās ir bezmaksas?", a: "Jā — profila izveide un sludinājumu publicēšana ir pilnīgi bezmaksas. NannyBooking neiekasē reģistrācijas vai sludinājumu maksas." },
+      { q: "Kā tiek veikts maksājums?", a: "Maksājuma nosacījumus vienojas tieši ar ģimeni. Lielākā daļa izmanto skaidru naudu vai bankas pārskaitījumu. NannyBooking neapstrādā maksājumus." },
       { q: "Vai varu pats noteikt darba laiku?", a: "Noteikti. Īstermiņa sludinājumiem izvēlaties konkrētus datumus un laikus. Ilgtermiņa sludinājumiem aprakstāt vispārējo pieejamību." },
       { q: "Ko darīt, ja ģimene atceļ?", a: "Ģimenes var atcelt rezervācijas pirms to apstiprināšanas. Vienmēr vienojieties ar ģimeni par atcelšanas politiku apstiprinātām rezervācijām." },
       { q: "Kā darbojas atsauksmes?", a: "Pēc pabeigtas rezervācijas ģimene var atstāt zvaigžņu vērtējumu un rakstiskas atsauksmes jūsu profilā. Godīgas atsauksmes palīdz veidot uzticamību." },
@@ -135,7 +135,7 @@ const content = {
       { title: "Получать запросы", desc: "Семьи находят ваше объявление и отправляют запросы на бронирование. Вы рассматриваете и принимаете или отклоняете в удобном темпе." },
       { title: "Координировать и зарабатывать", desc: "Обменяйтесь контактами после подтверждения бронирования и согласуйте детали напрямую с семьёй." },
     ],
-    whyTitle: "Почему стоит присоединиться к NannyBooking.org?",
+    whyTitle: "Почему стоит присоединиться к NannyBooking?",
     whyItems: [
       { title: "Гибкий график", desc: "Вы сами устанавливаете доступные даты и часы. Принимайте бронирования только тогда, когда вам удобно — никаких обязательств." },
       { title: "Вы устанавливаете ставку", desc: "Определите свою почасовую ставку. Никакой комиссии платформы — то, о чём вы договорились с семьёй, и есть ваш заработок." },
@@ -159,8 +159,8 @@ const content = {
     ],
     faqTitle: "Часто задаваемые вопросы",
     faqs: [
-      { q: "Бесплатно ли это?", a: "Да — создание профиля и размещение объявлений абсолютно бесплатно. NannyBooking.org не берёт регистрационных или листинговых сборов." },
-      { q: "Как происходит оплата?", a: "Условия оплаты вы согласовываете напрямую с семьёй. Большинство используют наличные или банковский перевод. NannyBooking.org не обрабатывает платежи." },
+      { q: "Бесплатно ли это?", a: "Да — создание профиля и размещение объявлений абсолютно бесплатно. NannyBooking не берёт регистрационных или листинговых сборов." },
+      { q: "Как происходит оплата?", a: "Условия оплаты вы согласовываете напрямую с семьёй. Большинство используют наличные или банковский перевод. NannyBooking не обрабатывает платежи." },
       { q: "Могу ли я сам устанавливать часы?", a: "Конечно. Для краткосрочных объявлений вы выбираете конкретные даты и время. Для долгосрочных описываете общую доступность." },
       { q: "Что делать, если семья отменяет?", a: "Семьи могут отменять бронирования до их подтверждения. Всегда договаривайтесь с семьёй о политике отмены для подтверждённых бронирований." },
       { q: "Как работают отзывы?", a: "После завершённого бронирования семья может оставить звёздный рейтинг и письменный отзыв на вашем профиле. Честные отзывы помогают строить доверие." },

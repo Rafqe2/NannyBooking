@@ -1,21 +1,21 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "For Nannies – Post Listings & Set Your Rates | NannyBooking.org",
+  title: "For Nannies – Post Listings & Set Your Rates | NannyBooking",
   description:
-    "Join NannyBooking.org as a nanny. Create a free listing, set your hourly rate, choose your availability, and get booked by families in Latvia.",
+    "Join NannyBooking as a nanny. Create a free listing, set your hourly rate, choose your availability, and get booked by families in Latvia.",
   alternates: { canonical: "/for-nannies" },
   openGraph: {
-    title: "For Nannies – Post Listings & Set Your Rates | NannyBooking.org",
+    title: "For Nannies – Post Listings & Set Your Rates | NannyBooking",
     description:
       "Create a free nanny listing, set your hourly rate and availability. Reach families looking for trusted childcare in Latvia.",
     url: "https://nannybooking.org/for-nannies",
-    siteName: "NannyBooking.org",
-    images: [{ url: "/images/og-image.png", width: 1200, height: 630, alt: "NannyBooking.org – For Nannies" }],
+    siteName: "NannyBooking",
+    images: [{ url: "/images/og-image.png", width: 1200, height: 630, alt: "NannyBooking – For Nannies" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "For Nannies – NannyBooking.org",
+    title: "For Nannies – NannyBooking",
     description: "Post a free childcare listing, set your rates and get booked by families.",
     images: ["/images/og-image.png"],
   },
@@ -27,18 +27,18 @@ const faqSchema = {
   mainEntity: [
     {
       "@type": "Question",
-      name: "Is it free to join NannyBooking.org as a nanny?",
+      name: "Is it free to join NannyBooking as a nanny?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Yes — creating a profile and posting listings is completely free. NannyBooking.org charges no registration or listing fees.",
+        text: "Yes — creating a profile and posting listings is completely free. NannyBooking charges no registration or listing fees.",
       },
     },
     {
       "@type": "Question",
-      name: "How do I get paid as a nanny on NannyBooking.org?",
+      name: "How do I get paid as a nanny on NannyBooking?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "You agree on payment terms directly with the family. Most arrange cash or bank transfer. NannyBooking.org does not process payments.",
+        text: "You agree on payment terms directly with the family. Most arrange cash or bank transfer. NannyBooking does not process payments.",
       },
     },
     {

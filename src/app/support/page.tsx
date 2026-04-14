@@ -23,8 +23,8 @@ const content = {
     gettingStartedItems: [
       { q: "How do I create an account?", a: "Click 'Log in' in the top-right corner and sign in with your Google or Facebook account. Your profile is created automatically." },
       { q: "Do I need to complete my profile before posting?", a: "Yes. After signing in you'll be guided through profile setup — choose whether you are a parent or a nanny, add your name, location, and a short bio." },
-      { q: "Is NannyBooking.org free to use?", a: "Browsing and basic use are free. Posting listings, receiving bookings, and all core features have no charge. We do not take commission on any payments between parents and nannies." },
-      { q: "Which cities does NannyBooking.org cover?", a: "NannyBooking.org covers all cities and towns across Latvia. Location search is powered by OpenStreetMap and restricted to Latvia." },
+      { q: "Is NannyBooking free to use?", a: "Browsing and basic use are free. Posting listings, receiving bookings, and all core features have no charge. We do not take commission on any payments between parents and nannies." },
+      { q: "Which cities does NannyBooking cover?", a: "NannyBooking covers all cities and towns across Latvia. Location search is powered by OpenStreetMap and restricted to Latvia." },
     ],
     bookingsTitle: "Bookings",
     bookingsItems: [
@@ -70,8 +70,8 @@ const content = {
     gettingStartedItems: [
       { q: "Kā izveidot kontu?", a: "Noklikšķiniet uz 'Pieteikties' augšējā labajā stūrī un pierakstieties ar savu Google vai Facebook kontu. Jūsu profils tiek izveidots automātiski." },
       { q: "Vai man jāaizpilda profils pirms publicēšanas?", a: "Jā. Pēc pieteikšanās jūs tiks vadīts caur profila iestatīšanu — izvēlieties, vai esat vecāks vai aukle, pievienojiet vārdu, atrašanās vietu un īsu bio." },
-      { q: "Vai NannyBooking.org ir bezmaksas?", a: "Pārlūkošana un pamata izmantošana ir bezmaksas. Sludinājumu publicēšanai, rezervāciju saņemšanai un visām pamatfunkcijām nav maksas. Mēs neiekasējam komisiju no jebkādiem maksājumiem starp vecākiem un auklēm." },
-      { q: "Kuras pilsētas aptver NannyBooking.org?", a: "NannyBooking.org aptver visas Latvijas pilsētas un ciematus. Atrašanās vietas meklēšana darbojas ar OpenStreetMap un ir ierobežota ar Latviju." },
+      { q: "Vai NannyBooking ir bezmaksas?", a: "Pārlūkošana un pamata izmantošana ir bezmaksas. Sludinājumu publicēšanai, rezervāciju saņemšanai un visām pamatfunkcijām nav maksas. Mēs neiekasējam komisiju no jebkādiem maksājumiem starp vecākiem un auklēm." },
+      { q: "Kuras pilsētas aptver NannyBooking?", a: "NannyBooking aptver visas Latvijas pilsētas un ciematus. Atrašanās vietas meklēšana darbojas ar OpenStreetMap un ir ierobežota ar Latviju." },
     ],
     bookingsTitle: "Rezervācijas",
     bookingsItems: [
@@ -117,8 +117,8 @@ const content = {
     gettingStartedItems: [
       { q: "Как создать аккаунт?", a: "Нажмите 'Войти' в правом верхнем углу и войдите через Google или Facebook. Ваш профиль создаётся автоматически." },
       { q: "Нужно ли заполнить профиль перед публикацией?", a: "Да. После входа вас проведут через настройку профиля — выберите, являетесь ли вы родителем или няней, добавьте имя, местоположение и краткое описание." },
-      { q: "NannyBooking.org бесплатен?", a: "Просмотр и базовое использование бесплатны. Размещение объявлений, получение бронирований и все основные функции бесплатны. Мы не берём комиссию с платежей между родителями и нянями." },
-      { q: "Какие города охватывает NannyBooking.org?", a: "NannyBooking.org охватывает все города и посёлки Латвии. Поиск по местоположению работает через OpenStreetMap и ограничен Латвией." },
+      { q: "NannyBooking бесплатен?", a: "Просмотр и базовое использование бесплатны. Размещение объявлений, получение бронирований и все основные функции бесплатны. Мы не берём комиссию с платежей между родителями и нянями." },
+      { q: "Какие города охватывает NannyBooking?", a: "NannyBooking охватывает все города и посёлки Латвии. Поиск по местоположению работает через OpenStreetMap и ограничен Латвией." },
     ],
     bookingsTitle: "Бронирования",
     bookingsItems: [

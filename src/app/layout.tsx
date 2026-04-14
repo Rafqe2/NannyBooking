@@ -9,14 +9,14 @@ import ScrollToTop from "../components/ScrollToTop";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "NannyBooking.org – Parents meet trusted nannies",
+  title: "NannyBooking – Parents meet trusted nannies",
   description:
-    "NannyBooking.org connects parents with trusted, verified nannies. Create or discover childcare ads, manage availability, and book care with confidence.",
+    "NannyBooking connects parents with trusted, verified nannies. Create or discover childcare ads, manage availability, and book care with confidence.",
   keywords:
     "childcare, nanny, babysitting, parents, bookings, availability, Latvia, Lithuania, Estonia, Sweden",
-  authors: [{ name: "NannyBooking.org Team" }],
-  creator: "NannyBooking.org",
-  publisher: "NannyBooking.org",
+  authors: [{ name: "NannyBooking Team" }],
+  creator: "NannyBooking",
+  publisher: "NannyBooking",
   formatDetection: {
     email: false,
     address: false,
@@ -25,18 +25,18 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://nannybooking.org"),
   alternates: { canonical: "/" },
   openGraph: {
-    title: "NannyBooking.org – Parents meet trusted nannies",
+    title: "NannyBooking – Parents meet trusted nannies",
     description:
       "Find trusted nannies or families. Manage childcare ads, availability and bookings in one place.",
     url: "https://nannybooking.org",
-    siteName: "NannyBooking.org",
+    siteName: "NannyBooking",
     locale: "en_US",
     type: "website",
-    images: [{ url: "/images/og-image.png", width: 1200, height: 630, alt: "NannyBooking.org" }],
+    images: [{ url: "/images/og-image.png", width: 1200, height: 630, alt: "NannyBooking" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "NannyBooking.org – Parents meet trusted nannies",
+    title: "NannyBooking – Parents meet trusted nannies",
     description: "Find trusted childcare, list services, and manage bookings.",
     images: ["/images/og-image.png"],
   },
@@ -74,7 +74,7 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Organization",
-              name: "NannyBooking.org",
+              name: "NannyBooking",
               url: "https://nannybooking.org",
               logo: {
                 "@type": "ImageObject",
@@ -82,7 +82,7 @@ export default function RootLayout({
                 width: 1200,
                 height: 630,
               },
-              description: "NannyBooking.org connects parents with trusted nannies in Latvia. Find childcare, post listings, and manage bookings.",
+              description: "NannyBooking connects parents with trusted nannies in Latvia. Find childcare, post listings, and manage bookings.",
               areaServed: { "@type": "Country", name: "Latvia" },
               contactPoint: {
                 "@type": "ContactPoint",
@@ -98,7 +98,7 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebSite",
-              name: "NannyBooking.org",
+              name: "NannyBooking",
               url: "https://nannybooking.org",
               description: "Find trusted nannies or post childcare listings in Latvia.",
               potentialAction: {

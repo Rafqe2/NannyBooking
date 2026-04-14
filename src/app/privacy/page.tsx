@@ -11,7 +11,7 @@ const content = {
     sections: [
       {
         heading: "1. Who we are",
-        body: "NannyBooking.org is a childcare matching platform operating in Latvia. We connect parents seeking childcare with nannies offering their services. This policy explains how we collect, use, and protect your personal data.",
+        body: "NannyBooking is a childcare matching platform operating in Latvia. We connect parents seeking childcare with nannies offering their services. This policy explains how we collect, use, and protect your personal data.",
       },
       {
         heading: "2. What data we collect",
@@ -53,7 +53,7 @@ const content = {
     sections: [
       {
         heading: "1. Kas mēs esam",
-        body: "NannyBooking.org ir bērnu aprūpes savienošanas platforma, kas darbojas Latvijā. Mēs savienojam vecākus, kas meklē bērnu aprūpi, ar auklēm, kas piedāvā savus pakalpojumus. Šī politika paskaidro, kā mēs apkopojam, izmantojam un aizsargājam jūsu personas datus.",
+        body: "NannyBooking ir bērnu aprūpes savienošanas platforma, kas darbojas Latvijā. Mēs savienojam vecākus, kas meklē bērnu aprūpi, ar auklēm, kas piedāvā savus pakalpojumus. Šī politika paskaidro, kā mēs apkopojam, izmantojam un aizsargājam jūsu personas datus.",
       },
       {
         heading: "2. Kādus datus mēs apkopojam",
@@ -95,7 +95,7 @@ const content = {
     sections: [
       {
         heading: "1. Кто мы",
-        body: "NannyBooking.org — платформа для подбора услуг по уходу за детьми, работающая в Латвии. Мы соединяем родителей, ищущих уход за детьми, с нянями, предлагающими свои услуги. Эта политика объясняет, как мы собираем, используем и защищаем ваши персональные данные.",
+        body: "NannyBooking — платформа для подбора услуг по уходу за детьми, работающая в Латвии. Мы соединяем родителей, ищущих уход за детьми, с нянями, предлагающими свои услуги. Эта политика объясняет, как мы собираем, используем и защищаем ваши персональные данные.",
       },
       {
         heading: "2. Какие данные мы собираем",

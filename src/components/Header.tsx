@@ -177,9 +177,10 @@ export default function Header() {
               } catch {}
               router.push("/");
             }}
-            className="text-2xl font-bold text-brand-600 tracking-wide hover:text-brand-700 transition-colors"
+            className="text-2xl font-bold tracking-wide transition-opacity hover:opacity-80"
+            style={{ background: "linear-gradient(135deg, #0F3D2E 0%, #276b52 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}
           >
-            NannyBooking.org
+            NannyBooking
           </button>
         </div>
         {/* User Menu (right) */}
@@ -202,9 +203,7 @@ export default function Header() {
                       .toUpperCase() || user.email?.charAt(0).toUpperCase()}
                   </div>
                   {(pendingCount > 0 || unreadMessages > 0) && (
-                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-600 rounded-full flex items-center justify-center">
-                      <span className="w-2 h-2 bg-white rounded-full" />
-                    </span>
+                    <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-accent rounded-full flex items-center justify-center ring-2 ring-white animate-pulse" />
                   )}
                 </div>
               ) : isLoading ? (
@@ -233,7 +232,7 @@ export default function Header() {
                     >
                       {t("profile.bookings")}
                       {pendingCount > 0 && (
-                        <span className="bg-orange-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                        <span className="bg-accent text-brand-800 text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
                           {pendingCount}
                         </span>
                       )}
@@ -244,7 +243,7 @@ export default function Header() {
                     >
                       {t("profile.messages")}
                       {unreadMessages > 0 && (
-                        <span className="bg-red-600 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                        <span className="bg-accent text-brand-800 text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
                           {unreadMessages}
                         </span>
                       )}

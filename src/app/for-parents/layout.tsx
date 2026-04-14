@@ -1,21 +1,21 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "For Parents – Find Trusted Nannies Near You | NannyBooking.org",
+  title: "For Parents – Find Trusted Nannies Near You | NannyBooking",
   description:
     "Search verified nanny listings by city and dates. Read reviews, check availability and book trusted childcare for your family in Latvia.",
   alternates: { canonical: "/for-parents" },
   openGraph: {
-    title: "For Parents – Find Trusted Nannies Near You | NannyBooking.org",
+    title: "For Parents – Find Trusted Nannies Near You | NannyBooking",
     description:
-      "Browse nanny listings by city and dates. Read reviews and book trusted childcare for your family — free on NannyBooking.org.",
+      "Browse nanny listings by city and dates. Read reviews and book trusted childcare for your family — free on NannyBooking.",
     url: "https://nannybooking.org/for-parents",
-    siteName: "NannyBooking.org",
-    images: [{ url: "/images/og-image.png", width: 1200, height: 630, alt: "NannyBooking.org – For Parents" }],
+    siteName: "NannyBooking",
+    images: [{ url: "/images/og-image.png", width: 1200, height: 630, alt: "NannyBooking – For Parents" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "For Parents – NannyBooking.org",
+    title: "For Parents – NannyBooking",
     description: "Find and book trusted nannies near you. Browse listings, read reviews, manage bookings.",
     images: ["/images/og-image.png"],
   },
@@ -27,10 +27,10 @@ const faqSchema = {
   mainEntity: [
     {
       "@type": "Question",
-      name: "Is it free to use NannyBooking.org as a parent?",
+      name: "Is it free to use NannyBooking as a parent?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Browsing and booking are free for parents. You pay the nanny directly at the agreed rate — NannyBooking.org charges no commission.",
+        text: "Browsing and booking are free for parents. You pay the nanny directly at the agreed rate — NannyBooking charges no commission.",
       },
     },
     {
@@ -59,7 +59,7 @@ const faqSchema = {
     },
     {
       "@type": "Question",
-      name: "What types of childcare are available on NannyBooking.org?",
+      name: "What types of childcare are available on NannyBooking?",
       acceptedAnswer: {
         "@type": "Answer",
         text: "Short-term (specific dates, e.g. a weekend) and long-term (ongoing, e.g. weekday evenings). You can filter by type when searching.",

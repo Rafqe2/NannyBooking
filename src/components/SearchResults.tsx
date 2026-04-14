@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
 import { Baby } from "lucide-react";
 import { supabase } from "../lib/supabase";
-import { toLocalYYYYMMDD, formatDateDDMMYYYY, stripLatvianGada } from "../lib/date";
+import { toLocalYYYYMMDD, formatDateDDMMYYYY } from "../lib/date";
 import { useSupabaseUser } from "../lib/useSupabaseUser";
 import { useTranslation } from "./LanguageProvider";
 import { getTranslatedSkill } from "../lib/constants/skills";
@@ -61,6 +61,7 @@ export default function SearchResults({
   const [loading, setLoading] = useState(true);
   const { user } = useSupabaseUser();
   const [viewerType, setViewerType] = useState<null | "parent" | "nanny">(null);
+  const [userProfileLocation, setUserProfileLocation] = useState<string | null>(null);
   const runIdRef = useRef(0);
   const [filters, setFilters] = useState<AdvancedFilters>(DEFAULT_FILTERS);
   const [sortBy, setSortBy] = useState<"newest" | "price_asc" | "price_desc" | "rating">("newest");
@@ -90,13 +91,16 @@ export default function SearchResults({
         }
         const { data } = await supabase
           .from("users")
-          .select("user_type")
+          .select("user_type, location")
           .eq("id", user.id)
           .maybeSingle();
         if (data?.user_type === "parent" || data?.user_type === "nanny") {
           setViewerType(data.user_type as any);
         } else {
           setViewerType(null);
+        }
+        if (data?.location) {
+          setUserProfileLocation(data.location);
         }
       } catch {
         setViewerType(null);
@@ -122,7 +126,7 @@ export default function SearchResults({
         const rawLocation =
           searchParams.location && searchParams.location !== "Location"
             ? searchParams.location
-            : null;
+            : (userProfileLocation || null);
         // Strip to city/town name only (before first comma) for broader ILIKE matching
         const locationParam = rawLocation
           ? rawLocation.split(",")[0].trim()
@@ -252,7 +256,7 @@ export default function SearchResults({
       }
     };
     run();
-  }, [searchParams, viewerType, filters]);
+  }, [searchParams, viewerType, filters, userProfileLocation]);
 
   const formatSearchSummary = () => {
     const { location, startDate, endDate } = searchParams;
@@ -266,9 +270,6 @@ export default function SearchResults({
     if (location !== "Location") {
       summary = t("search.resultsIn", { location });
     }
-
-    const locale =
-      language === "lv" ? "lv-LV" : language === "ru" ? "ru-RU" : "en-US";
 
     if (startDate) {
       if (endDate) {
@@ -293,8 +294,11 @@ export default function SearchResults({
       <main className="flex-1 px-8 py-16">
         <div className="max-w-6xl mx-auto">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">{t("search.searching")}</p>
+            <div className="relative mx-auto mb-4 w-12 h-12">
+              <div className="absolute inset-0 rounded-full border-2 border-brand-100" />
+              <div className="absolute inset-0 rounded-full border-2 border-t-brand-600 animate-spin" />
+            </div>
+            <p className="text-gray-500 text-sm font-medium">{t("search.searching")}</p>
           </div>
         </div>
       </main>
@@ -352,7 +356,7 @@ export default function SearchResults({
             return (
             <div
               key={ad.id}
-              className="group bg-white rounded-2xl shadow-sm border border-gray-100 hover:border-brand-200 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden cursor-pointer"
+              className="group bg-white rounded-2xl shadow-sm border border-gray-100 hover:border-brand-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-200 overflow-hidden cursor-pointer"
             >
               <Link
                 href={user ? `/advertisement/${ad.id}` : "/login"}
@@ -379,7 +383,7 @@ export default function SearchResults({
                   } catch {}
                 }}
               >
-                <div className="h-full flex flex-col p-5">
+                <div className="h-full flex flex-col p-5 bg-gradient-to-b from-white to-brand-50/30 group-hover:from-white group-hover:to-brand-50/60 transition-all duration-200">
                   {/* Top row: avatar + name + rating + type badge */}
                   <div className="flex items-start gap-3 mb-4">
                     <div className="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center font-bold text-lg flex-shrink-0 border-2 border-white shadow-sm bg-brand-100 text-brand-700">
@@ -427,7 +431,7 @@ export default function SearchResults({
                   {ad.skills && ad.skills.length > 0 && (
                     <div className="flex flex-wrap gap-1 mb-3">
                       {ad.skills.slice(0, 3).map((skill, i) => (
-                        <span key={i} className="bg-brand-50 text-brand-700 text-xs px-2 py-0.5 rounded-md font-medium border border-brand-100">
+                        <span key={i} className="bg-brand-50 text-brand-700 text-xs px-2 py-0.5 rounded-full font-medium border border-brand-100 group-hover:bg-brand-100 transition-colors">
                           {getTranslatedSkill(skill, language)}
                         </span>
                       ))}
@@ -462,7 +466,7 @@ export default function SearchResults({
                   {/* Footer: price + CTA */}
                   <div className="mt-auto pt-3 border-t border-gray-100 flex items-center justify-between">
                     <div className="flex items-baseline gap-1">
-                      <span className="text-xl font-bold text-accent-dark">€{ad.hourlyRate}</span>
+                      <span className="text-xl font-bold text-brand-600">€{ad.hourlyRate}</span>
                       <span className="text-xs text-gray-400">{t("ad.perHour")}</span>
                     </div>
                     <div className="flex items-center gap-1 text-sm font-semibold group-hover:gap-2 transition-all text-brand-600">

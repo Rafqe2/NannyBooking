@@ -11,19 +11,19 @@ const content = {
     sections: [
       {
         heading: "1. Acceptance of terms",
-        body: "By creating an account or using NannyBooking.org, you agree to these Terms of Service. If you do not agree, please do not use the platform.",
+        body: "By creating an account or using NannyBooking, you agree to these Terms of Service. If you do not agree, please do not use the platform.",
       },
       {
         heading: "2. Who can use the platform",
         body: "You must be at least 18 years old to register. By registering, you confirm that the information you provide is accurate and that you will keep it up to date.",
       },
       {
-        heading: "3. What NannyBooking.org provides",
-        body: "NannyBooking.org is a marketplace that connects parents and nannies. We do not employ nannies, provide childcare ourselves, or guarantee the suitability of any user. All arrangements are made directly between parents and nannies.",
+        heading: "3. What NannyBooking provides",
+        body: "NannyBooking is a marketplace that connects parents and nannies. We do not employ nannies, provide childcare ourselves, or guarantee the suitability of any user. All arrangements are made directly between parents and nannies.",
       },
       {
         heading: "4. Listings and bookings",
-        body: "Nannies are responsible for the accuracy of their listings, including availability, rates, and qualifications. Parents are responsible for verifying suitability before confirming a booking. NannyBooking.org does not process payments — all financial arrangements are made directly between the parties.",
+        body: "Nannies are responsible for the accuracy of their listings, including availability, rates, and qualifications. Parents are responsible for verifying suitability before confirming a booking. NannyBooking does not process payments — all financial arrangements are made directly between the parties.",
       },
       {
         heading: "5. Prohibited conduct",
@@ -31,7 +31,7 @@ const content = {
       },
       {
         heading: "6. Content",
-        body: "You retain ownership of content you post (profile photos, listing descriptions). By posting, you grant NannyBooking.org a non-exclusive licence to display that content on the platform. You are responsible for ensuring your content does not infringe third-party rights.",
+        body: "You retain ownership of content you post (profile photos, listing descriptions). By posting, you grant NannyBooking a non-exclusive licence to display that content on the platform. You are responsible for ensuring your content does not infringe third-party rights.",
       },
       {
         heading: "7. Account termination",
@@ -39,7 +39,7 @@ const content = {
       },
       {
         heading: "8. Limitation of liability",
-        body: "NannyBooking.org is provided 'as is'. We are not liable for the conduct of users, the outcome of childcare arrangements, or any indirect or consequential damages arising from use of the platform.",
+        body: "NannyBooking is provided 'as is'. We are not liable for the conduct of users, the outcome of childcare arrangements, or any indirect or consequential damages arising from use of the platform.",
       },
       {
         heading: "9. Changes to these terms",
@@ -57,19 +57,19 @@ const content = {
     sections: [
       {
         heading: "1. Noteikumu akceptēšana",
-        body: "Izveidojot kontu vai izmantojot NannyBooking.org, jūs piekrītat šiem pakalpojumu noteikumiem. Ja nepiekrītat, lūdzu, neizmantojiet platformu.",
+        body: "Izveidojot kontu vai izmantojot NannyBooking, jūs piekrītat šiem pakalpojumu noteikumiem. Ja nepiekrītat, lūdzu, neizmantojiet platformu.",
       },
       {
         heading: "2. Kas var izmantot platformu",
         body: "Jums jābūt vismaz 18 gadus vecam, lai reģistrētos. Reģistrējoties, jūs apliecināt, ka sniegtā informācija ir precīza.",
       },
       {
-        heading: "3. Ko nodrošina NannyBooking.org",
-        body: "NannyBooking.org ir tirgus vieta, kas savieno vecākus un aukles. Mēs nenodrošinām bērnu aprūpi paši un negarantējam neviena lietotāja piemērotību. Visas vienošanās tiek slēgtas tieši starp vecākiem un auklēm.",
+        heading: "3. Ko nodrošina NannyBooking",
+        body: "NannyBooking ir tirgus vieta, kas savieno vecākus un aukles. Mēs nenodrošinām bērnu aprūpi paši un negarantējam neviena lietotāja piemērotību. Visas vienošanās tiek slēgtas tieši starp vecākiem un auklēm.",
       },
       {
         heading: "4. Sludinājumi un rezervācijas",
-        body: "Aukles ir atbildīgas par sludinājumu precizitāti. Vecāki ir atbildīgi par piemērotības pārbaudi pirms rezervācijas apstiprināšanas. NannyBooking.org neapstrādā maksājumus.",
+        body: "Aukles ir atbildīgas par sludinājumu precizitāti. Vecāki ir atbildīgi par piemērotības pārbaudi pirms rezervācijas apstiprināšanas. NannyBooking neapstrādā maksājumus.",
       },
       {
         heading: "5. Aizliegtā rīcība",
@@ -77,7 +77,7 @@ const content = {
       },
       {
         heading: "6. Saturs",
-        body: "Jūs saglabājat īpašumtiesības uz publicēto saturu. Publicējot, jūs piešķirat NannyBooking.org neekskluzīvu licenci satura rādīšanai platformā.",
+        body: "Jūs saglabājat īpašumtiesības uz publicēto saturu. Publicējot, jūs piešķirat NannyBooking neekskluzīvu licenci satura rādīšanai platformā.",
       },
       {
         heading: "7. Konta izbeigšana",
@@ -85,7 +85,7 @@ const content = {
       },
       {
         heading: "8. Atbildības ierobežošana",
-        body: "NannyBooking.org tiek nodrošināts 'tāds, kāds ir'. Mēs neuzņemamies atbildību par lietotāju rīcību vai bērnu aprūpes vienošanos rezultātiem.",
+        body: "NannyBooking tiek nodrošināts 'tāds, kāds ir'. Mēs neuzņemamies atbildību par lietotāju rīcību vai bērnu aprūpes vienošanos rezultātiem.",
       },
       {
         heading: "9. Noteikumu izmaiņas",
@@ -103,19 +103,19 @@ const content = {
     sections: [
       {
         heading: "1. Принятие условий",
-        body: "Создавая аккаунт или используя NannyBooking.org, вы соглашаетесь с настоящими Условиями. Если вы не согласны, пожалуйста, не используйте платформу.",
+        body: "Создавая аккаунт или используя NannyBooking, вы соглашаетесь с настоящими Условиями. Если вы не согласны, пожалуйста, не используйте платформу.",
       },
       {
         heading: "2. Кто может пользоваться платформой",
         body: "Для регистрации вам должно быть не менее 18 лет. Регистрируясь, вы подтверждаете, что предоставленные данные достоверны.",
       },
       {
-        heading: "3. Что предоставляет NannyBooking.org",
-        body: "NannyBooking.org — маркетплейс, соединяющий родителей и нянь. Мы не трудоустраиваем нянь и не гарантируем пригодность пользователей. Все договорённости заключаются напрямую.",
+        heading: "3. Что предоставляет NannyBooking",
+        body: "NannyBooking — маркетплейс, соединяющий родителей и нянь. Мы не трудоустраиваем нянь и не гарантируем пригодность пользователей. Все договорённости заключаются напрямую.",
       },
       {
         heading: "4. Объявления и бронирования",
-        body: "Няни несут ответственность за точность объявлений. Родители обязаны проверить пригодность перед подтверждением бронирования. NannyBooking.org не обрабатывает платежи.",
+        body: "Няни несут ответственность за точность объявлений. Родители обязаны проверить пригодность перед подтверждением бронирования. NannyBooking не обрабатывает платежи.",
       },
       {
         heading: "5. Запрещённые действия",
@@ -123,7 +123,7 @@ const content = {
       },
       {
         heading: "6. Контент",
-        body: "Вы сохраняете права на публикуемый контент. Размещая контент, вы предоставляете NannyBooking.org неисключительную лицензию на его отображение.",
+        body: "Вы сохраняете права на публикуемый контент. Размещая контент, вы предоставляете NannyBooking неисключительную лицензию на его отображение.",
       },
       {
         heading: "7. Закрытие аккаунта",
@@ -131,7 +131,7 @@ const content = {
       },
       {
         heading: "8. Ограничение ответственности",
-        body: "NannyBooking.org предоставляется «как есть». Мы не несём ответственности за действия пользователей или результаты договорённостей по уходу за детьми.",
+        body: "NannyBooking предоставляется «как есть». Мы не несём ответственности за действия пользователей или результаты договорённостей по уходу за детьми.",
       },
       {
         heading: "9. Изменения условий",

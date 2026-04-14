@@ -21,8 +21,8 @@ export async function generateMetadata({
 
   if (!data) {
     return {
-      title: "Advertisement – NannyBooking.org",
-      description: "Find childcare services on NannyBooking.org",
+      title: "Advertisement – NannyBooking",
+      description: "Find childcare services on NannyBooking",
     };
   }
 
@@ -32,21 +32,21 @@ export async function generateMetadata({
   const price = data.price_per_hour ? ` · €${data.price_per_hour}/h` : "";
   const description =
     data.description?.slice(0, 155) ||
-    `${adTypeLabel}${location}${price} – NannyBooking.org`;
+    `${adTypeLabel}${location}${price} – NannyBooking`;
 
   return {
-    title: `${data.title} – NannyBooking.org`,
+    title: `${data.title} – NannyBooking`,
     description,
     openGraph: {
-      title: `${data.title} – NannyBooking.org`,
+      title: `${data.title} – NannyBooking`,
       description,
       type: "website",
-      siteName: "NannyBooking.org",
-      images: [{ url: "/images/og-image.png", width: 1200, height: 630, alt: "NannyBooking.org" }],
+      siteName: "NannyBooking",
+      images: [{ url: "/images/og-image.png", width: 1200, height: 630, alt: "NannyBooking" }],
     },
     twitter: {
       card: "summary_large_image",
-      title: `${data.title} – NannyBooking.org`,
+      title: `${data.title} – NannyBooking`,
       description,
       images: ["/images/og-image.png"],
     },
@@ -80,7 +80,7 @@ export default async function AdLayout({
         url: `${baseUrl}/advertisement/${id}`,
         provider: {
           "@type": "Organization",
-          name: "NannyBooking.org",
+          name: "NannyBooking",
           url: baseUrl,
         },
         areaServed: data.location_city
