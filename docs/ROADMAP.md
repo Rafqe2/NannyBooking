@@ -36,7 +36,7 @@ The platform has core functionality working:
 - [ ] Have native speakers review LV and RU translations for accuracy
 
 ### Security ✅ Done
-- [x] Remove `.env.local.backup` from git history
+
 - [x] Fix overly broad users RLS — created `user_public_info` view (email/phone no longer exposed)
 - [x] Fix error message leaking env var names in `/api/account/delete`
 - [x] Organized public assets into `public/icons/` and `public/images/`
