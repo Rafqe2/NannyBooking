@@ -10,6 +10,10 @@
   --text-black: #000000;
 }
 
+html {
+  background-color: #0F3D2E;
+}
+
 body {
   color: var(--text-black);
   background: var(--background-cream);
