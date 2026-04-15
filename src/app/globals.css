@@ -39,7 +39,7 @@ body {
   background: #a8a8a8;
 }
 
-/* Line clamp utilities for text truncation */
+/* Line clamp utilities for text truncation x */
 .line-clamp-1 {
   overflow: hidden;
   display: -webkit-box;
