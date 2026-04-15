@@ -490,24 +490,29 @@ export const translations = {
 
   // Footer
   'footer.description': {
-    en: 'Connecting families with trusted childcare professionals across Latvia. Safe, reliable, and professional childcare solutions.',
-    lv: 'Savienojam ģimenes ar uzticamiem bērnu aprūpes speciālistiem visā Latvijā. Drošas, uzticamas un profesionālas bērnu aprūpes risinājumi.',
-    ru: 'Соединяем семьи с надежными специалистами по уходу за детьми по всей Латвии. Безопасные, надежные и профессиональные решения по уходу за детьми.'
+    en: 'The place where families and nannies find each other. Simple, transparent, and without middlemen.',
+    lv: 'Vieta, kur ģimenes un auklītes atrod viens otru. Vienkārši, caurspīdīgi un bez starpniekiem.',
+    ru: 'Место, где семьи и няни находят друг друга. Просто, прозрачно и без посредников.'
   },
   'footer.forParents': {
     en: 'For Parents',
     lv: 'Vecākiem',
-    ru: 'Для Родителей'
+    ru: 'Для родителей'
   },
   'footer.findNanny': {
-    en: 'Find a Nanny',
-    lv: 'Atrast Aukli',
-    ru: 'Найти Няню'
+    en: 'Find nannies',
+    lv: 'Meklēt auklītes',
+    ru: 'Найти нянь'
+  },
+  'footer.howItWorks': {
+    en: 'How it works',
+    lv: 'Kā tas darbojas',
+    ru: 'Как это работает'
   },
   'footer.safetyGuidelines': {
-    en: 'Safety Guidelines',
-    lv: 'Drošības Vadlīnijas',
-    ru: 'Правила Безопасности'
+    en: 'Safety tips',
+    lv: 'Drošības padomi',
+    ru: 'Советы по безопасности'
   },
   'footer.backgroundChecks': {
     en: 'Background Checks',
@@ -521,28 +526,33 @@ export const translations = {
   },
   'footer.forNannies': {
     en: 'For Nannies',
-    lv: 'Auklēm',
-    ru: 'Для Нянь'
+    lv: 'Auklītēm',
+    ru: 'Для нянь'
   },
   'footer.findFamilies': {
-    en: 'Find Families',
-    lv: 'Atrast Ģimenes',
-    ru: 'Найти Семьи'
+    en: 'Find families',
+    lv: 'Atrast ģimenes',
+    ru: 'Найти семьи'
   },
   'footer.setRates': {
-    en: 'Set Your Rates',
-    lv: 'Noteikt Cenas',
-    ru: 'Установить Тарифы'
+    en: 'Set your rates',
+    lv: 'Noteikt savas cenas',
+    ru: 'Установить тарифы'
+  },
+  'footer.createProfile': {
+    en: 'Create a profile',
+    lv: 'Izveidot profilu',
+    ru: 'Создать профиль'
   },
   'footer.safetyTips': {
     en: 'Safety Tips',
     lv: 'Drošības Padomi',
-    ru: 'Советы по Безопасности'
+    ru: 'Советы по безопасности'
   },
   'footer.successStories': {
     en: 'Success Stories',
     lv: 'Panākumu Stāsti',
-    ru: 'Истории Успеха'
+    ru: 'Истории успеха'
   },
   'footer.support': {
     en: 'Support',
@@ -551,23 +561,23 @@ export const translations = {
   },
   'footer.helpCenter': {
     en: 'Help Center',
-    lv: 'Palīdzības Centrs',
-    ru: 'Центр Помощи'
+    lv: 'Palīdzības centrs',
+    ru: 'Центр помощи'
   },
   'footer.contact': {
     en: 'Contact Us',
-    lv: 'Sazinieties ar Mums',
-    ru: 'Связаться с Нами'
+    lv: 'Sazināties ar mums',
+    ru: 'Связаться с нами'
   },
   'footer.privacy': {
-    en: 'Privacy',
-    lv: 'Privātums',
-    ru: 'Конфиденциальность'
+    en: 'Privacy Policy',
+    lv: 'Privātuma politika',
+    ru: 'Политика конфиденциальности'
   },
   'footer.terms': {
-    en: 'Terms',
-    lv: 'Noteikumi',
-    ru: 'Условия'
+    en: 'Terms of Use',
+    lv: 'Lietošanas noteikumi',
+    ru: 'Условия использования'
   },
   'footer.sitemap': {
     en: 'Sitemap',
@@ -739,9 +749,9 @@ export const translations = {
     ru: 'Когда'
   },
   'search.locationPlaceholder': {
-    en: 'Search city, country or street',
-    lv: 'Meklēt pilsētu, valsti vai ielu',
-    ru: 'Поиск города, страны или улицы'
+    en: 'Search city',
+    lv: 'Meklēt pilsētu',
+    ru: 'Поиск города'
   },
   'search.findMatch': {
     en: 'Find Match',
@@ -2216,19 +2226,19 @@ export const translations = {
 
   // Home page hero section
   'home.heroTitle': {
-    en: 'Find Your Perfect',
-    lv: 'Atrodiet Savu Ideālo',
-    ru: 'Найдите Своего Идеального'
+    en: 'Find the nanny you trust.',
+    lv: 'Atrodiet auklīti, kurai uzticaties.',
+    ru: 'Найдите няню, которой доверяете.'
   },
   'home.heroSubtitle': {
-    en: 'Childcare Match',
-    lv: 'Bērnu Aprūpes Partneri',
-    ru: 'Партнера по Уходу за Детьми'
+    en: 'Find the family that values you.',
+    lv: 'Atrodiet ģimeni, kas jūs novērtē.',
+    ru: 'Найдите семью, которая вас ценит.'
   },
   'home.heroDescription': {
-    en: 'Connect trusted parents with qualified nannies in your area. Safe, reliable, and professional childcare solutions.',
-    lv: 'Savienojiet uzticamus vecākus ar kvalificētām aukām jūsu apkārtnē. Drošas, uzticamas un profesionālas bērnu aprūpes risinājumi.',
-    ru: 'Соединяем надежных родителей с квалифицированными няньками в вашем районе. Безопасные, надежные и профессиональные решения по уходу за детьми.'
+    en: 'NannyBooking connects parents and nannies in one place. You choose, you agree — we just help you find each other.',
+    lv: 'NannyBooking savieno vecākus ar auklītēm vienuviet. Jūs izvēlaties, jūs vienojaties — mēs tikai palīdzam atrast vienam otru.',
+    ru: 'NannyBooking объединяет родителей и нянь в одном месте. Вы выбираете, вы договариваетесь — мы просто помогаем найти друг друга.'
   },
 
   // Feature cards

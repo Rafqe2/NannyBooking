@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { useTranslation } from "../../components/LanguageProvider";
@@ -23,99 +24,127 @@ const whyIcons = [
 const content = {
   en: {
     title: "For Parents",
-    subtitle: "Find trusted childcare that fits your family's needs",
+    subtitle: "Find the nanny you trust. Find the family that values you.",
+    description: "NannyBooking connects parents and nannies in one place. You choose, you agree — we just help you find each other.",
     howTitle: "How it works",
     steps: [
-      { title: "Search", desc: "Enter your city and preferred dates. Browse active listings from vetted nannies near you." },
-      { title: "Review profiles", desc: "Read experience, skills, rates and verified reviews from other families before reaching out." },
-      { title: "Request a booking", desc: "Select the dates you need and send a booking request. The nanny reviews and accepts it." },
-      { title: "Connect directly", desc: "Once accepted, exchange contact details through the secure messaging system and coordinate the details." },
+      { title: "Search", desc: "Enter your location and preferred dates. Browse available listings in your area." },
+      { title: "Review profiles", desc: "Read about the nanny's experience, skills, and hourly rate. Reviews from other families will help you choose." },
+      { title: "Request a booking", desc: "Select a date and send a request. The nanny will receive it and confirm or suggest another time." },
+      { title: "Connect directly", desc: "Once confirmed, exchange contact details and agree on the details. We recommend a short introductory call before the first meeting." },
     ],
-    whyTitle: "Why NannyBooking?",
+    whyTitle: "Why parents choose NannyBooking?",
     whyItems: [
-      { title: "Verified listings", desc: "Every nanny profile is reviewed. You see honest ratings and reviews from real families." },
-      { title: "Latvia-focused", desc: "Built specifically for Latvia. All listings are in Latvian cities and regions you actually live in." },
-      { title: "Privacy-first", desc: "Contact information is only exchanged after a booking is confirmed — no cold calls or spam." },
-      { title: "Transparent pricing", desc: "Hourly rates are listed upfront. No hidden fees, no commission on the final arrangement." },
+      { title: "Verified profiles", desc: "Every nanny creates their own profile with experience, skills, and hourly rate. Family reviews help you choose." },
+      { title: "Flexible for any situation", desc: "Need a nanny for one evening or regularly every weekday? Find someone who fits exactly your schedule." },
+      { title: "Privacy first", desc: "Your contact details are exchanged only after a booking is confirmed — you control who you communicate with." },
+      { title: "Transparent pricing", desc: "Nannies set their own hourly rates and you see them right away. No commissions, no hidden costs." },
     ],
     faqTitle: "Frequently asked questions",
     faqs: [
-      { q: "Is it free to use?", a: "Browsing and booking are free for parents. You pay the nanny directly at the agreed rate — NannyBooking charges no commission." },
-      { q: "How do I know a nanny is trustworthy?", a: "Read reviews left by other families, check their skills and experience section, and always arrange a brief introductory call or meeting before the first booking." },
-      { q: "What if the nanny cancels last minute?", a: "You can cancel a booking and rebook with another nanny. We recommend confirming the arrangement at least 24 hours in advance." },
-      { q: "Can I post a listing as a parent?", a: "Yes. Post a 'seeking nanny' listing describing your needs — experienced nannies in your area can then contact you directly." },
-      { q: "What types of care are available?", a: "Short-term (specific dates, e.g. a weekend) and long-term (ongoing, e.g. weekday evenings). Filter by type when searching." },
+      { q: "How much does it cost?", a: "Registration and profile creation are completely free for nannies. Browsing is free for parents — a small platform fee applies only when you want to contact a nanny. NannyBooking does not charge commission on nanny earnings." },
+      { q: "How do I choose the right nanny?", a: "Every nanny has a profile with experience, skills, and hourly rate. Read reviews from other families and always arrange a short introductory call or meeting before the first time." },
+      { q: "What if the nanny cancels last minute?", a: "You can immediately search for another nanny and send a new booking request. We recommend confirming care at least 24 hours in advance so both sides have time to prepare." },
+      { q: "Can I as a parent post a listing?", a: "Yes — describe what care you need and nannies in your area will be able to contact you directly. This is a good option if you prefer to receive offers rather than searching yourself." },
+      { q: "What types of care can be found here?", a: "Both short-term (e.g. one evening or weekend care) and long-term (regular weekday evenings or full-time care). In search you can filter by type that fits your needs." },
     ],
-    ctaTitle: "Ready to find your nanny?",
-    ctaDesc: "Browse hundreds of listings from experienced childcare providers across Latvia.",
-    ctaBtn: "Search nannies",
+    ctaTitle: "Start searching now",
+    ctaDesc: "Find a nanny in your city — browse profiles, read reviews and connect directly.",
+    ctaBtn: "Find nannies",
+    heroBtn: "Find a nanny",
     stepLabel: "Step",
   },
   lv: {
     title: "Vecākiem",
-    subtitle: "Atrodiet uzticamu bērnu aprūpi, kas atbilst jūsu ģimenes vajadzībām",
+    subtitle: "Atrodiet auklīti, kurai uzticaties. Atrodiet ģimeni, kas jūs novērtē.",
+    description: "NannyBooking savieno vecākus ar auklītēm vienuviet. Jūs izvēlaties, jūs vienojaties — mēs tikai palīdzam atrast vienam otru.",
     howTitle: "Kā tas darbojas",
     steps: [
-      { title: "Meklēt", desc: "Ievadiet savu pilsētu un vēlamos datumus. Pārlūkojiet aktīvus sludinājumus no pārbaudītām auklēm jūsu tuvumā." },
-      { title: "Aplūkot profilus", desc: "Izlasiet par pieredzi, prasmēm, tarifiem un atsauksmēm no citām ģimenēm pirms sazināšanās." },
-      { title: "Pieprasīt rezervāciju", desc: "Izvēlieties nepieciešamos datumus un nosūtiet rezervācijas pieprasījumu. Aukle pārskata un apstiprina to." },
-      { title: "Sazināties tieši", desc: "Pēc apstiprināšanas apmainiet kontaktinformāciju drošajā ziņojumu sistēmā un vienojieties par detaļām." },
+      { title: "Meklēt", desc: "Ievadiet savu atrašanās vietu un vēlamos datumus. Apskatiet pieejamos sludinājumus savā apkaimē." },
+      { title: "Iepazīties ar profiliem", desc: "Izlasiet par auklītes pieredzi, prasmēm un stundas likmi. Atsauksmes no citām ģimenēm palīdzēs izvēlēties." },
+      { title: "Pieprasīt rezervāciju", desc: "Izvēlieties datumu un nosūtiet pieprasījumu. Auklīte to saņems un apstiprinās vai piedāvās citu laiku." },
+      { title: "Sazināties tieši", desc: "Pēc apstiprināšanas apmainiet kontaktinformāciju un vienojieties par detaļām. Iesakām īsu iepazīšanās zvanu pirms pirmās tikšanās." },
     ],
-    whyTitle: "Kāpēc NannyBooking?",
+    whyTitle: "Kāpēc vecāki izvēlas NannyBooking?",
     whyItems: [
-      { title: "Pārbaudīti sludinājumi", desc: "Katrs aukles profils tiek pārskatīts. Redzat godīgas vērtējumus un atsauksmes no reālām ģimenēm." },
-      { title: "Latvija fokuss", desc: "Izveidots tieši Latvijai. Visi sludinājumi ir Latvijas pilsētās un reģionos, kur jūs dzīvojat." },
-      { title: "Privātums pirmajā vietā", desc: "Kontaktinformācija tiek apmainīta tikai pēc rezervācijas apstiprināšanas — nekādi nevēlami zvani vai surogāts." },
-      { title: "Caurspīdīgas cenas", desc: "Stundas tarifi ir norādīti uzreiz. Nav slēpto maksas, nav komisijas no galīgās vienošanās." },
+      { title: "Pārbaudīti profili", desc: "Katra auklīte veido savu profilu ar pieredzi, prasmēm un stundas likmi. Ģimeņu atsauksmes palīdz jums izvēlēties." },
+      { title: "Elastīgs jebkurai situācijai", desc: "Nepieciešama auklīte vienai vakara stundai vai regulāri katru darba dienu? Atrodiet cilvēku, kas atbilst tieši jūsu grafikam." },
+      { title: "Privātums pirmajā vietā", desc: "Jūsu kontaktinformācija tiek apmainīta tikai pēc rezervācijas apstiprināšanas — jūs kontrolējat, ar ko sazināties." },
+      { title: "Caurspīdīgas cenas", desc: "Auklītes nosaka savas stundas likmes, jūs tās redzat uzreiz. Bez komisijām, bez slēptām izmaksām." },
     ],
     faqTitle: "Biežāk uzdotie jautājumi",
     faqs: [
-      { q: "Vai tas ir bezmaksas?", a: "Pārlūkošana un rezervācija vecākiem ir bezmaksas. Jūs maksājat auklei tieši par vienoto tarifu — NannyBooking neiekasē komisiju." },
-      { q: "Kā zināt, vai aukle ir uzticama?", a: "Izlasiet citu ģimeņu atsauksmes, pārbaudiet prasmju un pieredzes sadaļu, un vienmēr rīkojiet īsu iepazīšanās zvanu vai tikšanos pirms pirmās rezervācijas." },
-      { q: "Ko darīt, ja aukle atceļ pēdējā brīdī?", a: "Varat atcelt rezervāciju un rezervēt citu aukli. Iesakām apstiprināt vienošanos vismaz 24 stundas iepriekš." },
-      { q: "Vai vecāki var publicēt sludinājumu?", a: "Jā. Publicējiet sludinājumu 'meklēju aukli', aprakstot savas vajadzības — pieredzējušas aukles jūsu apkaimē var ar jums sazināties tieši." },
-      { q: "Kādi aprūpes veidi ir pieejami?", a: "Īstermiņa (konkrēti datumi, piemēram, nedēļas nogale) un ilgtermiņa (pastāvīgi, piemēram, darbadienu vakari). Meklējot filtrējiet pēc veida." },
+      { q: "Cik tas maksā?", a: "Auklītēm reģistrācija un profila izveide ir pilnīgi bezmaksas. Vecākiem pārlūkošana ir bez maksas — neliela platformas maksa tiek piemērota tikai tad, kad vēlaties sazināties ar auklīti. NannyBooking neiekasē komisiju no auklīšu ienākumiem." },
+      { q: "Kā izvēlēties pareizo auklīti?", a: "Katrai auklītei ir profils ar pieredzi, prasmēm un stundas likmi. Izlasiet citu ģimeņu atsauksmes un vienmēr sarīkojiet īsu iepazīšanās zvanu vai tikšanos pirms pirmās reizes." },
+      { q: "Ko darīt, ja aukle atceļ pēdējā brīdī?", a: "Varat uzreiz meklēt citu auklīti un nosūtīt jaunu rezervācijas pieprasījumu. Iesakām vienoties par aprūpi vismaz 24 stundas iepriekš, lai abām pusēm ir laiks sagatavoties." },
+      { q: "Vai es kā vecāks varu publicēt sludinājumu?", a: "Jā — aprakstiet, kāda aprūpe jums nepieciešama, un auklītes jūsu apkaimē varēs sazināties ar jums tieši. Tas ir labs variants, ja vēlaties saņemt piedāvājumus, nevis meklēt pašam." },
+      { q: "Kāda veida aprūpi šeit var atrast?", a: "Gan īstermiņa (piemēram, viena vakara vai nedēļas nogales aprūpe), gan ilgtermiņa (regulāri darba dienu vakari vai pilna laika aprūpe). Meklēšanā varat filtrēt pēc veida, kas atbilst jūsu vajadzībām." },
     ],
-    ctaTitle: "Gatavs atrast aukli?",
-    ctaDesc: "Pārlūkojiet simtiem sludinājumu no pieredzējušiem bērnu aprūpes speciālistiem visā Latvijā.",
-    ctaBtn: "Meklēt aukles",
+    ctaTitle: "Sāciet meklēšanu jau tagad",
+    ctaDesc: "Atrodiet auklīti savā pilsētā — pārlūkojiet profilus, izlasiet atsauksmes un sazināties tieši.",
+    ctaBtn: "Meklēt auklītes",
+    heroBtn: "Meklēt auklīti",
     stepLabel: "Solis",
   },
   ru: {
     title: "Для родителей",
-    subtitle: "Найдите надёжный уход за детьми, подходящий для вашей семьи",
+    subtitle: "Найдите няню, которой доверяете. Найдите семью, которая вас ценит.",
+    description: "NannyBooking объединяет родителей и нянь в одном месте. Вы выбираете, вы договариваетесь — мы просто помогаем найти друг друга.",
     howTitle: "Как это работает",
     steps: [
-      { title: "Поиск", desc: "Введите свой город и желаемые даты. Просматривайте активные объявления от проверенных нянь рядом с вами." },
-      { title: "Просмотр профилей", desc: "Читайте об опыте, навыках, тарифах и проверенных отзывах от других семей перед обращением." },
-      { title: "Запрос бронирования", desc: "Выберите нужные даты и отправьте запрос на бронирование. Няня рассматривает и принимает его." },
-      { title: "Связаться напрямую", desc: "После подтверждения обменяйтесь контактными данными через защищённую систему сообщений и согласуйте детали." },
+      { title: "Поиск", desc: "Введите своё местоположение и желаемые даты. Просматривайте доступные объявления в вашем районе." },
+      { title: "Знакомство с профилями", desc: "Читайте об опыте, навыках и почасовой ставке няни. Отзывы других семей помогут вам выбрать." },
+      { title: "Запрос бронирования", desc: "Выберите дату и отправьте запрос. Няня получит его и подтвердит или предложит другое время." },
+      { title: "Связаться напрямую", desc: "После подтверждения обменяйтесь контактами и согласуйте детали. Рекомендуем короткий вводный звонок перед первой встречей." },
     ],
-    whyTitle: "Почему NannyBooking?",
+    whyTitle: "Почему родители выбирают NannyBooking?",
     whyItems: [
-      { title: "Проверенные объявления", desc: "Каждый профиль няни проверяется. Вы видите честные оценки и отзывы от реальных семей." },
-      { title: "Фокус на Латвию", desc: "Создано специально для Латвии. Все объявления находятся в городах и регионах, где вы живёте." },
-      { title: "Конфиденциальность прежде всего", desc: "Контактные данные обмениваются только после подтверждения бронирования — никаких холодных звонков или спама." },
-      { title: "Прозрачные цены", desc: "Почасовые ставки указаны заранее. Никаких скрытых платежей, никакой комиссии с итоговой договорённости." },
+      { title: "Проверенные профили", desc: "Каждая няня создаёт свой профиль с опытом, навыками и почасовой ставкой. Отзывы семей помогают вам выбрать." },
+      { title: "Гибко для любой ситуации", desc: "Нужна няня на один вечерний час или регулярно каждый будний день? Найдите человека, подходящего именно под ваш график." },
+      { title: "Конфиденциальность прежде всего", desc: "Ваши контактные данные передаются только после подтверждения бронирования — вы контролируете, с кем общаться." },
+      { title: "Прозрачные цены", desc: "Няни устанавливают свои почасовые ставки, вы видите их сразу. Без комиссий, без скрытых платежей." },
     ],
     faqTitle: "Часто задаваемые вопросы",
     faqs: [
-      { q: "Это бесплатно?", a: "Просмотр и бронирование бесплатны для родителей. Вы платите няне напрямую по согласованной ставке — NannyBooking не берёт комиссию." },
-      { q: "Как убедиться, что няня надёжна?", a: "Читайте отзывы других семей, проверяйте раздел навыков и опыта, и всегда устраивайте короткое знакомство по звонку или лично перед первым бронированием." },
-      { q: "Что делать, если няня отменяет в последний момент?", a: "Вы можете отменить бронирование и выбрать другую няню. Рекомендуем подтверждать договорённость минимум за 24 часа." },
-      { q: "Может ли родитель разместить объявление?", a: "Да. Разместите объявление 'ищу няню', описав свои потребности — опытные няни в вашем районе смогут связаться с вами напрямую." },
-      { q: "Какие виды ухода доступны?", a: "Краткосрочный (конкретные даты, например, выходные) и долгосрочный (постоянный, например, вечера в будни). Фильтруйте по типу при поиске." },
+      { q: "Сколько это стоит?", a: "Регистрация и создание профиля для нянь абсолютно бесплатны. Просмотр для родителей бесплатен — небольшая комиссия платформы применяется только тогда, когда вы хотите связаться с няней. NannyBooking не взимает комиссию с заработка нянь." },
+      { q: "Как выбрать правильную няню?", a: "У каждой няни есть профиль с опытом, навыками и почасовой ставкой. Читайте отзывы других семей и всегда проводите короткий вводный звонок или встречу перед первым разом." },
+      { q: "Что делать, если няня отменяет в последний момент?", a: "Вы можете сразу искать другую няню и отправить новый запрос на бронирование. Рекомендуем договариваться об уходе как минимум за 24 часа, чтобы у обеих сторон было время подготовиться." },
+      { q: "Могу ли я как родитель разместить объявление?", a: "Да — опишите, какой уход вам нужен, и няни в вашем районе смогут связаться с вами напрямую. Это хороший вариант, если вы хотите получать предложения, а не искать самостоятельно." },
+      { q: "Какие виды ухода здесь можно найти?", a: "Как краткосрочный (например, уход на один вечер или выходные), так и долгосрочный (регулярные вечера в будни или уход на полный день). В поиске можно фильтровать по нужному вам типу." },
     ],
-    ctaTitle: "Готовы найти няню?",
-    ctaDesc: "Просматривайте сотни объявлений от опытных специалистов по уходу за детьми по всей Латвии.",
+    ctaTitle: "Начните поиск прямо сейчас",
+    ctaDesc: "Найдите няню в своём городе — просматривайте профили, читайте отзывы и связывайтесь напрямую.",
     ctaBtn: "Найти нянь",
+    heroBtn: "Найти няню",
     stepLabel: "Шаг",
   },
 };
 
+const pageTitles: Record<string, string> = {
+  en: "For Parents | NannyBooking",
+  lv: "Vecākiem | NannyBooking",
+  ru: "Для родителей | NannyBooking",
+};
+
+function goToResults(e: React.MouseEvent) {
+  e.preventDefault();
+  try {
+    sessionStorage.setItem(
+      "nannybooking:lastSearch",
+      JSON.stringify({ location: "Location", startDate: null, endDate: null, openResults: true })
+    );
+    sessionStorage.setItem("nannybooking:restoreNext", "1");
+  } catch {}
+  window.location.href = "/";
+}
+
 export default function ForParentsPage() {
   const { language } = useTranslation();
   const c = content[language as keyof typeof content] || content.en;
+
+  useEffect(() => {
+    document.title = pageTitles[language] ?? pageTitles.en;
+  }, [language]);
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
@@ -128,11 +157,13 @@ export default function ForParentsPage() {
             <Users className="w-4 h-4" />{c.title}
           </div>
           <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 leading-tight">{c.subtitle}</h1>
+          <p className="text-lg text-gray-500 max-w-2xl mx-auto mb-6 leading-relaxed">{c.description}</p>
           <Link
             href="/"
-            className="inline-block mt-4 px-8 py-3 bg-brand-600 text-white font-semibold rounded-xl hover:bg-brand-700 transition-colors shadow-sm"
+            onClick={goToResults}
+            className="inline-block mt-2 px-8 py-3 bg-brand-600 text-white font-semibold rounded-xl hover:bg-brand-700 transition-colors shadow-sm"
           >
-            {c.ctaBtn}
+            {c.heroBtn}
           </Link>
         </div>
       </section>
@@ -203,6 +234,7 @@ export default function ForParentsPage() {
           <p className="text-brand-200 mb-8 text-lg">{c.ctaDesc}</p>
           <Link
             href="/"
+            onClick={goToResults}
             className="inline-block px-10 py-3 bg-white text-brand-700 font-bold rounded-xl hover:bg-brand-50 transition-colors shadow-lg"
           >
             {c.ctaBtn}

@@ -46,13 +46,13 @@ export default function Footer() {
                   </a>
                 </li>
                 <li>
-                  <a href="/support#safety" className="text-brand-200 hover:text-white hover:translate-x-1 transition-all duration-200 text-sm inline-block">
-                    {t("footer.safetyGuidelines")}
+                  <a href="/for-parents" className="text-brand-200 hover:text-white hover:translate-x-1 transition-all duration-200 text-sm inline-block">
+                    {t("footer.howItWorks")}
                   </a>
                 </li>
                 <li>
-                  <a href="/for-parents" className="text-brand-200 hover:text-white hover:translate-x-1 transition-all duration-200 text-sm inline-block">
-                    {t("footer.backgroundChecks")}
+                  <a href="/support#safety" className="text-brand-200 hover:text-white hover:translate-x-1 transition-all duration-200 text-sm inline-block">
+                    {t("footer.safetyGuidelines")}
                   </a>
                 </li>
                 <li>
@@ -72,7 +72,7 @@ export default function Footer() {
               </h4>
               <ul className="space-y-3">
                 <li>
-                  <a href="/create-advertisement" className="text-brand-200 hover:text-white hover:translate-x-1 transition-all duration-200 text-sm inline-block">
+                  <a href="/" className="text-brand-200 hover:text-white hover:translate-x-1 transition-all duration-200 text-sm inline-block">
                     {t("footer.findFamilies")}
                   </a>
                 </li>
@@ -82,8 +82,8 @@ export default function Footer() {
                   </a>
                 </li>
                 <li>
-                  <a href="/support#safety" className="text-brand-200 hover:text-white hover:translate-x-1 transition-all duration-200 text-sm inline-block">
-                    {t("footer.safetyTips")}
+                  <a href="/create-advertisement" className="text-brand-200 hover:text-white hover:translate-x-1 transition-all duration-200 text-sm inline-block">
+                    {t("footer.createProfile")}
                   </a>
                 </li>
                 <li>
@@ -112,13 +112,13 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="/support#safety" className="text-brand-200 hover:text-white hover:translate-x-1 transition-all duration-200 text-sm inline-block">
-                  {t("footer.safetyGuidelines")}
+                <a href="/privacy" className="text-brand-200 hover:text-white hover:translate-x-1 transition-all duration-200 text-sm inline-block">
+                  {t("footer.privacy")}
                 </a>
               </li>
               <li>
-                <a href="/for-parents" className="text-brand-200 hover:text-white hover:translate-x-1 transition-all duration-200 text-sm inline-block">
-                  {t("footer.backgroundChecks")}
+                <a href="/terms" className="text-brand-200 hover:text-white hover:translate-x-1 transition-all duration-200 text-sm inline-block">
+                  {t("footer.terms")}
                 </a>
               </li>
             </ul>

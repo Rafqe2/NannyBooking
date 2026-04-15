@@ -7,7 +7,8 @@
       "Bash(grep:*)",
       "WebSearch",
       "Bash(git rm --cached .env.local.backup)",
-      "Bash(grep -n 'from\\(\"\"users\"\"\\)' /Users/rafa/Desktop/Projects/Auklite1/src/app/advertisement/[id]/page.tsx -A 3)"
+      "Bash(grep -n 'from\\(\"\"users\"\"\\)' /Users/rafa/Desktop/Projects/Auklite1/src/app/advertisement/[id]/page.tsx -A 3)",
+      "Bash(ls -1 /Users/rafa/Desktop/Projects/NannyBooking/NannyBooking/supabase/migrations/*.sql)"
     ]
   }
 }

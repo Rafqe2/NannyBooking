@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { useTranslation } from "../../components/LanguageProvider";
@@ -37,144 +38,154 @@ const tipIcons = [
 const content = {
   en: {
     title: "For Nannies",
-    subtitle: "Turn your childcare experience into a flexible career",
+    subtitle: "Your experience. Your schedule. Your rates.",
     howTitle: "How to get started",
     steps: [
-      { title: "Create your profile", desc: "Sign up, complete your profile with your experience, skills and a short bio that families will see." },
-      { title: "Post a listing", desc: "Create a listing — short-term for specific dates, or long-term for ongoing availability. Set your hourly rate." },
-      { title: "Receive requests", desc: "Families find your listing and send booking requests. You review and accept or decline at your own pace." },
-      { title: "Coordinate & earn", desc: "Exchange contact details once the booking is confirmed and arrange the details directly with the family." },
+      { title: "Create your profile", desc: "Sign up and tell about yourself — experience, skills, availability and a short bio that families will see before contacting you." },
+      { title: "Set your terms", desc: "Set your hourly rate and availability — short-term, long-term or both. You decide which offers to accept." },
+      { title: "Receive requests", desc: "Families in your area find your profile and send a booking request. Review and respond at your own discretion." },
+      { title: "Connect directly", desc: "After the booking is confirmed, exchange contact details and agree on the details directly with the family." },
     ],
     whyTitle: "Why join NannyBooking?",
     whyItems: [
-      { title: "Flexible schedule", desc: "You set your available dates and hours. Take bookings only when it suits you — no obligation." },
-      { title: "You set the rate", desc: "Define your own hourly rate. No platform commission — what you agree with the family is what you earn." },
-      { title: "Build your reputation", desc: "Collect verified reviews from families you've worked with. A strong profile brings more bookings organically." },
-      { title: "Local & targeted", desc: "Listings are filtered by city, so you only get requests from families in areas where you're willing to work." },
+      { title: "Flexible schedule", desc: "You choose when you are available. Accept requests that fit your life." },
+      { title: "You set the rate", desc: "Set your hourly rate and change it at any time. No commissions — what you agree with the family is what you receive in full." },
+      { title: "Reviews that work for you", desc: "After each booking, families can leave a review. The more positive ratings, the more new requests." },
+      { title: "Families find you", desc: "Your listing is visible to families in your city and neighbourhood. You don't need to search for clients — they come to you." },
     ],
     ratesTitle: "How to set your rates",
-    ratesIntro: "Your hourly rate is visible on your listing and is one of the first things families check. Here's how to approach it.",
+    ratesIntro: "Your hourly rate is visible on your listing and is one of the first things families check. Here's what can help you choose.",
     rateItems: [
-      { title: "Market range in Latvia", desc: "Most nannies in Latvia charge between €5–€12/h. Experienced nannies or those with formal education, first aid certification, or language skills typically charge €8–€15/h." },
-      { title: "Factor in the number of children", desc: "If a family has multiple children, consider setting a higher rate or negotiating a per-child supplement directly with the family after booking." },
-      { title: "Evening & weekend rates", desc: "Evening, overnight or weekend care is typically priced 20–40% higher than daytime rates. You can mention this in your listing description." },
-      { title: "Start competitive, then raise it", desc: "New to the platform? Start at a rate that's easy to book and build up reviews. Once you have 3–5 positive reviews, gradually increase your rate." },
+      { title: "Market range in Latvia", desc: "Most nannies in Latvia charge €5–€12/h. With formal education, a first aid certificate or language skills the rate is typically €8–€15/h." },
+      { title: "Factor in the number of children", desc: "If a family has multiple children, you can set a higher rate or agree on a supplement per additional child directly with the family." },
+      { title: "Evening and weekend rates", desc: "Care in the evenings, nights or on weekends is typically valued 20–40% higher. Mention it in your profile description so families know in advance." },
+      { title: "Start with a competitive rate", desc: "New to the platform? Start with a lower rate to get your first bookings and reviews faster. After 3–5 positive ratings you can raise your rate." },
     ],
-    tipsTitle: "Tips for a great profile",
+    tipsTitle: "Tips to help you stand out",
     tips: [
-      { title: "Add a clear photo", desc: "Profiles with a friendly, professional photo receive significantly more attention from parents." },
-      { title: "Write a detailed bio", desc: "Mention your experience with different age groups, any certifications (first aid, education), and your childcare approach." },
-      { title: "Select relevant skills", desc: "Tick all the skills that apply — cooking, tutoring, special needs, swimming, etc. Parents filter by these." },
-      { title: "Keep dates current", desc: "Short-term listings auto-deactivate after 7 days. Re-activate with fresh dates to stay visible in search results." },
+      { title: "Add a good photo", desc: "A friendly, clear photo is the first thing families notice. Choose an image where you are smiling and natural — it builds trust even before reading your profile." },
+      { title: "Write a personal description", desc: "Tell about your experience with different age groups, certifications and approach to childcare. Families want to understand who you are, not just what you can do." },
+      { title: "Mark your skills", desc: "Cooking, tutoring, special needs, swimming — the more precisely you indicate, the easier it is for families to find you using filters." },
+      { title: "Update dates regularly", desc: "Short-term listings auto-deactivate after 7 days. Update them with current dates so your profile is always visible in search results." },
     ],
     faqTitle: "Frequently asked questions",
     faqs: [
-      { q: "Is it free to join?", a: "Yes — creating a profile and posting listings is completely free. NannyBooking charges no registration or listing fees." },
-      { q: "How do I get paid?", a: "You agree on payment terms directly with the family. Most arrange cash or bank transfer. NannyBooking does not process payments." },
-      { q: "Can I set my own hours?", a: "Absolutely. For short-term listings you pick specific dates and times. For long-term you describe general availability." },
-      { q: "What if a family cancels?", a: "Families can cancel bookings before they are confirmed. Always agree on a cancellation policy with the family for confirmed bookings." },
-      { q: "How do reviews work?", a: "After a completed booking, the family can leave a star rating and written review on your profile. Honest reviews help you build trust." },
+      { q: "Is registration free?", a: "Yes — creating a profile and posting listings is free. If you want greater visibility or additional features, paid plans are available — but you can start completely for free." },
+      { q: "How does payment work with the family?", a: "You agree on payment directly with the family — NannyBooking does not process payments and does not charge commission on your earnings. Most use cash or bank transfer." },
+      { q: "Do I choose my own working hours?", a: "Completely. For short-term listings specify specific dates and hours, for long-term listings — your general availability. You accept only the requests that suit you." },
+      { q: "What if a family cancels a booking?", a: "Families can cancel a booking before it is confirmed. We recommend briefly discussing cancellation terms before the first meeting so both parties have clarity." },
+      { q: "How do reviews work?", a: "After a completed booking, the family can leave a star rating and written review on your profile. You cannot edit them, but you can respond — this shows families that you care." },
     ],
-    ctaTitle: "Start earning on your terms",
-    ctaDesc: "Create your free profile today and reach hundreds of families looking for experienced childcare.",
-    ctaBtn: "Create a listing",
+    ctaTitle: "Ready to start?",
+    ctaDesc: "Create your free profile and let families in your area find you.",
+    ctaBtn: "Create a profile",
     stepLabel: "Step",
   },
   lv: {
-    title: "Auklēm",
-    subtitle: "Pārvērtiet savu bērnu aprūpes pieredzi elastīgā karjerā",
+    title: "Auklītēm",
+    subtitle: "Jūsu pieredze. Jūsu grafiks. Jūsu cenas.",
     howTitle: "Kā sākt",
     steps: [
-      { title: "Izveidot profilu", desc: "Reģistrējieties, aizpildiet profilu ar savu pieredzi, prasmēm un īsu bio, ko redzēs ģimenes." },
-      { title: "Publicēt sludinājumu", desc: "Izveidojiet sludinājumu — īstermiņa konkrētiem datumiem vai ilgtermiņa pastāvīgai pieejamībai. Nosakiet stundu tarifu." },
-      { title: "Saņemt pieprasījumus", desc: "Ģimenes atrod jūsu sludinājumu un nosūta rezervācijas pieprasījumus. Jūs pārskatāt un pieņemat vai noraidāt pēc saviem ieskatiem." },
-      { title: "Koordinēt un nopelnīt", desc: "Apmainiet kontaktinformāciju pēc rezervācijas apstiprināšanas un saskaņojiet detaļas tieši ar ģimeni." },
+      { title: "Izveidojiet profilu", desc: "Reģistrējieties un pastāstiet par sevi — pieredze, prasmes, pieejamība un īss apraksts, ko ģimenes redzēs pirms sazināšanās." },
+      { title: "Norādiet savus nosacījumus", desc: "Nosakiet stundas likmi un pieejamību — īstermiņa, ilgtermiņa vai abiem variantiem. Jūs lemjat, kādus piedāvājumus pieņemt." },
+      { title: "Saņemiet pieprasījumus", desc: "Ģimenes jūsu apkaimē atrod jūsu profilu un nosūta rezervācijas pieprasījumu. Pārskatiet un atbildiet pēc saviem ieskatiem." },
+      { title: "Sazināties tieši", desc: "Pēc rezervācijas apstiprināšanas apmainiet kontaktinformāciju un vienojieties par detaļām tieši ar ģimeni." },
     ],
     whyTitle: "Kāpēc pievienoties NannyBooking?",
     whyItems: [
-      { title: "Elastīgs grafiks", desc: "Jūs nosakāt savus pieejamos datumus un stundas. Pieņemiet rezervācijas tikai tad, kad jums ērti — bez pienākuma." },
-      { title: "Jūs nosakāt tarifu", desc: "Definējiet savu stundas tarifu. Nav platformas komisijas — tas, par ko vienojaties ar ģimeni, ir jūsu pelņa." },
-      { title: "Veidojiet reputāciju", desc: "Vāciet pārbaudītas atsauksmes no ģimenēm, ar kurām esat strādājuši. Spēcīgs profils piesaista vairāk rezervāciju." },
-      { title: "Lokāls un mērķtiecīgs", desc: "Sludinājumi tiek filtrēti pēc pilsētas, tāpēc pieprasījumus saņemat tikai no ģimenēm jūsu vēlamajā reģionā." },
+      { title: "Elastīgs grafiks", desc: "Jūs izvēlaties, kad esat pieejama. Pieņemiet pieprasījumus, kas iederas jūsu dzīvē." },
+      { title: "Jūs nosakāt tarifu", desc: "Norādiet savu stundas likmi un mainiet to jebkurā brīdī. Nav komisiju — ko vienojaties ar ģimeni, to saņemat pilnībā." },
+      { title: "Atsauksmes, kas strādā jūsu labā", desc: "Pēc katras rezervācijas ģimenes var atstāt atsauksmi. Jo vairāk pozitīvu vērtējumu, jo vairāk jaunu pieprasījumu." },
+      { title: "Ģimenes atrod jūs", desc: "Jūsu sludinājums ir redzams ģimenēm jūsu pilsētā un apkaimē. Jums nav jāmeklē klienti — viņi nāk pie jums." },
     ],
     ratesTitle: "Kā noteikt savu tarifu",
-    ratesIntro: "Jūsu stundas tarifs ir redzams sludinājumā un ir viens no pirmajiem, ko ģimenes pārbauda. Lūk, kā tam pieiet.",
+    ratesIntro: "Jūsu stundas tarifs ir redzams sludinājumā un ir viens no pirmajiem, ko ģimenes pārbauda. Lūk, kas var palīdzēt izvēlēties.",
     rateItems: [
-      { title: "Tirgus diapazons Latvijā", desc: "Lielākā daļa aukļu Latvijā iekasē €5–€12/h. Pieredzējušas aukles vai tās ar formālo izglītību, pirmās palīdzības sertifikātu vai valodu prasmēm parasti iekasē €8–€15/h." },
-      { title: "Ņemiet vērā bērnu skaitu", desc: "Ja ģimenei ir vairāki bērni, apsveriet augstāku tarifu vai vienojieties par papildu maksu par katru bērnu tieši ar ģimeni pēc rezervācijas." },
-      { title: "Vakara un nedēļas nogales tarifi", desc: "Vakara, nakts vai nedēļas nogales aprūpe parasti tiek novērtēta par 20–40% augstāk nekā dienas laikā. To varat pieminēt sludinājuma aprakstā." },
-      { title: "Sāciet konkurētspējīgi, tad paaugstiniet", desc: "Jauns platformā? Sāciet ar tarifu, ar kuru viegli iegūt rezervācijas, un veidojiet atsauksmes. Kad jums būs 3–5 pozitīvas atsauksmes, pakāpeniski palieliniet tarifu." },
+      { title: "Tirgus diapazons Latvijā", desc: "Lielākā daļa auklīšu Latvijā iekasē €5–€12/h. Ar formālo izglītību, pirmās palīdzības sertifikātu vai valodu prasmēm tarifs parasti ir €8–€15/h." },
+      { title: "Ņemiet vērā bērnu skaitu", desc: "Ja ģimenē ir vairāki bērni, varat norādīt augstāku likmi vai vienoties par piemaksu par katru papildu bērnu tieši ar ģimeni." },
+      { title: "Vakara un nedēļas nogales tarifi", desc: "Aprūpe vakaros, naktīs vai brīvdienās parasti tiek novērtēta par 20–40% augstāk. Pieminiet to sava profila aprakstā, lai ģimenes zina jau iepriekš." },
+      { title: "Sāciet ar konkurētspējīgu tarifu", desc: "Ja esat jauna platformā, sāciet ar zemāku likmi, lai ātrāk iegūtu pirmās rezervācijas un atsauksmes. Pēc 3–5 pozitīviem vērtējumiem varat tarifu paaugstināt." },
     ],
-    tipsTitle: "Padomi lieliskam profilam",
+    tipsTitle: "Padomi, kas palīdz izcelties",
     tips: [
-      { title: "Pievienojiet skaidru fotogrāfiju", desc: "Profili ar draudzīgu, profesionālu fotogrāfiju saņem ievērojami vairāk uzmanības no vecākiem." },
-      { title: "Uzrakstiet detalizētu bio", desc: "Miniet savu pieredzi ar dažādām vecuma grupām, sertifikātus (pirmā palīdzība, izglītība) un pieeju bērnu aprūpei." },
-      { title: "Izvēlieties atbilstošas prasmes", desc: "Atzīmējiet visas atbilstošās prasmes — gatavošana, mācīšana, speciālās vajadzības, peldēšana u.c. Vecāki filtrē pēc tām." },
-      { title: "Uzturiet datumus aktuālus", desc: "Īstermiņa sludinājumi automātiski deaktivējas pēc 7 dienām. Aktivizējiet atkārtoti ar jauniem datumiem, lai paliktu redzams." },
+      { title: "Pievienojiet labu fotogrāfiju", desc: "Draudzīga, skaidra fotogrāfija ir pirmais, ko ģimenes pamana. Izvēlieties attēlu, kurā esat smaidoša un dabiska — tas rada uzticību vēl pirms profila lasīšanas." },
+      { title: "Uzrakstiet personīgu aprakstu", desc: "Pastāstiet par savu pieredzi ar dažādām vecuma grupām, sertifikātiem un pieeju bērnu aprūpei. Ģimenes vēlas saprast, kas jūs esat, ne tikai ko jūs protat." },
+      { title: "Atzīmējiet savas prasmes", desc: "Gatavošana, mācīšana, speciālās vajadzības, peldēšana — jo precīzāk norādīsiet, jo vieglāk ģimenēm būs jūs atrast, izmantojot filtrus." },
+      { title: "Atjaunojiet datumus regulāri", desc: "Īstermiņa sludinājumi automātiski deaktivējas pēc 7 dienām. Atjaunojiet tos ar aktuāliem datumiem, lai jūsu profils vienmēr būtu redzams meklēšanas rezultātos." },
     ],
     faqTitle: "Biežāk uzdotie jautājumi",
     faqs: [
-      { q: "Vai pievienošanās ir bezmaksas?", a: "Jā — profila izveide un sludinājumu publicēšana ir pilnīgi bezmaksas. NannyBooking neiekasē reģistrācijas vai sludinājumu maksas." },
-      { q: "Kā tiek veikts maksājums?", a: "Maksājuma nosacījumus vienojas tieši ar ģimeni. Lielākā daļa izmanto skaidru naudu vai bankas pārskaitījumu. NannyBooking neapstrādā maksājumus." },
-      { q: "Vai varu pats noteikt darba laiku?", a: "Noteikti. Īstermiņa sludinājumiem izvēlaties konkrētus datumus un laikus. Ilgtermiņa sludinājumiem aprakstāt vispārējo pieejamību." },
-      { q: "Ko darīt, ja ģimene atceļ?", a: "Ģimenes var atcelt rezervācijas pirms to apstiprināšanas. Vienmēr vienojieties ar ģimeni par atcelšanas politiku apstiprinātām rezervācijām." },
-      { q: "Kā darbojas atsauksmes?", a: "Pēc pabeigtas rezervācijas ģimene var atstāt zvaigžņu vērtējumu un rakstiskas atsauksmes jūsu profilā. Godīgas atsauksmes palīdz veidot uzticamību." },
+      { q: "Vai reģistrācija ir bezmaksas?", a: "Jā — profila izveide un sludinājumu publicēšana ir bez maksas. Ja vēlaties lielāku redzamību vai papildu iespējas, ir pieejami arī maksas plāni — bet sākt var pilnīgi bez maksas." },
+      { q: "Kā notiek norēķini ar ģimeni?", a: "Par samaksu jūs vienojaties tieši ar ģimeni — NannyBooking neapstrādā maksājumus un neiekasē komisiju no jūsu ienākumiem. Lielākā daļa izmanto skaidru naudu vai bankas pārskaitījumu." },
+      { q: "Vai es pati izvēlos darba laiku?", a: "Pilnībā. Īstermiņa sludinājumiem norādiet konkrētus datumus un stundas, ilgtermiņa sludinājumiem — savu vispārējo pieejamību. Jūs pieņemat tikai tos pieprasījumus, kas jums der." },
+      { q: "Ko darīt, ja ģimene atceļ rezervāciju?", a: "Ģimenes var atcelt rezervāciju pirms tās apstiprināšanas. Iesakām jau pirms pirmās tikšanās īsi aprunāties par atcelšanas nosacījumiem, lai abām pusēm ir skaidrība." },
+      { q: "Kā darbojas atsauksmes?", a: "Pēc pabeigtas rezervācijas ģimene var atstāt zvaigžņu vērtējumu un rakstisku atsauksmi jūsu profilā. Jūs nevarat tās rediģēt, bet varat atbildēt — tas rāda ģimenēm, ka jums rūp." },
     ],
-    ctaTitle: "Sāciet pelnīt pēc saviem noteikumiem",
-    ctaDesc: "Šodien izveidojiet bezmaksas profilu un sasniedziet simtiem ģimeņu, kas meklē pieredzējušu bērnu aprūpi.",
-    ctaBtn: "Izveidot sludinājumu",
+    ctaTitle: "Gatava sākt?",
+    ctaDesc: "Izveidojiet profilu bez maksas un ļaujiet ģimenēm jūsu apkaimē atrast jūs.",
+    ctaBtn: "Izveidot profilu",
     stepLabel: "Solis",
   },
   ru: {
     title: "Для нянь",
-    subtitle: "Превратите свой опыт ухода за детьми в гибкую карьеру",
+    subtitle: "Ваш опыт. Ваш график. Ваши цены.",
     howTitle: "Как начать",
     steps: [
-      { title: "Создать профиль", desc: "Зарегистрируйтесь, заполните профиль своим опытом, навыками и кратким описанием, которое увидят семьи." },
-      { title: "Разместить объявление", desc: "Создайте объявление — краткосрочное на конкретные даты или долгосрочное для постоянной доступности. Установите почасовую ставку." },
-      { title: "Получать запросы", desc: "Семьи находят ваше объявление и отправляют запросы на бронирование. Вы рассматриваете и принимаете или отклоняете в удобном темпе." },
-      { title: "Координировать и зарабатывать", desc: "Обменяйтесь контактами после подтверждения бронирования и согласуйте детали напрямую с семьёй." },
+      { title: "Создайте профиль", desc: "Зарегистрируйтесь и расскажите о себе — опыт, навыки, доступность и краткое описание, которое семьи увидят перед тем, как связаться с вами." },
+      { title: "Укажите свои условия", desc: "Установите почасовую ставку и доступность — краткосрочно, долгосрочно или оба варианта. Вы решаете, какие предложения принимать." },
+      { title: "Получайте запросы", desc: "Семьи в вашем районе находят ваш профиль и отправляют запрос на бронирование. Рассматривайте и отвечайте по своему усмотрению." },
+      { title: "Связывайтесь напрямую", desc: "После подтверждения бронирования обменяйтесь контактными данными и согласуйте детали напрямую с семьёй." },
     ],
     whyTitle: "Почему стоит присоединиться к NannyBooking?",
     whyItems: [
-      { title: "Гибкий график", desc: "Вы сами устанавливаете доступные даты и часы. Принимайте бронирования только тогда, когда вам удобно — никаких обязательств." },
-      { title: "Вы устанавливаете ставку", desc: "Определите свою почасовую ставку. Никакой комиссии платформы — то, о чём вы договорились с семьёй, и есть ваш заработок." },
-      { title: "Создайте репутацию", desc: "Собирайте проверенные отзывы от семей, с которыми вы работали. Сильный профиль привлекает больше бронирований." },
-      { title: "Локально и целенаправленно", desc: "Объявления фильтруются по городу, поэтому вы получаете запросы только от семей в нужных вам районах." },
+      { title: "Гибкий график", desc: "Вы выбираете, когда доступны. Принимайте запросы, которые вписываются в вашу жизнь." },
+      { title: "Вы устанавливаете ставку", desc: "Укажите свою почасовую ставку и меняйте её в любое время. Без комиссий — то, о чём договорились с семьёй, получаете полностью." },
+      { title: "Отзывы, работающие на вас", desc: "После каждого бронирования семьи могут оставить отзыв. Чем больше положительных оценок, тем больше новых запросов." },
+      { title: "Семьи находят вас", desc: "Ваше объявление видно семьям в вашем городе и районе. Вам не нужно искать клиентов — они приходят к вам." },
     ],
-    ratesTitle: "Как установить ставку",
-    ratesIntro: "Ваша почасовая ставка видна в объявлении и является одним из первых, что проверяют семьи. Вот как к этому подойти.",
+    ratesTitle: "Как установить свой тариф",
+    ratesIntro: "Ваша почасовая ставка видна в объявлении и является одним из первых, что проверяют семьи. Вот что может помочь выбрать.",
     rateItems: [
-      { title: "Рыночный диапазон в Латвии", desc: "Большинство нянь в Латвии берут €5–€12/ч. Опытные няни или с профессиональным образованием, сертификатом первой помощи или языковыми навыками обычно берут €8–€15/ч." },
-      { title: "Учитывайте количество детей", desc: "Если в семье несколько детей, рассмотрите более высокую ставку или договоритесь о доплате за каждого ребёнка напрямую с семьёй после бронирования." },
-      { title: "Вечерние и выходные ставки", desc: "Вечерний, ночной или уход в выходные дни обычно оцениваются на 20–40% выше дневных. Можно упомянуть это в описании объявления." },
-      { title: "Начните конкурентоспособно, затем повышайте", desc: "Новичок на платформе? Начните со ставки, с которой легко получить бронирования, и накапливайте отзывы. Когда у вас будет 3–5 положительных отзывов, постепенно повышайте ставку." },
+      { title: "Рыночный диапазон в Латвии", desc: "Большинство нянь в Латвии берут €5–€12/ч. С профессиональным образованием, сертификатом первой помощи или языковыми навыками ставка обычно €8–€15/ч." },
+      { title: "Учитывайте количество детей", desc: "Если в семье несколько детей, можно установить более высокую ставку или договориться о доплате за каждого дополнительного ребёнка напрямую с семьёй." },
+      { title: "Вечерние и выходные ставки", desc: "Уход по вечерам, ночью или в выходные обычно оценивается на 20–40% выше. Упомяните это в описании профиля, чтобы семьи знали заранее." },
+      { title: "Начните с конкурентоспособной ставки", desc: "Новичок на платформе? Начните с более низкой ставки, чтобы быстрее получить первые бронирования и отзывы. После 3–5 положительных оценок можно повысить ставку." },
     ],
-    tipsTitle: "Советы для отличного профиля",
+    tipsTitle: "Советы, которые помогут выделиться",
     tips: [
-      { title: "Добавьте чёткое фото", desc: "Профили с дружелюбным, профессиональным фото получают значительно больше внимания от родителей." },
-      { title: "Напишите подробное описание", desc: "Упомяните опыт с разными возрастными группами, сертификаты (первая помощь, образование) и ваш подход к уходу." },
-      { title: "Выберите актуальные навыки", desc: "Отметьте все подходящие навыки — готовка, обучение, особые потребности, плавание и т.д. Родители фильтруют по ним." },
-      { title: "Актуализируйте даты", desc: "Краткосрочные объявления автоматически деактивируются через 7 дней. Повторно активируйте с новыми датами, чтобы оставаться в поиске." },
+      { title: "Добавьте хорошее фото", desc: "Дружелюбное, чёткое фото — первое, что замечают семьи. Выберите снимок, где вы улыбаетесь и выглядите естественно — это создаёт доверие ещё до прочтения профиля." },
+      { title: "Напишите личное описание", desc: "Расскажите о своём опыте с разными возрастными группами, сертификатах и подходе к уходу за детьми. Семьи хотят понять, кто вы, а не только что умеете." },
+      { title: "Отметьте свои навыки", desc: "Готовка, обучение, особые потребности, плавание — чем точнее укажете, тем легче семьям найти вас через фильтры." },
+      { title: "Регулярно обновляйте даты", desc: "Краткосрочные объявления автоматически деактивируются через 7 дней. Обновляйте их актуальными датами, чтобы профиль всегда был виден в результатах поиска." },
     ],
     faqTitle: "Часто задаваемые вопросы",
     faqs: [
-      { q: "Бесплатно ли это?", a: "Да — создание профиля и размещение объявлений абсолютно бесплатно. NannyBooking не берёт регистрационных или листинговых сборов." },
-      { q: "Как происходит оплата?", a: "Условия оплаты вы согласовываете напрямую с семьёй. Большинство используют наличные или банковский перевод. NannyBooking не обрабатывает платежи." },
-      { q: "Могу ли я сам устанавливать часы?", a: "Конечно. Для краткосрочных объявлений вы выбираете конкретные даты и время. Для долгосрочных описываете общую доступность." },
-      { q: "Что делать, если семья отменяет?", a: "Семьи могут отменять бронирования до их подтверждения. Всегда договаривайтесь с семьёй о политике отмены для подтверждённых бронирований." },
-      { q: "Как работают отзывы?", a: "После завершённого бронирования семья может оставить звёздный рейтинг и письменный отзыв на вашем профиле. Честные отзывы помогают строить доверие." },
+      { q: "Регистрация бесплатна?", a: "Да — создание профиля и размещение объявлений бесплатно. Если хотите большей видимости или дополнительных возможностей, доступны платные планы — но начать можно совершенно бесплатно." },
+      { q: "Как происходят расчёты с семьёй?", a: "Об оплате договариваетесь напрямую с семьёй — NannyBooking не обрабатывает платежи и не берёт комиссию с ваших доходов. Большинство используют наличные или банковский перевод." },
+      { q: "Сама ли я выбираю рабочее время?", a: "Полностью. Для краткосрочных объявлений укажите конкретные даты и часы, для долгосрочных — свою общую доступность. Вы принимаете только те запросы, которые вам подходят." },
+      { q: "Что делать, если семья отменяет бронирование?", a: "Семьи могут отменить бронирование до его подтверждения. Рекомендуем заранее кратко обсудить условия отмены, чтобы у обеих сторон была ясность." },
+      { q: "Как работают отзывы?", a: "После завершённого бронирования семья может оставить звёздный рейтинг и письменный отзыв на вашем профиле. Вы не можете их редактировать, но можете ответить — это показывает семьям, что вам важно." },
     ],
-    ctaTitle: "Начните зарабатывать на своих условиях",
-    ctaDesc: "Создайте бесплатный профиль сегодня и охватите сотни семей, ищущих опытный уход за детьми.",
-    ctaBtn: "Создать объявление",
+    ctaTitle: "Готова начать?",
+    ctaDesc: "Создайте профиль бесплатно и позвольте семьям в вашем районе найти вас.",
+    ctaBtn: "Создать профиль",
     stepLabel: "Шаг",
   },
+};
+
+const pageTitles: Record<string, string> = {
+  en: "For Nannies | NannyBooking",
+  lv: "Auklītēm | NannyBooking",
+  ru: "Для нянь | NannyBooking",
 };
 
 export default function ForNanniesPage() {
   const { language } = useTranslation();
   const c = content[language as keyof typeof content] || content.en;
+
+  useEffect(() => {
+    document.title = pageTitles[language] ?? pageTitles.en;
+  }, [language]);
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
@@ -193,6 +204,7 @@ export default function ForNanniesPage() {
           >
             {c.ctaBtn}
           </Link>
+
         </div>
       </section>
 
