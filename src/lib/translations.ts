@@ -2249,7 +2249,7 @@ export const translations = {
   },
   'home.forParentsDesc': {
     en: 'Find experienced, background-checked nannies who match your family\'s needs and schedule.',
-    lv: 'Atrodiet pieredzējušas, pārbaudītas aukles, kas atbilst jūsu ģimenes vajadzībām un grafikam.',
+    lv: 'Meklējiet auklītes savā apkaimē, izlasiet atsauksmes no citām ģimenēm un sazināties tieši pēc rezervācijas apstiprināšanas.',
     ru: 'Найдите опытных, проверенных нянь, которые соответствуют потребностям и расписанию вашей семьи.'
   },
   'home.forNannies': {
@@ -2259,7 +2259,7 @@ export const translations = {
   },
   'home.forNanniesDesc': {
     en: 'Connect with families looking for quality childcare. Set your rates and availability.',
-    lv: 'Sazinieties ar ģimenēm, kas meklē kvalitatīvu bērnu aprūpi. Noteiciet savas cenas un pieejamību.',
+    lv: 'Izveidojiet profilu bez maksas, norādiet savu pieredzi un pieejamību — ģimenes jūs atradīs un nosūtīs pieprasījumu.',
     ru: 'Свяжитесь с семьями, ищущими качественный уход за детьми. Установите свои тарифы и доступность.'
   },
   'home.safeSecure': {
@@ -2269,7 +2269,7 @@ export const translations = {
   },
   'home.safeSecureDesc': {
     en: 'All users are verified with background checks and references for peace of mind.',
-    lv: 'Visi lietotāji ir pārbaudīti ar dzīves liecībām un atsauksmēm jūsu miera dēļ.',
+    lv: 'Profilu atsauksmes, caurspīdīga informācija un privāta kontaktinformācijas apmaiņa — lai abas puses justos droši katrā solī.',
     ru: 'Все пользователи проверены с помощью биографических проверок и рекомендаций для вашего спокойствия.'
   },
 

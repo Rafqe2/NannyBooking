@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
-import { SEARCH_LOCATIONS } from "../lib/constants/cities";
 import { formatDateRange } from "../lib/date";
 import Calendar from "./Calendar";
 import LocationAutocomplete from "./LocationAutocomplete";
@@ -17,38 +16,16 @@ interface SearchBarProps {
 
 export default function SearchBar({ onSearch }: SearchBarProps) {
   const { t, language } = useTranslation();
-  const [showLocationPicker, setShowLocationPicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState("Location");
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
-  const [locationSearch, setLocationSearch] = useState("");
-  const [filteredLocations, setFilteredLocations] = useState<string[]>([]);
   const [currentLocationQuery, setCurrentLocationQuery] = useState<string>(""); // Track typed text
 
-  const locationRef = useRef<HTMLDivElement>(null);
   const dateRef = useRef<HTMLDivElement>(null);
-
-  const locations = useMemo(() => SEARCH_LOCATIONS, []);
-
-  // Filter locations based on search input
-  useEffect(() => {
-    if (locationSearch.trim() === "") {
-      setFilteredLocations(locations);
-    } else {
-      const filtered = locations.filter((location) =>
-        location.toLowerCase().includes(locationSearch.toLowerCase())
-      );
-      setFilteredLocations(filtered);
-    }
-  }, [locationSearch, locations]);
 
   const handleClickOutside = useCallback((event: MouseEvent) => {
     const target = event.target as Node;
-
-    if (locationRef.current && !locationRef.current.contains(target)) {
-      setShowLocationPicker(false);
-    }
     if (dateRef.current && !dateRef.current.contains(target)) {
       setShowDatePicker(false);
     }
@@ -66,7 +43,6 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
       setStartDate(null);
       setEndDate(null);
       setShowDatePicker(false);
-      setShowLocationPicker(false);
     };
     if (typeof window !== "undefined") {
       window.addEventListener("resetSearch", handleReset);
@@ -151,7 +127,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
         <div className="flex justify-center px-2 sm:px-4 md:px-8 lg:px-16">
           <div className="w-full max-w-4xl bg-white shadow-2xl border border-gray-100 p-4 md:p-6 hover:shadow-3xl transition-shadow duration-300 rounded-3xl lg:rounded-full lg:flex lg:items-center lg:space-x-4 lg:space-y-0 space-y-4">
             {/* Where */}
-            <div className="relative flex-1" ref={locationRef}>
+            <div className="relative flex-1">
               <label className="block text-sm font-medium text-gray-700 mb-2 lg:hidden">
                 {t("search.where")}
               </label>
@@ -163,7 +139,6 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
                   onChange={(next) => {
                     setSelectedLocation(next.label);
                     setCurrentLocationQuery(next.label); // Update query when suggestion is selected
-                    setShowLocationPicker(false);
                   }}
                   onQueryChange={(query) => {
                     setCurrentLocationQuery(query); // Track the typed text

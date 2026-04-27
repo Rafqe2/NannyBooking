@@ -65,13 +65,13 @@ const content = {
   },
   lv: {
     title: "Atbalsts un palīdzības centrs",
-    subtitle: "Atrodiet atbildes, norādījumus un saziņas iespējas",
+    subtitle: "Jautājumi, padomi un saziņas iespējas — viss vienuviet.",
     gettingStartedTitle: "Sākšana",
     gettingStartedItems: [
-      { q: "Kā izveidot kontu?", a: "Noklikšķiniet uz 'Pieteikties' augšējā labajā stūrī un pierakstieties ar savu Google vai Facebook kontu. Jūsu profils tiek izveidots automātiski." },
-      { q: "Vai man jāaizpilda profils pirms publicēšanas?", a: "Jā. Pēc pieteikšanās jūs tiks vadīts caur profila iestatīšanu — izvēlieties, vai esat vecāks vai aukle, pievienojiet vārdu, atrašanās vietu un īsu bio." },
-      { q: "Vai NannyBooking ir bezmaksas?", a: "Pārlūkošana un pamata izmantošana ir bezmaksas. Sludinājumu publicēšanai, rezervāciju saņemšanai un visām pamatfunkcijām nav maksas. Mēs neiekasējam komisiju no jebkādiem maksājumiem starp vecākiem un auklēm." },
-      { q: "Kuras pilsētas aptver NannyBooking?", a: "NannyBooking aptver visas Latvijas pilsētas un ciematus. Atrašanās vietas meklēšana darbojas ar OpenStreetMap un ir ierobežota ar Latviju." },
+      { q: "Kā izveidot kontu?", a: "Nospiediet \"Pieteikties\" augšējā labajā stūrī un pierakstieties ar savu Google vai Facebook kontu. Profils tiek izveidots automātiski — pēc tam varēsiet to papildināt ar savu informāciju." },
+      { q: "Vai man jāaizpilda profils pirms publicēšanas?", a: "Jā — pēc reģistrācijas jūs tiksiet vadīts caur īsu profila iestatīšanu: izvēlieties lomu (vecāks vai auklīte), pievienojiet vārdu, atrašanās vietu un īsu aprakstu par sevi. Tas aizņem tikai pāris minūtes." },
+      { q: "Vai NannyBooking ir bezmaksas?", a: "Reģistrācija, pārlūkošana un pamata funkcijas ir bez maksas abām pusēm. NannyBooking neiekasē komisiju no maksājumiem starp vecākiem un auklītēm. Nākotnē būs pieejami arī izvēles maksas plāni ar papildu iespējām, bet sākt var pilnīgi bez maksas." },
+      { q: "Kuras pilsētas aptver NannyBooking?", a: "Visas Latvijas pilsētas un apdzīvotās vietas. Meklēšanā ievadiet savu atrašanās vietu, un redzēsiet sludinājumus tuvākajā apkaimē." },
     ],
     bookingsTitle: "Rezervācijas",
     bookingsItems: [
