@@ -121,7 +121,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
   }, []);
 
   return (
-    <div className="bg-white py-6 px-4 md:px-8">
+    <div className="py-6 px-4 md:px-8">
       <div className="max-w-7xl mx-auto relative">
         {/* Single Responsive Search Bar */}
         <div className="flex justify-center px-2 sm:px-4 md:px-8 lg:px-16">

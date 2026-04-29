@@ -251,16 +251,20 @@ export default function CreateAdvertisement() {
     <div className="max-w-4xl mx-auto p-6">
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         {/* Header */}
-        <div className="px-8 py-7 border-b border-gray-100 bg-gradient-to-r from-brand-50 to-brand-50/50">
-          <h1 className="text-2xl font-bold text-gray-900">
-            {t("adCreate.title")}
-          </h1>
-          <p className="text-gray-500 mt-1 text-sm">{t("adCreate.subtitle")}</p>
+        <div className="px-8 py-7 border-b border-brand-100/60" style={{ background: '#E9E5DD' }}>
+          <p className="text-[10px] font-bold tracking-[0.22em] uppercase text-brand-500 mb-1.5">{t("adCreate.createEyebrow")}</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t("adCreate.title")}</h1>
+          <p className="text-gray-600 mt-1 text-sm">{t("adCreate.subtitle")}</p>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-8 space-y-8">
+        <form onSubmit={handleSubmit} className="bg-gray-50 p-4 md:p-6 space-y-4">
           {/* Basic Information */}
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+            <p className="text-[10px] font-bold tracking-[0.22em] uppercase text-brand-400 mb-1">{t("common.basics")}</p>
+            <h2 className="text-base font-semibold text-gray-900 mb-5 flex items-center gap-2 after:flex-1 after:h-px after:bg-gray-100">
+              {t("adCreate.basicDetails")}
+            </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -341,10 +345,12 @@ export default function CreateAdvertisement() {
               </p>
             </div>
           </div>
+          </div>{/* end basic card */}
 
           {/* Availability (hidden for long-term) */}
           {formData.type === "short-term" && (
-            <div>
+            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+              <p className="text-[10px] font-bold tracking-[0.22em] uppercase text-brand-400 mb-1">{t("common.schedule")}</p>
               <h2 className="text-base font-semibold text-gray-900 mb-4 flex items-center gap-2 after:flex-1 after:h-px after:bg-gray-100">
                 {t("adCreate.availabilitySchedule")}
               </h2>
@@ -524,8 +530,9 @@ export default function CreateAdvertisement() {
           )}
 
           {/* Location */}
-          <div>
-            <h2 className="text-base font-semibold text-gray-900 mb-4 flex items-center gap-2 after:flex-1 after:h-px after:bg-gray-100">
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+            <p className="text-[10px] font-bold tracking-[0.22em] uppercase text-brand-400 mb-1">{t("common.location")}</p>
+            <h2 className="text-base font-semibold text-gray-900 mb-5 flex items-center gap-2 after:flex-1 after:h-px after:bg-gray-100">
               {t("adCreate.location")}
             </h2>
             <div className="grid grid-cols-1 gap-4">
@@ -598,8 +605,9 @@ export default function CreateAdvertisement() {
           </div>
 
           {/* Skills */}
-          <div>
-            <h2 className="text-base font-semibold text-gray-900 mb-4 flex items-center gap-2 after:flex-1 after:h-px after:bg-gray-100">
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+            <p className="text-[10px] font-bold tracking-[0.22em] uppercase text-brand-400 mb-1">{t("common.skills")}</p>
+            <h2 className="text-base font-semibold text-gray-900 mb-5 flex items-center gap-2 after:flex-1 after:h-px after:bg-gray-100">
               {isParent ? t("adCreate.requiredSkills") : t("adCreate.skills")}
             </h2>
             <p className="text-sm text-gray-600 mb-4">
@@ -628,8 +636,13 @@ export default function CreateAdvertisement() {
             </div>
           </div>
 
-          {/* Description */}
-          <div>
+          {/* Description + Experience + Additional Info */}
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 space-y-6">
+            <div>
+            <p className="text-[10px] font-bold tracking-[0.22em] uppercase text-brand-400 mb-1">{t("common.about")}</p>
+            <h2 className="text-base font-semibold text-gray-900 mb-5 flex items-center gap-2 after:flex-1 after:h-px after:bg-gray-100">
+              {t("adCreate.aboutSection")}
+            </h2>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               {descriptionLabel} <span className="text-red-500">*</span>
             </label>
@@ -657,7 +670,7 @@ export default function CreateAdvertisement() {
             <p className="text-xs text-gray-500 mt-1">
               {formData.description.length}/2000 {t("adCreate.characters")}
             </p>
-          </div>
+            </div>
 
           {/* Experience / Requirements (optional) */}
           <div>
@@ -726,6 +739,7 @@ export default function CreateAdvertisement() {
               </>
             )}
           </div>
+          </div>{/* end about card */}
 
           {/* Error Message */}
           {error && (
@@ -738,7 +752,7 @@ export default function CreateAdvertisement() {
           )}
 
           {/* Submit Button */}
-          <div className="flex justify-end space-x-4 pt-6">
+          <div className="flex justify-end space-x-4 pb-2">
             <button
               type="button"
               onClick={() => {

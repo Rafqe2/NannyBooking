@@ -166,13 +166,10 @@ export default function EditAdvertisement({
 
   return (
     <div className="max-w-3xl mx-auto bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
-      <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-brand-50 to-brand-50/40">
-        <h1 className="text-xl font-bold text-gray-900">
-          {t("createAd.editTitle")}
-        </h1>
-        <p className="text-sm text-gray-500 mt-0.5">
-          {isParent ? t("adCreate.titlePlaceholderParent") : t("adCreate.subtitle")}
-        </p>
+      <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-brand-50 to-brand-50/30">
+        <p className="text-[10px] font-bold tracking-[0.22em] uppercase text-brand-400 mb-1">{t("adCreate.editEyebrow")}</p>
+        <h1 className="text-xl font-bold text-gray-900">{t("createAd.editTitle")}</h1>
+        <p className="text-sm text-gray-500 mt-0.5">{t("adCreate.editSubtitle")}</p>
       </div>
       {isActive && (
         <div className="flex items-center gap-3 px-6 py-3 bg-amber-50 border-b border-amber-200 text-sm text-amber-800">
@@ -180,8 +177,11 @@ export default function EditAdvertisement({
           {t("adEdit.lockedWhileActive")}
         </div>
       )}
-      <div className="p-6">
+      <div className="bg-gray-50 p-4 md:p-5 space-y-4">
 
+      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+      <p className="text-[10px] font-bold tracking-[0.22em] uppercase text-brand-400 mb-1">{t("common.basics")}</p>
+      <h2 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2 after:flex-1 after:h-px after:bg-gray-100">{t("adCreate.basicDetails")}</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -199,7 +199,7 @@ export default function EditAdvertisement({
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            {t("adCreate.pricePerHour")}
+            {isParent ? t("adCreate.budgetPerHour") : t("adCreate.pricePerHour")}
           </label>
           <input
             disabled={isActive}
@@ -244,28 +244,28 @@ export default function EditAdvertisement({
             )}
           </p>
         </div>
-        <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            {t("ad.description")}
-          </label>
+      </div>
+      </div>{/* end basic card */}
+
+      {/* About card */}
+      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 space-y-4">
+        <div>
+          <p className="text-[10px] font-bold tracking-[0.22em] uppercase text-brand-400 mb-1">{t("common.about")}</p>
+          <h2 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2 after:flex-1 after:h-px after:bg-gray-100">{t("adCreate.aboutSection")}</h2>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">{t("ad.description")}</label>
           <textarea
             disabled={isActive}
             rows={3}
             value={description}
-            onChange={(e) => {
-              const value = e.target.value;
-              if (value.length <= 2000) {
-                setDescription(value);
-              }
-            }}
+            onChange={(e) => { const value = e.target.value; if (value.length <= 2000) setDescription(value); }}
             maxLength={2000}
-            className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-50"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent resize-none disabled:bg-gray-50"
           />
-          <p className="text-xs text-gray-500 mt-1">
-            {description.length}/2000 {t("adCreate.characters")}
-          </p>
+          <p className="text-xs text-gray-500 mt-1">{description.length}/2000 {t("adCreate.characters")}</p>
         </div>
-        <div className="md:col-span-2">
+        <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             {isParent ? t("adCreate.requirementsPreferences") : t("adCreate.experienceBackground")}
           </label>
@@ -273,78 +273,65 @@ export default function EditAdvertisement({
             disabled={isActive}
             rows={3}
             value={experience}
-            onChange={(e) => {
-              const value = e.target.value;
-              if (value.length <= 1000) {
-                setExperience(value);
-              }
-            }}
+            onChange={(e) => { const value = e.target.value; if (value.length <= 1000) setExperience(value); }}
             maxLength={1000}
-            className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-50"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent resize-none disabled:bg-gray-50"
           />
-          <p className="text-xs text-gray-500 mt-1">
-            {experience.length}/1000 {t("adCreate.characters")}
-          </p>
+          <p className="text-xs text-gray-500 mt-1">{experience.length}/1000 {t("adCreate.characters")}</p>
         </div>
-        <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            {t("adCreate.additionalInfo")}
-          </label>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">{t("adCreate.additionalInfo")}</label>
           <textarea
             disabled={isActive}
             rows={2}
             value={additionalInfo}
-            onChange={(e) => {
-              const value = e.target.value;
-              if (value.length <= 500) {
-                setAdditionalInfo(value);
-              }
-            }}
+            onChange={(e) => { const value = e.target.value; if (value.length <= 500) setAdditionalInfo(value); }}
             maxLength={500}
-            className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-50"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent resize-none disabled:bg-gray-50"
           />
-          <p className="text-xs text-gray-500 mt-1">
-            {additionalInfo.length}/500 {t("adCreate.characters")}
-          </p>
-        </div>
-        <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            {t("adCreate.location")}
-          </label>
-          <LocationAutocomplete
-            value={locationCity}
-            onChange={(v) => setLocationCity(v.label)}
-            placeholder={t("adCreate.placeholderSearch")}
-          />
-        </div>
-        <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            {t("ad.skills")}
-          </label>
-          <div className="flex flex-wrap gap-2">
-            {availableSkills.map((s) => (
-              <button
-                key={s}
-                type="button"
-                disabled={isActive}
-                onClick={() => handleSkillToggle(s)}
-                className={
-                  "px-3 py-1 rounded-full text-xs border " +
-                  (skills.includes(s)
-                    ? "bg-brand-100 text-brand-700 border-brand-200"
-                    : "bg-white text-gray-700 border-gray-300") +
-                  (isActive ? " opacity-60 cursor-not-allowed" : "")
-                }
-              >
-                {getTranslatedSkill(s, language)}
-              </button>
-            ))}
-          </div>
+          <p className="text-xs text-gray-500 mt-1">{additionalInfo.length}/500 {t("adCreate.characters")}</p>
         </div>
       </div>
 
-      {/* Extra locations (collapsed, add button) */}
-      <div className="mt-6">
+      {/* Location card */}
+      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+        <p className="text-[10px] font-bold tracking-[0.22em] uppercase text-brand-400 mb-1">{t("common.location")}</p>
+        <h2 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2 after:flex-1 after:h-px after:bg-gray-100">{t("adCreate.location")}</h2>
+        <label className="block text-sm font-medium text-gray-700 mb-1">{t("adCreate.primaryLocation")}</label>
+        <LocationAutocomplete
+          value={locationCity}
+          onChange={(v) => setLocationCity(v.label)}
+          placeholder={t("adCreate.placeholderSearch")}
+        />
+      </div>
+
+      {/* Skills card */}
+      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+        <p className="text-[10px] font-bold tracking-[0.22em] uppercase text-brand-400 mb-1">{t("common.skills")}</p>
+        <h2 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2 after:flex-1 after:h-px after:bg-gray-100">{isParent ? t("adCreate.requiredSkills") : t("adCreate.skills")}</h2>
+        <div className="flex flex-wrap gap-2">
+          {availableSkills.map((s) => (
+            <button
+              key={s}
+              type="button"
+              disabled={isActive}
+              onClick={() => handleSkillToggle(s)}
+              className={
+                "px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-150 " +
+                (skills.includes(s)
+                  ? "bg-brand-600 text-white border-brand-600 shadow-sm"
+                  : "bg-white text-gray-600 border-gray-200 hover:border-brand-300 hover:text-brand-700") +
+                (isActive ? " opacity-60 cursor-not-allowed" : "")
+              }
+            >
+              {getTranslatedSkill(s, language)}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Extra locations (collapsed) */}
+      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
         <div className="flex items-center justify-between">
           <label className="block text-sm font-medium text-gray-700">
             {t("adEdit.additionalLocations")}
@@ -425,8 +412,9 @@ export default function EditAdvertisement({
 
       {/* Availability */}
       {type === "short-term" && (
-        <div className="mt-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+          <p className="text-[10px] font-bold tracking-[0.22em] uppercase text-brand-400 mb-1">{t("common.schedule")}</p>
+          <h2 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2 after:flex-1 after:h-px after:bg-gray-100">
             {t("adCreate.availabilitySchedule")}
           </h2>
           <p className="text-sm text-gray-600 mb-4">
@@ -564,7 +552,7 @@ export default function EditAdvertisement({
       )}
 
       {saveError && (
-        <div className="mt-6 flex items-start gap-3 px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
+        <div className="flex items-start gap-3 px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
           <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
           </svg>
@@ -572,7 +560,7 @@ export default function EditAdvertisement({
         </div>
       )}
 
-      <div className="mt-8 flex items-center justify-between gap-3 pt-4 border-t border-gray-100">
+      <div className="flex items-center justify-between gap-3 pb-2">
         <button
           type="button"
           disabled={saving}

@@ -8,10 +8,10 @@ import Link from "next/link";
 import { User, FileText, Inbox, MessageCircle, Clock, Euro, Star, MapPin, BarChart2, Baby, Moon, Lightbulb, Camera, Tag, CalendarDays, Pencil } from "lucide-react";
 
 const stepIcons = [
-  <User key="user" className="w-7 h-7 text-brand-600" />,
-  <FileText key="file" className="w-7 h-7 text-brand-600" />,
-  <Inbox key="inbox" className="w-7 h-7 text-brand-600" />,
-  <MessageCircle key="msg" className="w-7 h-7 text-brand-600" />,
+  <User key="user" className="w-6 h-6 text-brand-600" />,
+  <FileText key="file" className="w-6 h-6 text-brand-600" />,
+  <Inbox key="inbox" className="w-6 h-6 text-brand-600" />,
+  <MessageCircle key="msg" className="w-6 h-6 text-brand-600" />,
 ];
 
 const whyIcons = [
@@ -40,6 +40,7 @@ const content = {
     title: "For Nannies",
     subtitle: "Your experience. Your schedule. Your rates.",
     howTitle: "How to get started",
+    howEyebrow: "Get started",
     steps: [
       { title: "Create your profile", desc: "Sign up and tell about yourself — experience, skills, availability and a short bio that families will see before contacting you." },
       { title: "Set your terms", desc: "Set your hourly rate and availability — short-term, long-term or both. You decide which offers to accept." },
@@ -47,6 +48,7 @@ const content = {
       { title: "Connect directly", desc: "After the booking is confirmed, exchange contact details and agree on the details directly with the family." },
     ],
     whyTitle: "Why join NannyBooking?",
+    whyEyebrow: "Why us",
     whyItems: [
       { title: "Flexible schedule", desc: "You choose when you are available. Accept requests that fit your life." },
       { title: "You set the rate", desc: "Set your hourly rate and change it at any time. No commissions — what you agree with the family is what you receive in full." },
@@ -54,6 +56,7 @@ const content = {
       { title: "Families find you", desc: "Your listing is visible to families in your city and neighbourhood. You don't need to search for clients — they come to you." },
     ],
     ratesTitle: "How to set your rates",
+    ratesEyebrow: "Rates guide",
     ratesIntro: "Your hourly rate is visible on your listing and is one of the first things families check. Here's what can help you choose.",
     rateItems: [
       { title: "Market range in Latvia", desc: "Most nannies in Latvia charge €5–€12/h. With formal education, a first aid certificate or language skills the rate is typically €8–€15/h." },
@@ -62,6 +65,7 @@ const content = {
       { title: "Start with a competitive rate", desc: "New to the platform? Start with a lower rate to get your first bookings and reviews faster. After 3–5 positive ratings you can raise your rate." },
     ],
     tipsTitle: "Tips to help you stand out",
+    tipsEyebrow: "Pro tips",
     tips: [
       { title: "Add a good photo", desc: "A friendly, clear photo is the first thing families notice. Choose an image where you are smiling and natural — it builds trust even before reading your profile." },
       { title: "Write a personal description", desc: "Tell about your experience with different age groups, certifications and approach to childcare. Families want to understand who you are, not just what you can do." },
@@ -69,6 +73,7 @@ const content = {
       { title: "Update dates regularly", desc: "Short-term listings auto-deactivate after 7 days. Update them with current dates so your profile is always visible in search results." },
     ],
     faqTitle: "Frequently asked questions",
+    faqEyebrow: "FAQ",
     faqs: [
       { q: "Is registration free?", a: "Yes — creating a profile and posting listings is free. If you want greater visibility or additional features, paid plans are available — but you can start completely for free." },
       { q: "How does payment work with the family?", a: "You agree on payment directly with the family — NannyBooking does not process payments and does not charge commission on your earnings. Most use cash or bank transfer." },
@@ -85,6 +90,7 @@ const content = {
     title: "Auklītēm",
     subtitle: "Jūsu pieredze. Jūsu grafiks. Jūsu cenas.",
     howTitle: "Kā sākt",
+    howEyebrow: "Sākums",
     steps: [
       { title: "Izveidojiet profilu", desc: "Reģistrējieties un pastāstiet par sevi — pieredze, prasmes, pieejamība un īss apraksts, ko ģimenes redzēs pirms sazināšanās." },
       { title: "Norādiet savus nosacījumus", desc: "Nosakiet stundas likmi un pieejamību — īstermiņa, ilgtermiņa vai abiem variantiem. Jūs lemjat, kādus piedāvājumus pieņemt." },
@@ -92,6 +98,7 @@ const content = {
       { title: "Sazināties tieši", desc: "Pēc rezervācijas apstiprināšanas apmainiet kontaktinformāciju un vienojieties par detaļām tieši ar ģimeni." },
     ],
     whyTitle: "Kāpēc pievienoties NannyBooking?",
+    whyEyebrow: "Kāpēc mēs",
     whyItems: [
       { title: "Elastīgs grafiks", desc: "Jūs izvēlaties, kad esat pieejama. Pieņemiet pieprasījumus, kas iederas jūsu dzīvē." },
       { title: "Jūs nosakāt tarifu", desc: "Norādiet savu stundas likmi un mainiet to jebkurā brīdī. Nav komisiju — ko vienojaties ar ģimeni, to saņemat pilnībā." },
@@ -99,6 +106,7 @@ const content = {
       { title: "Ģimenes atrod jūs", desc: "Jūsu sludinājums ir redzams ģimenēm jūsu pilsētā un apkaimē. Jums nav jāmeklē klienti — viņi nāk pie jums." },
     ],
     ratesTitle: "Kā noteikt savu tarifu",
+    ratesEyebrow: "Tarifu ceļvedis",
     ratesIntro: "Jūsu stundas tarifs ir redzams sludinājumā un ir viens no pirmajiem, ko ģimenes pārbauda. Lūk, kas var palīdzēt izvēlēties.",
     rateItems: [
       { title: "Tirgus diapazons Latvijā", desc: "Lielākā daļa auklīšu Latvijā iekasē €5–€12/h. Ar formālo izglītību, pirmās palīdzības sertifikātu vai valodu prasmēm tarifs parasti ir €8–€15/h." },
@@ -107,6 +115,7 @@ const content = {
       { title: "Sāciet ar konkurētspējīgu tarifu", desc: "Ja esat jauna platformā, sāciet ar zemāku likmi, lai ātrāk iegūtu pirmās rezervācijas un atsauksmes. Pēc 3–5 pozitīviem vērtējumiem varat tarifu paaugstināt." },
     ],
     tipsTitle: "Padomi, kas palīdz izcelties",
+    tipsEyebrow: "Padomi",
     tips: [
       { title: "Pievienojiet labu fotogrāfiju", desc: "Draudzīga, skaidra fotogrāfija ir pirmais, ko ģimenes pamana. Izvēlieties attēlu, kurā esat smaidoša un dabiska — tas rada uzticību vēl pirms profila lasīšanas." },
       { title: "Uzrakstiet personīgu aprakstu", desc: "Pastāstiet par savu pieredzi ar dažādām vecuma grupām, sertifikātiem un pieeju bērnu aprūpei. Ģimenes vēlas saprast, kas jūs esat, ne tikai ko jūs protat." },
@@ -114,6 +123,7 @@ const content = {
       { title: "Atjaunojiet datumus regulāri", desc: "Īstermiņa sludinājumi automātiski deaktivējas pēc 7 dienām. Atjaunojiet tos ar aktuāliem datumiem, lai jūsu profils vienmēr būtu redzams meklēšanas rezultātos." },
     ],
     faqTitle: "Biežāk uzdotie jautājumi",
+    faqEyebrow: "BUJ",
     faqs: [
       { q: "Vai reģistrācija ir bezmaksas?", a: "Jā — profila izveide un sludinājumu publicēšana ir bez maksas. Ja vēlaties lielāku redzamību vai papildu iespējas, ir pieejami arī maksas plāni — bet sākt var pilnīgi bez maksas." },
       { q: "Kā notiek norēķini ar ģimeni?", a: "Par samaksu jūs vienojaties tieši ar ģimeni — NannyBooking neapstrādā maksājumus un neiekasē komisiju no jūsu ienākumiem. Lielākā daļa izmanto skaidru naudu vai bankas pārskaitījumu." },
@@ -130,6 +140,7 @@ const content = {
     title: "Для нянь",
     subtitle: "Ваш опыт. Ваш график. Ваши цены.",
     howTitle: "Как начать",
+    howEyebrow: "Начало",
     steps: [
       { title: "Создайте профиль", desc: "Зарегистрируйтесь и расскажите о себе — опыт, навыки, доступность и краткое описание, которое семьи увидят перед тем, как связаться с вами." },
       { title: "Укажите свои условия", desc: "Установите почасовую ставку и доступность — краткосрочно, долгосрочно или оба варианта. Вы решаете, какие предложения принимать." },
@@ -137,6 +148,7 @@ const content = {
       { title: "Связывайтесь напрямую", desc: "После подтверждения бронирования обменяйтесь контактными данными и согласуйте детали напрямую с семьёй." },
     ],
     whyTitle: "Почему стоит присоединиться к NannyBooking?",
+    whyEyebrow: "Почему мы",
     whyItems: [
       { title: "Гибкий график", desc: "Вы выбираете, когда доступны. Принимайте запросы, которые вписываются в вашу жизнь." },
       { title: "Вы устанавливаете ставку", desc: "Укажите свою почасовую ставку и меняйте её в любое время. Без комиссий — то, о чём договорились с семьёй, получаете полностью." },
@@ -144,6 +156,7 @@ const content = {
       { title: "Семьи находят вас", desc: "Ваше объявление видно семьям в вашем городе и районе. Вам не нужно искать клиентов — они приходят к вам." },
     ],
     ratesTitle: "Как установить свой тариф",
+    ratesEyebrow: "Тарифное руководство",
     ratesIntro: "Ваша почасовая ставка видна в объявлении и является одним из первых, что проверяют семьи. Вот что может помочь выбрать.",
     rateItems: [
       { title: "Рыночный диапазон в Латвии", desc: "Большинство нянь в Латвии берут €5–€12/ч. С профессиональным образованием, сертификатом первой помощи или языковыми навыками ставка обычно €8–€15/ч." },
@@ -152,6 +165,7 @@ const content = {
       { title: "Начните с конкурентоспособной ставки", desc: "Новичок на платформе? Начните с более низкой ставки, чтобы быстрее получить первые бронирования и отзывы. После 3–5 положительных оценок можно повысить ставку." },
     ],
     tipsTitle: "Советы, которые помогут выделиться",
+    tipsEyebrow: "Советы",
     tips: [
       { title: "Добавьте хорошее фото", desc: "Дружелюбное, чёткое фото — первое, что замечают семьи. Выберите снимок, где вы улыбаетесь и выглядите естественно — это создаёт доверие ещё до прочтения профиля." },
       { title: "Напишите личное описание", desc: "Расскажите о своём опыте с разными возрастными группами, сертификатах и подходе к уходу за детьми. Семьи хотят понять, кто вы, а не только что умеете." },
@@ -159,6 +173,7 @@ const content = {
       { title: "Регулярно обновляйте даты", desc: "Краткосрочные объявления автоматически деактивируются через 7 дней. Обновляйте их актуальными датами, чтобы профиль всегда был виден в результатах поиска." },
     ],
     faqTitle: "Часто задаваемые вопросы",
+    faqEyebrow: "ЧЗВ",
     faqs: [
       { q: "Регистрация бесплатна?", a: "Да — создание профиля и размещение объявлений бесплатно. Если хотите большей видимости или дополнительных возможностей, доступны платные планы — но начать можно совершенно бесплатно." },
       { q: "Как происходят расчёты с семьёй?", a: "Об оплате договариваетесь напрямую с семьёй — NannyBooking не обрабатывает платежи и не берёт комиссию с ваших доходов. Большинство используют наличные или банковский перевод." },
@@ -192,33 +207,41 @@ export default function ForNanniesPage() {
       <Header />
 
       {/* Hero */}
-      <section className="bg-gradient-to-br from-brand-50 to-brand-50/40 pt-14 pb-16 px-4">
-        <div className="max-w-3xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-brand-100 text-brand-700 text-sm font-medium px-4 py-1.5 rounded-full mb-6">
-            <Baby className="w-4 h-4" />{c.title}
-          </div>
-          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 leading-tight">{c.subtitle}</h1>
+      <section className="relative bg-brand-600 overflow-hidden pt-16 pb-20 px-4">
+        <div className="absolute -top-12 -right-12 w-72 h-72 rounded-full bg-brand-500 opacity-20 pointer-events-none" />
+        <div className="absolute -bottom-16 -left-16 w-96 h-96 rounded-full bg-brand-500 opacity-10 pointer-events-none" />
+        <div className="relative max-w-3xl mx-auto text-center">
+          <span className="inline-block bg-brand-500/40 text-brand-100 text-[10px] font-bold tracking-[0.2em] uppercase px-4 py-1.5 rounded-full mb-6">
+            {c.title}
+          </span>
+          <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-5 leading-tight">
+            {c.subtitle}
+          </h1>
           <Link
             href="/create-advertisement"
-            className="inline-block mt-4 px-8 py-3 bg-brand-600 text-white font-semibold rounded-xl hover:bg-brand-700 transition-colors shadow-sm"
+            className="inline-block mt-2 px-8 py-3.5 bg-white text-brand-700 font-bold rounded-xl hover:bg-brand-50 transition-colors shadow-lg"
           >
             {c.ctaBtn}
           </Link>
-
         </div>
       </section>
 
       {/* How to get started */}
-      <section className="py-16 px-4">
+      <section className="px-4 py-16">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-bold text-gray-900 mb-10 text-center">{c.howTitle}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <p className="text-center text-[10px] font-bold tracking-[0.22em] uppercase text-brand-400 mb-3">{c.howEyebrow}</p>
+          <h2 className="text-3xl font-extrabold text-gray-900 mb-10 text-center">{c.howTitle}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
             {c.steps.map((step, i) => (
-              <div key={i} className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
-                <div className="mb-3">{stepIcons[i]}</div>
-                <div className="text-xs font-bold text-brand-500 uppercase tracking-wide mb-1">{c.stepLabel} {i + 1}</div>
-                <h3 className="text-base font-semibold text-gray-900 mb-2">{step.title}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{step.desc}</p>
+              <div key={i} className="rounded-3xl p-7" style={{ background: "#E9E5DD" }}>
+                <div className="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-brand-200/60 mb-4">
+                  {stepIcons[i]}
+                </div>
+                <p className="text-[10px] font-bold tracking-[0.18em] uppercase text-brand-500 mb-2">
+                  {c.stepLabel} {i + 1}
+                </p>
+                <h3 className="text-base font-bold text-gray-900 mb-2">{step.title}</h3>
+                <p className="text-sm text-gray-600 leading-relaxed">{step.desc}</p>
               </div>
             ))}
           </div>
@@ -226,15 +249,20 @@ export default function ForNanniesPage() {
       </section>
 
       {/* Why join */}
-      <section className="py-16 px-4 bg-gray-50/60">
+      <section className="px-4 py-16 bg-white">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-bold text-gray-900 mb-10 text-center">{c.whyTitle}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <p className="text-center text-[10px] font-bold tracking-[0.22em] uppercase text-brand-400 mb-3">{c.whyEyebrow}</p>
+          <h2 className="text-3xl font-extrabold text-gray-900 mb-10 text-center">{c.whyTitle}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {c.whyItems.map((item, i) => (
-              <div key={i} className="flex gap-4 bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-                <div className="flex-shrink-0 mt-0.5">{whyIcons[i]}</div>
+              <div key={i} className="flex gap-5 bg-white border border-gray-100 rounded-3xl p-7 shadow-sm">
+                <div className="flex-shrink-0">
+                  <div className="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-brand-50">
+                    {whyIcons[i]}
+                  </div>
+                </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">{item.title}</h3>
+                  <h3 className="font-bold text-gray-900 mb-1.5">{item.title}</h3>
                   <p className="text-sm text-gray-500 leading-relaxed">{item.desc}</p>
                 </div>
               </div>
@@ -244,16 +272,24 @@ export default function ForNanniesPage() {
       </section>
 
       {/* Rates guide */}
-      <section className="py-16 px-4">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-bold text-gray-900 mb-3 text-center">{c.ratesTitle}</h2>
-          <p className="text-center text-gray-500 text-sm mb-10 max-w-xl mx-auto">{c.ratesIntro}</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <section className="relative overflow-hidden px-4 py-16" style={{ background: "#E9E5DD" }}>
+        <div className="absolute -top-10 -right-10 w-64 h-64 rounded-full bg-brand-600 opacity-[0.05] pointer-events-none" />
+        <div className="absolute -bottom-10 -left-10 w-80 h-80 rounded-full bg-brand-600 opacity-[0.04] pointer-events-none" />
+        <div className="absolute top-1/3 right-1/3 w-40 h-40 rounded-full bg-brand-600 opacity-[0.03] pointer-events-none" />
+        <div className="relative max-w-5xl mx-auto">
+          <p className="text-center text-[10px] font-bold tracking-[0.22em] uppercase text-brand-400 mb-3">{c.ratesEyebrow}</p>
+          <h2 className="text-3xl font-extrabold text-gray-900 mb-3 text-center">{c.ratesTitle}</h2>
+          <p className="text-center text-gray-600 text-sm mb-10 max-w-xl mx-auto">{c.ratesIntro}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {c.rateItems.map((item, i) => (
-              <div key={i} className="flex gap-4 bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-                <div className="flex-shrink-0 mt-0.5">{rateIcons[i]}</div>
+              <div key={i} className="flex gap-5 bg-white border border-gray-100 rounded-3xl p-7 shadow-sm">
+                <div className="flex-shrink-0">
+                  <div className="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-brand-50">
+                    {rateIcons[i]}
+                  </div>
+                </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">{item.title}</h3>
+                  <h3 className="font-bold text-gray-900 mb-1.5">{item.title}</h3>
                   <p className="text-sm text-gray-500 leading-relaxed">{item.desc}</p>
                 </div>
               </div>
@@ -263,15 +299,20 @@ export default function ForNanniesPage() {
       </section>
 
       {/* Tips */}
-      <section className="py-16 px-4 bg-gray-50/60">
+      <section className="px-4 py-16 bg-white">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-bold text-gray-900 mb-10 text-center">{c.tipsTitle}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <p className="text-center text-[10px] font-bold tracking-[0.22em] uppercase text-brand-400 mb-3">{c.tipsEyebrow}</p>
+          <h2 className="text-3xl font-extrabold text-gray-900 mb-10 text-center">{c.tipsTitle}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {c.tips.map((tip, i) => (
-              <div key={i} className="flex gap-4 border border-gray-100 rounded-2xl p-6 bg-white shadow-sm">
-                <div className="flex-shrink-0 mt-0.5">{tipIcons[i]}</div>
+              <div key={i} className="flex gap-5 bg-white border border-gray-100 rounded-3xl p-7 shadow-sm">
+                <div className="flex-shrink-0">
+                  <div className="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-brand-50">
+                    {tipIcons[i]}
+                  </div>
+                </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">{tip.title}</h3>
+                  <h3 className="font-bold text-gray-900 mb-1.5">{tip.title}</h3>
                   <p className="text-sm text-gray-500 leading-relaxed">{tip.desc}</p>
                 </div>
               </div>
@@ -281,13 +322,17 @@ export default function ForNanniesPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-16 px-4 bg-gray-50/60">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-2xl font-bold text-gray-900 mb-10 text-center">{c.faqTitle}</h2>
-          <div className="space-y-4">
+      <section className="relative overflow-hidden px-4 py-16" style={{ background: "#E9E5DD" }}>
+        <div className="absolute -top-10 -right-10 w-64 h-64 rounded-full bg-brand-600 opacity-[0.05] pointer-events-none" />
+        <div className="absolute -bottom-10 -left-10 w-80 h-80 rounded-full bg-brand-600 opacity-[0.04] pointer-events-none" />
+        <div className="absolute top-1/2 left-1/4 w-48 h-48 rounded-full bg-brand-600 opacity-[0.03] pointer-events-none" />
+        <div className="relative max-w-3xl mx-auto">
+          <p className="text-center text-[10px] font-bold tracking-[0.22em] uppercase text-brand-400 mb-3">{c.faqEyebrow}</p>
+          <h2 className="text-3xl font-extrabold text-gray-900 mb-10 text-center">{c.faqTitle}</h2>
+          <div className="space-y-3">
             {c.faqs.map((faq, i) => (
-              <details key={i} className="group border border-gray-100 rounded-2xl bg-white shadow-sm overflow-hidden">
-                <summary className="flex items-center justify-between px-6 py-4 cursor-pointer font-medium text-gray-900 select-none list-none">
+              <details key={i} className="group rounded-2xl bg-white shadow-sm overflow-hidden">
+                <summary className="flex items-center justify-between px-6 py-4 cursor-pointer font-semibold text-gray-900 select-none list-none">
                   {faq.q}
                   <span className="text-brand-400 group-open:rotate-180 transition-transform duration-200 ml-4 flex-shrink-0">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -295,7 +340,7 @@ export default function ForNanniesPage() {
                     </svg>
                   </span>
                 </summary>
-                <div className="px-6 pb-5 text-sm text-gray-500 leading-relaxed border-t border-gray-50 pt-3">
+                <div className="px-6 pb-5 text-sm text-gray-500 leading-relaxed border-t border-gray-100 pt-3">
                   {faq.a}
                 </div>
               </details>
@@ -305,13 +350,13 @@ export default function ForNanniesPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 px-4 bg-gradient-to-r from-brand-600 to-brand-600">
+      <section className="px-4 py-16 bg-white">
         <div className="max-w-2xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-white mb-3">{c.ctaTitle}</h2>
-          <p className="text-brand-200 mb-8 text-lg">{c.ctaDesc}</p>
+          <h2 className="text-3xl font-extrabold text-gray-900 mb-3">{c.ctaTitle}</h2>
+          <p className="text-gray-600 mb-8 text-lg">{c.ctaDesc}</p>
           <Link
             href="/create-advertisement"
-            className="inline-block px-10 py-3 bg-white text-brand-700 font-bold rounded-xl hover:bg-brand-50 transition-colors shadow-lg"
+            className="inline-block px-10 py-3.5 bg-brand-600 text-white font-bold rounded-xl hover:bg-brand-700 transition-colors shadow-lg"
           >
             {c.ctaBtn}
           </Link>

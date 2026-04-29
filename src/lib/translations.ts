@@ -24,14 +24,14 @@ export const translations = {
 
   // Home Page
   'home.title': {
-    en: 'Find trusted childcare in the Baltic region',
-    lv: 'Atrodiet uzticamu bērnu aprūpi Baltijas reģionā',
-    ru: 'Найдите надежный уход за детьми в Балтийском регионе'
+    en: 'Find trusted childcare in Latvia',
+    lv: 'Atrodiet uzticamu bērnu aprūpi Latvijā',
+    ru: 'Найдите надежный уход за детьми в Латвии'
   },
   'home.subtitle': {
-    en: 'Connect with verified nannies and families across Latvia, Lithuania, Estonia, and Sweden',
-    lv: 'Sazinieties ar verificētām auklēm un ģimenēm Latvijā, Lietuvā, Igaunijā un Zviedrijā',
-    ru: 'Свяжитесь с проверенными нянями и семьями в Латвии, Литве, Эстонии и Швеции'
+    en: 'Connect with nannies and families across Latvia',
+    lv: 'Sazinieties ar auklītēm un ģimenēm visā Latvijā',
+    ru: 'Свяжитесь с нянями и семьями по всей Латвии'
   },
   'home.searchPlaceholder': {
     en: 'Enter location (e.g., Rīga, Jūrmala, Liepāja)',
@@ -736,6 +736,31 @@ export const translations = {
     lv: 'atlikuši',
     ru: 'ост.'
   },
+  'common.basics': {
+    en: 'Basics',
+    lv: 'Pamati',
+    ru: 'Основное'
+  },
+  'common.about': {
+    en: 'About',
+    lv: 'Par',
+    ru: 'О себе'
+  },
+  'common.schedule': {
+    en: 'Schedule',
+    lv: 'Grafiks',
+    ru: 'Расписание'
+  },
+  'common.location': {
+    en: 'Location',
+    lv: 'Atrašanās vieta',
+    ru: 'Местоположение'
+  },
+  'common.skills': {
+    en: 'Skills',
+    lv: 'Prasmes',
+    ru: 'Навыки'
+  },
 
   // Search Bar
   'search.where': {
@@ -1108,6 +1133,31 @@ export const translations = {
     lv: 'Izveidojiet profesionālu sludinājumu, lai demonstrētu savus bērnu aprūpes pakalpojumus',
     ru: 'Создайте профессиональное объявление, чтобы продемонстрировать ваши услуги по уходу за детьми'
   },
+  'adCreate.editSubtitle': {
+    en: 'Update your advertisement details below',
+    lv: 'Atjauniniet sava sludinājuma informāciju',
+    ru: 'Обновите данные вашего объявления'
+  },
+  'adCreate.editEyebrow': {
+    en: 'Edit',
+    lv: 'Rediģēt',
+    ru: 'Редактировать'
+  },
+  'adCreate.createEyebrow': {
+    en: 'New',
+    lv: 'Jauns',
+    ru: 'Новое'
+  },
+  'adCreate.basicDetails': {
+    en: 'Basic Details',
+    lv: 'Pamata Informācija',
+    ru: 'Основная Информация'
+  },
+  'adCreate.aboutSection': {
+    en: 'Description & Experience',
+    lv: 'Apraksts un Pieredze',
+    ru: 'Описание и Опыт'
+  },
   'adCreate.nannyOnly': {
     en: 'This page is for nannies',
     lv: 'Šī lapa ir paredzēta auklēm',
@@ -1240,7 +1290,7 @@ export const translations = {
   },
   'adCreate.experiencePlaceholderNanny': {
     en: 'Tell families about your childcare experience, education, and background.',
-    lv: 'Pastāstiet ģimenēm par savu bērnu aprūpes pieredzi, izglītību un pieredzi.',
+    lv: 'Pastāstiet ģimenēm par savu bērnu aprūpes pieredzi, izglītību un kvalifikāciju.',
     ru: 'Расскажите семьям о вашем опыте ухода за детьми, образовании и квалификации.'
   },
   'adCreate.descriptionPlaceholderParent': {
@@ -1419,9 +1469,9 @@ export const translations = {
     ru: 'Удалить'
   },
   'adCreate.placeholderSearch': {
-    en: 'Start typing to search...',
-    lv: 'Sāciet rakstīt, lai meklētu...',
-    ru: 'Начните печатать для поиска...'
+    en: 'e.g. "Rīga", "Āgenskalns"',
+    lv: 'piem. "Rīga", "Āgenskalns"',
+    ru: 'напр. "Рига", "Агенскалнс"'
   },
   'adCreate.additionalLocation': {
     en: 'Additional location',
@@ -1894,7 +1944,7 @@ export const translations = {
     ru: 'Выглядит хорошо? Вам стоит забронировать и связаться с {{providerType}}.'
   },
   'ad.lookingGoodParent': {
-    en: 'Looking good? You should Offer Your services.',
+    en: 'Looking good? You should offer your services.',
     lv: 'Izskatās labi? Jums vajadzētu piedāvāt savus pakalpojumus.',
     ru: 'Выглядит хорошо? Вам стоит предложить свои услуги.'
   },
@@ -1963,9 +2013,9 @@ export const translations = {
     ru: 'Войти в NannyBooking'
   },
   'login.subtitle': {
-    en: 'Connect with trusted childcare providers in the Baltic region',
-    lv: 'Sazinieties ar uzticamiem bērnu aprūpes pakalpojumu sniedzējiem Baltijas reģionā',
-    ru: 'Свяжитесь с надежными поставщиками услуг по уходу за детьми в Балтийском регионе'
+    en: 'Connect with trusted nannies and families across Latvia',
+    lv: 'Sazinieties ar uzticamām auklītēm un ģimenēm visā Latvijā',
+    ru: 'Свяжитесь с надежными нянями и семьями по всей Латвии'
   },
   'login.continueWith': {
     en: 'Continue with',
@@ -2240,6 +2290,26 @@ export const translations = {
     lv: 'NannyBooking savieno vecākus ar auklītēm vienuviet. Jūs izvēlaties, jūs vienojaties — mēs tikai palīdzam atrast vienam otru.',
     ru: 'NannyBooking объединяет родителей и нянь в одном месте. Вы выбираете, вы договариваетесь — мы просто помогаем найти друг друга.'
   },
+  'home.heroParentsDesc': {
+    en: 'Browse verified profiles, read reviews from other families and connect after a booking is confirmed.',
+    lv: 'Pārlūkojiet profilus, lasiet atsauksmes no citām ģimenēm un sazināties tieši pēc rezervācijas apstiprināšanas.',
+    ru: 'Просматривайте профили, читайте отзывы других семей и связывайтесь после подтверждения бронирования.'
+  },
+  'home.heroNanniesDesc': {
+    en: 'Create a free profile, set your schedule and rates — families in your area will find you.',
+    lv: 'Izveidojiet profilu bez maksas, norādiet grafiku un cenas — ģimenes jūsu apkaimē jūs atradīs.',
+    ru: 'Создайте бесплатный профиль, укажите расписание и ставки — семьи в вашем районе найдут вас.'
+  },
+  'home.heroParentsBtn': {
+    en: 'Find a nanny',
+    lv: 'Meklēt auklīti',
+    ru: 'Найти няню'
+  },
+  'home.heroNanniesBtn': {
+    en: 'Create a profile',
+    lv: 'Izveidot profilu',
+    ru: 'Создать профиль'
+  },
 
   // Feature cards
   'home.forParents': {
@@ -2248,19 +2318,19 @@ export const translations = {
     ru: 'Для Родителей'
   },
   'home.forParentsDesc': {
-    en: 'Find experienced, background-checked nannies who match your family\'s needs and schedule.',
+    en: 'Browse profiles in your area, read reviews from other families and connect directly after a booking is confirmed.',
     lv: 'Meklējiet auklītes savā apkaimē, izlasiet atsauksmes no citām ģimenēm un sazināties tieši pēc rezervācijas apstiprināšanas.',
-    ru: 'Найдите опытных, проверенных нянь, которые соответствуют потребностям и расписанию вашей семьи.'
+    ru: 'Просматривайте профили в вашем районе, читайте отзывы других семей и связывайтесь напрямую после подтверждения бронирования.'
   },
   'home.forNannies': {
     en: 'For Nannies',
-    lv: 'Auklēm',
+    lv: 'Auklītēm',
     ru: 'Для Нянь'
   },
   'home.forNanniesDesc': {
-    en: 'Connect with families looking for quality childcare. Set your rates and availability.',
+    en: 'Create a free profile, set your experience and availability — families will find you and send a request.',
     lv: 'Izveidojiet profilu bez maksas, norādiet savu pieredzi un pieejamību — ģimenes jūs atradīs un nosūtīs pieprasījumu.',
-    ru: 'Свяжитесь с семьями, ищущими качественный уход за детьми. Установите свои тарифы и доступность.'
+    ru: 'Создайте бесплатный профиль, укажите опыт и доступность — семьи найдут вас и отправят запрос.'
   },
   'home.safeSecure': {
     en: 'Safe & Secure',
@@ -2268,9 +2338,9 @@ export const translations = {
     ru: 'Безопасно и Надежно'
   },
   'home.safeSecureDesc': {
-    en: 'All users are verified with background checks and references for peace of mind.',
+    en: 'Profile reviews, transparent information and private contact exchange — so both sides feel safe at every step.',
     lv: 'Profilu atsauksmes, caurspīdīga informācija un privāta kontaktinformācijas apmaiņa — lai abas puses justos droši katrā solī.',
-    ru: 'Все пользователи проверены с помощью биографических проверок и рекомендаций для вашего спокойствия.'
+    ru: 'Отзывы профилей, прозрачная информация и приватный обмен контактами — чтобы обе стороны чувствовали себя в безопасности на каждом шагу.'
   },
 
   // Stats

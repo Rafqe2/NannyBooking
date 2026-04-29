@@ -7,18 +7,19 @@ import { useTranslation } from "../../components/LanguageProvider";
 import { Handshake, Phone, ClipboardList, Lock, Star, AlertTriangle, LifeBuoy } from "lucide-react";
 
 const safetyIcons = [
-  <Handshake key="handshake" className="w-6 h-6 text-amber-600" />,
-  <Phone key="phone" className="w-6 h-6 text-amber-600" />,
-  <ClipboardList key="clipboard" className="w-6 h-6 text-amber-600" />,
-  <Lock key="lock" className="w-6 h-6 text-amber-600" />,
-  <Star key="star" className="w-6 h-6 text-amber-600" />,
-  <AlertTriangle key="alert" className="w-6 h-6 text-amber-600" />,
+  <Handshake key="handshake" className="w-6 h-6 text-brand-600" />,
+  <Phone key="phone" className="w-6 h-6 text-brand-600" />,
+  <ClipboardList key="clipboard" className="w-6 h-6 text-brand-600" />,
+  <Lock key="lock" className="w-6 h-6 text-brand-600" />,
+  <Star key="star" className="w-6 h-6 text-brand-600" />,
+  <AlertTriangle key="alert" className="w-6 h-6 text-brand-600" />,
 ];
 
 const content = {
   en: {
     title: "Support & Help Center",
     subtitle: "Find answers, guidance, and ways to get in touch",
+    heroEyebrow: "Help Center",
     gettingStartedTitle: "Getting started",
     gettingStartedItems: [
       { q: "How do I create an account?", a: "Click 'Log in' in the top-right corner and sign in with your Google or Facebook account. Your profile is created automatically." },
@@ -46,6 +47,7 @@ const content = {
       { q: "Can I edit my active listing?", a: "You can update availability dates and locations while a listing is active. Title, type, price, description and skills are locked — deactivate first to edit those." },
     ],
     safetyTitle: "Safety guidelines",
+    safetyEyebrow: "Stay safe",
     safetyItems: [
       { title: "Meet before the first booking", desc: "Arrange a short video or in-person introduction before the first session. This helps both parties feel comfortable and confirm expectations." },
       { title: "Verify contact info", desc: "After exchanging contact details through the platform, confirm via a quick call before meeting in person." },
@@ -55,6 +57,7 @@ const content = {
       { title: "Report concerns", desc: "If you encounter inappropriate content or behaviour, contact us immediately using the form below." },
     ],
     contactTitle: "Contact us",
+    contactEyebrow: "Get in touch",
     contactDesc: "Have a question not covered above, or need to report an issue? Send us a message and we'll get back to you within 1 business day.",
     contactEmailLabel: "Your email",
     contactEmailPlaceholder: "you@example.com",
@@ -66,6 +69,7 @@ const content = {
   lv: {
     title: "Atbalsts un palīdzības centrs",
     subtitle: "Jautājumi, padomi un saziņas iespējas — viss vienuviet.",
+    heroEyebrow: "Palīdzības centrs",
     gettingStartedTitle: "Sākšana",
     gettingStartedItems: [
       { q: "Kā izveidot kontu?", a: "Nospiediet \"Pieteikties\" augšējā labajā stūrī un pierakstieties ar savu Google vai Facebook kontu. Profils tiek izveidots automātiski — pēc tam varēsiet to papildināt ar savu informāciju." },
@@ -93,6 +97,7 @@ const content = {
       { q: "Vai varu rediģēt aktīvo sludinājumu?", a: "Aktīva sludinājuma laikā varat atjaunināt pieejamības datumus un atrašanās vietas. Nosaukums, veids, cena, apraksts un prasmes ir bloķētas — vispirms deaktivizējiet, lai tos rediģētu." },
     ],
     safetyTitle: "Drošības vadlīnijas",
+    safetyEyebrow: "Drošība",
     safetyItems: [
       { title: "Tikieties pirms pirmās rezervācijas", desc: "Pirms pirmās sesijas rīkojiet īsu video vai klātienes iepazīšanos. Tas palīdz abām pusēm justies ērti un apstiprināt cerības." },
       { title: "Pārbaudiet kontaktinformāciju", desc: "Pēc kontaktinformācijas apmaiņas caur platformu, pirms personīgās tikšanās apstipriniet to ar ātru zvanu." },
@@ -102,6 +107,7 @@ const content = {
       { title: "Ziņojiet par bažām", desc: "Ja sastopaties ar nepiemērotu saturu vai uzvedību, nekavējoties sazinieties ar mums, izmantojot zemāk esošo formu." },
     ],
     contactTitle: "Sazinieties ar mums",
+    contactEyebrow: "Sazināties",
     contactDesc: "Vai jums ir jautājums, kas nav apskatīts iepriekš, vai jums jāziņo par problēmu? Nosūtiet mums ziņojumu, un mēs atbildēsim 1 darba dienas laikā.",
     contactEmailLabel: "Jūsu e-pasts",
     contactEmailPlaceholder: "jūs@piemers.lv",
@@ -113,6 +119,7 @@ const content = {
   ru: {
     title: "Поддержка и справочный центр",
     subtitle: "Найдите ответы, руководство и способы связаться с нами",
+    heroEyebrow: "Справочный центр",
     gettingStartedTitle: "Начало работы",
     gettingStartedItems: [
       { q: "Как создать аккаунт?", a: "Нажмите 'Войти' в правом верхнем углу и войдите через Google или Facebook. Ваш профиль создаётся автоматически." },
@@ -140,6 +147,7 @@ const content = {
       { q: "Могу ли я редактировать активное объявление?", a: "Вы можете обновлять даты доступности и местоположения, пока объявление активно. Название, тип, цена, описание и навыки заблокированы — сначала деактивируйте, чтобы их редактировать." },
     ],
     safetyTitle: "Рекомендации по безопасности",
+    safetyEyebrow: "Безопасность",
     safetyItems: [
       { title: "Встретьтесь перед первым бронированием", desc: "Организуйте короткое видео или личное знакомство перед первым сеансом. Это помогает обеим сторонам чувствовать себя комфортно и уточнить ожидания." },
       { title: "Проверьте контактные данные", desc: "После обмена контактами через платформу подтвердите их коротким звонком перед личной встречей." },
@@ -149,6 +157,7 @@ const content = {
       { title: "Сообщайте об инцидентах", desc: "Если вы столкнулись с неприемлемым контентом или поведением, немедленно свяжитесь с нами через форму ниже." },
     ],
     contactTitle: "Свяжитесь с нами",
+    contactEyebrow: "Связь",
     contactDesc: "Есть вопрос, не описанный выше, или нужно сообщить о проблеме? Напишите нам, и мы ответим в течение 1 рабочего дня.",
     contactEmailLabel: "Ваш email",
     contactEmailPlaceholder: "вы@example.com",
@@ -163,7 +172,7 @@ export default function SupportPage() {
   const { language } = useTranslation();
   const c = content[language as keyof typeof content] || content.en;
 
-  const sections = [
+  const faqSections = [
     { title: c.gettingStartedTitle, items: c.gettingStartedItems },
     { title: c.bookingsTitle, items: c.bookingsItems },
     { title: c.messagingTitle, items: c.messagingItems },
@@ -175,25 +184,31 @@ export default function SupportPage() {
       <Header />
 
       {/* Hero */}
-      <section className="bg-gradient-to-br from-gray-50 to-brand-50/30 pt-14 pb-14 px-4">
-        <div className="max-w-3xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-gray-100 text-gray-700 text-sm font-medium px-4 py-1.5 rounded-full mb-6">
-            <LifeBuoy className="w-4 h-4" />{c.title}
-          </div>
-          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-3 leading-tight">{c.title}</h1>
-          <p className="text-gray-500 text-lg">{c.subtitle}</p>
+      <section className="relative bg-brand-600 overflow-hidden pt-16 pb-20 px-4">
+        <div className="absolute -top-12 -right-12 w-72 h-72 rounded-full bg-brand-500 opacity-20 pointer-events-none" />
+        <div className="absolute -bottom-16 -left-16 w-96 h-96 rounded-full bg-brand-500 opacity-10 pointer-events-none" />
+        <div className="relative max-w-3xl mx-auto text-center">
+          <span className="inline-flex items-center gap-2 bg-brand-500/40 text-brand-100 text-[10px] font-bold tracking-[0.2em] uppercase px-4 py-1.5 rounded-full mb-6">
+            <LifeBuoy className="w-4 h-4" />{c.heroEyebrow}
+          </span>
+          <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4 leading-tight">{c.title}</h1>
+          <p className="text-brand-200 text-lg">{c.subtitle}</p>
         </div>
       </section>
 
-      {/* FAQ Sections */}
-      {sections.map((section) => (
-        <section key={section.title} className="py-12 px-4 border-b border-gray-100">
+      {/* FAQ Sections — alternating cream / white */}
+      {faqSections.map((section, sIdx) => (
+        <section
+          key={section.title}
+          className="px-4 py-14"
+          style={{ background: sIdx % 2 === 0 ? "#E9E5DD" : "#ffffff" }}
+        >
           <div className="max-w-3xl mx-auto">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">{section.title}</h2>
+            <h2 className="text-2xl font-extrabold text-gray-900 mb-6">{section.title}</h2>
             <div className="space-y-3">
               {section.items.map((item, i) => (
-                <details key={i} className="group border border-gray-100 rounded-2xl bg-white shadow-sm overflow-hidden">
-                  <summary className="flex items-center justify-between px-6 py-4 cursor-pointer font-medium text-gray-900 select-none list-none">
+                <details key={i} className="group rounded-2xl bg-white shadow-sm overflow-hidden">
+                  <summary className="flex items-center justify-between px-6 py-4 cursor-pointer font-semibold text-gray-900 select-none list-none">
                     {item.q}
                     <span className="text-brand-400 group-open:rotate-180 transition-transform duration-200 ml-4 flex-shrink-0">
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -201,7 +216,7 @@ export default function SupportPage() {
                       </svg>
                     </span>
                   </summary>
-                  <div className="px-6 pb-5 text-sm text-gray-500 leading-relaxed border-t border-gray-50 pt-3">
+                  <div className="px-6 pb-5 text-sm text-gray-500 leading-relaxed border-t border-gray-100 pt-3">
                     {item.a}
                   </div>
                 </details>
@@ -212,15 +227,22 @@ export default function SupportPage() {
       ))}
 
       {/* Safety Guidelines */}
-      <section className="py-16 px-4 bg-amber-50/40">
+      <section className="px-4 py-16 bg-white">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-bold text-gray-900 mb-10 text-center">{c.safetyTitle}</h2>
+          <p className="text-center text-[10px] font-bold tracking-[0.22em] uppercase text-brand-400 mb-3">{c.safetyEyebrow}</p>
+          <h2 className="text-3xl font-extrabold text-gray-900 mb-10 text-center">{c.safetyTitle}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {c.safetyItems.map((item, i) => (
-              <div key={i} className="bg-white border border-amber-100 rounded-2xl p-5 shadow-sm">
-                <div className="mb-3">{safetyIcons[i]}</div>
-                <h3 className="font-semibold text-gray-900 mb-1 text-sm">{item.title}</h3>
-                <p className="text-xs text-gray-500 leading-relaxed">{item.desc}</p>
+              <div key={i} className="flex gap-4 bg-white border border-gray-100 rounded-3xl p-6 shadow-sm">
+                <div className="flex-shrink-0">
+                  <div className="inline-flex items-center justify-center w-10 h-10 rounded-2xl bg-brand-50">
+                    {safetyIcons[i]}
+                  </div>
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-900 mb-1 text-sm">{item.title}</h3>
+                  <p className="text-xs text-gray-500 leading-relaxed">{item.desc}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -228,11 +250,14 @@ export default function SupportPage() {
       </section>
 
       {/* Contact Form */}
-      <section className="py-16 px-4">
+      <section className="px-4 py-16" style={{ background: "#E9E5DD" }}>
         <div className="max-w-xl mx-auto">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2 text-center">{c.contactTitle}</h2>
-          <p className="text-gray-500 text-sm text-center mb-8">{c.contactDesc}</p>
-          <ContactForm c={c} />
+          <p className="text-center text-[10px] font-bold tracking-[0.22em] uppercase text-brand-400 mb-3">{c.contactEyebrow}</p>
+          <h2 className="text-3xl font-extrabold text-gray-900 mb-2 text-center">{c.contactTitle}</h2>
+          <p className="text-gray-600 text-sm text-center mb-8">{c.contactDesc}</p>
+          <div className="bg-white rounded-3xl p-8 shadow-sm">
+            <ContactForm c={c} />
+          </div>
         </div>
       </section>
 

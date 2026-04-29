@@ -8,17 +8,17 @@ import Link from "next/link";
 import { Search, ClipboardList, CalendarDays, MessageCircle, CheckCircle, MapPin, Lock, Euro, Users } from "lucide-react";
 
 const stepIcons = [
-  <Search key="search" className="w-7 h-7 text-brand-600" />,
-  <ClipboardList key="clipboard" className="w-7 h-7 text-brand-600" />,
-  <CalendarDays key="calendar" className="w-7 h-7 text-brand-600" />,
-  <MessageCircle key="message" className="w-7 h-7 text-brand-600" />,
+  <Search key="search" className="w-5 h-5 text-brand-600" />,
+  <ClipboardList key="clipboard" className="w-5 h-5 text-brand-600" />,
+  <CalendarDays key="calendar" className="w-5 h-5 text-brand-600" />,
+  <MessageCircle key="message" className="w-5 h-5 text-brand-600" />,
 ];
 
 const whyIcons = [
-  <CheckCircle key="check" className="w-6 h-6 text-brand-600" />,
-  <MapPin key="map" className="w-6 h-6 text-brand-600" />,
-  <Lock key="lock" className="w-6 h-6 text-brand-600" />,
-  <Euro key="euro" className="w-6 h-6 text-brand-600" />,
+  <CheckCircle key="check" className="w-5 h-5 text-brand-600" />,
+  <MapPin key="map" className="w-5 h-5 text-brand-600" />,
+  <Lock key="lock" className="w-5 h-5 text-brand-600" />,
+  <Euro key="euro" className="w-5 h-5 text-brand-600" />,
 ];
 
 const content = {
@@ -34,6 +34,7 @@ const content = {
       { title: "Connect directly", desc: "Once confirmed, exchange contact details and agree on the details. We recommend a short introductory call before the first meeting." },
     ],
     whyTitle: "Why parents choose NannyBooking?",
+    whyEyebrow: "Why us",
     whyItems: [
       { title: "Verified profiles", desc: "Every nanny creates their own profile with experience, skills, and hourly rate. Family reviews help you choose." },
       { title: "Flexible for any situation", desc: "Need a nanny for one evening or regularly every weekday? Find someone who fits exactly your schedule." },
@@ -66,6 +67,7 @@ const content = {
       { title: "Sazināties tieši", desc: "Pēc apstiprināšanas apmainiet kontaktinformāciju un vienojieties par detaļām. Iesakām īsu iepazīšanās zvanu pirms pirmās tikšanās." },
     ],
     whyTitle: "Kāpēc vecāki izvēlas NannyBooking?",
+    whyEyebrow: "Kāpēc mēs",
     whyItems: [
       { title: "Pārbaudīti profili", desc: "Katra auklīte veido savu profilu ar pieredzi, prasmēm un stundas likmi. Ģimeņu atsauksmes palīdz jums izvēlēties." },
       { title: "Elastīgs jebkurai situācijai", desc: "Nepieciešama auklīte vienai vakara stundai vai regulāri katru darba dienu? Atrodiet cilvēku, kas atbilst tieši jūsu grafikam." },
@@ -98,6 +100,7 @@ const content = {
       { title: "Связаться напрямую", desc: "После подтверждения обменяйтесь контактами и согласуйте детали. Рекомендуем короткий вводный звонок перед первой встречей." },
     ],
     whyTitle: "Почему родители выбирают NannyBooking?",
+    whyEyebrow: "Почему мы",
     whyItems: [
       { title: "Проверенные профили", desc: "Каждая няня создаёт свой профиль с опытом, навыками и почасовой ставкой. Отзывы семей помогают вам выбрать." },
       { title: "Гибко для любой ситуации", desc: "Нужна няня на один вечерний час или регулярно каждый будний день? Найдите человека, подходящего именно под ваш график." },
@@ -151,17 +154,19 @@ export default function ForParentsPage() {
       <Header />
 
       {/* Hero */}
-      <section className="bg-gradient-to-br from-brand-50 to-brand-50/40 pt-14 pb-16 px-4">
-        <div className="max-w-3xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-brand-100 text-brand-700 text-sm font-medium px-4 py-1.5 rounded-full mb-6">
-            <Users className="w-4 h-4" />{c.title}
+      <section className="relative bg-brand-600 overflow-hidden px-6 md:px-12 pt-16 pb-20">
+        <div className="absolute -top-12 -right-12 w-72 h-72 rounded-full bg-brand-500 opacity-20 pointer-events-none" />
+        <div className="absolute -bottom-16 -left-16 w-80 h-80 rounded-full bg-brand-700 opacity-25 pointer-events-none" />
+        <div className="relative max-w-3xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 bg-brand-500/40 text-brand-100 text-[10px] font-bold tracking-[0.2em] uppercase px-4 py-1.5 rounded-full mb-6">
+            <Users className="w-3.5 h-3.5" />{c.title}
           </div>
-          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 leading-tight">{c.subtitle}</h1>
-          <p className="text-lg text-gray-500 max-w-2xl mx-auto mb-6 leading-relaxed">{c.description}</p>
+          <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4 leading-tight">{c.subtitle}</h1>
+          <p className="text-brand-200 text-lg max-w-2xl mx-auto mb-8 leading-relaxed">{c.description}</p>
           <Link
             href="/"
             onClick={goToResults}
-            className="inline-block mt-2 px-8 py-3 bg-brand-600 text-white font-semibold rounded-xl hover:bg-brand-700 transition-colors shadow-sm"
+            className="inline-block px-8 py-3 bg-white text-brand-700 font-bold rounded-xl hover:bg-brand-50 transition-colors shadow-lg"
           >
             {c.heroBtn}
           </Link>
@@ -169,16 +174,18 @@ export default function ForParentsPage() {
       </section>
 
       {/* How it works */}
-      <section className="py-16 px-4">
+      <section className="py-16 px-4 md:px-8">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-bold text-gray-900 mb-10 text-center">{c.howTitle}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <p className="text-center text-[10px] font-bold tracking-[0.22em] uppercase text-brand-400 mb-3">{c.howTitle}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {c.steps.map((step, i) => (
-              <div key={i} className="relative bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
-                <div className="mb-3">{stepIcons[i]}</div>
-                <div className="text-xs font-bold text-brand-500 uppercase tracking-wide mb-1">{c.stepLabel} {i + 1}</div>
-                <h3 className="text-base font-semibold text-gray-900 mb-2">{step.title}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{step.desc}</p>
+              <div key={i} className="relative rounded-3xl p-7 overflow-hidden" style={{ backgroundColor: '#E9E5DD' }}>
+                <div className="w-10 h-10 rounded-2xl bg-brand-200/60 flex items-center justify-center mb-5">
+                  {stepIcons[i]}
+                </div>
+                <div className="text-[10px] font-bold text-brand-500 tracking-[0.18em] uppercase mb-2">{c.stepLabel} {i + 1}</div>
+                <h3 className="text-base font-bold text-brand-800 mb-2">{step.title}</h3>
+                <p className="text-sm text-brand-600 leading-relaxed">{step.desc}</p>
               </div>
             ))}
           </div>
@@ -186,15 +193,18 @@ export default function ForParentsPage() {
       </section>
 
       {/* Why NannyBooking */}
-      <section className="py-16 px-4 bg-gray-50/60">
+      <section className="py-16 px-4 md:px-8 bg-white">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-bold text-gray-900 mb-10 text-center">{c.whyTitle}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <p className="text-center text-[10px] font-bold tracking-[0.22em] uppercase text-brand-400 mb-3">{c.whyEyebrow}</p>
+          <h2 className="text-3xl font-extrabold text-gray-900 mb-10 text-center">{c.whyTitle}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {c.whyItems.map((item, i) => (
-              <div key={i} className="flex gap-4 bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-                <div className="flex-shrink-0 mt-0.5">{whyIcons[i]}</div>
+              <div key={i} className="flex gap-4 rounded-3xl p-7 bg-white border border-gray-100 shadow-sm">
+                <div className="flex-shrink-0 w-10 h-10 rounded-2xl bg-brand-50 flex items-center justify-center mt-0.5">
+                  {whyIcons[i]}
+                </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">{item.title}</h3>
+                  <h3 className="font-bold text-gray-900 mb-1.5">{item.title}</h3>
                   <p className="text-sm text-gray-500 leading-relaxed">{item.desc}</p>
                 </div>
               </div>
@@ -204,21 +214,24 @@ export default function ForParentsPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-16 px-4">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-2xl font-bold text-gray-900 mb-10 text-center">{c.faqTitle}</h2>
-          <div className="space-y-4">
+      <section className="relative overflow-hidden py-16 px-4 md:px-8" style={{ backgroundColor: '#E9E5DD' }}>
+        <div className="absolute -top-10 -right-10 w-64 h-64 rounded-full bg-brand-600 opacity-[0.05] pointer-events-none" />
+        <div className="absolute -bottom-10 -left-10 w-80 h-80 rounded-full bg-brand-600 opacity-[0.04] pointer-events-none" />
+        <div className="absolute top-1/2 right-1/4 w-40 h-40 rounded-full bg-brand-600 opacity-[0.03] pointer-events-none" />
+        <div className="relative max-w-3xl mx-auto">
+          <p className="text-center text-[10px] font-bold tracking-[0.22em] uppercase text-brand-400 mb-3">{c.faqTitle}</p>
+          <div className="space-y-3">
             {c.faqs.map((faq, i) => (
-              <details key={i} className="group border border-gray-100 rounded-2xl bg-white shadow-sm overflow-hidden">
-                <summary className="flex items-center justify-between px-6 py-4 cursor-pointer font-medium text-gray-900 select-none list-none">
+              <details key={i} className="group rounded-2xl bg-white overflow-hidden shadow-sm">
+                <summary className="flex items-center justify-between px-6 py-4 cursor-pointer font-semibold text-gray-900 select-none list-none text-sm">
                   {faq.q}
                   <span className="text-brand-400 group-open:rotate-180 transition-transform duration-200 ml-4 flex-shrink-0">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                   </span>
                 </summary>
-                <div className="px-6 pb-5 text-sm text-gray-500 leading-relaxed border-t border-gray-50 pt-3">
+                <div className="px-6 pb-5 pt-3 text-sm text-gray-500 leading-relaxed border-t border-gray-50">
                   {faq.a}
                 </div>
               </details>
@@ -228,14 +241,14 @@ export default function ForParentsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 px-4 bg-gradient-to-r from-brand-600 to-brand-600">
+      <section className="px-6 py-16 bg-white">
         <div className="max-w-2xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-white mb-3">{c.ctaTitle}</h2>
-          <p className="text-brand-200 mb-8 text-lg">{c.ctaDesc}</p>
+          <h2 className="text-3xl font-extrabold text-gray-900 mb-3">{c.ctaTitle}</h2>
+          <p className="text-gray-600 mb-8 leading-relaxed">{c.ctaDesc}</p>
           <Link
             href="/"
             onClick={goToResults}
-            className="inline-block px-10 py-3 bg-white text-brand-700 font-bold rounded-xl hover:bg-brand-50 transition-colors shadow-lg"
+            className="inline-block px-10 py-3.5 bg-brand-600 text-white font-bold rounded-xl hover:bg-brand-700 transition-colors shadow-lg"
           >
             {c.ctaBtn}
           </Link>
