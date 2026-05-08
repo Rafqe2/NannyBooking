@@ -32,6 +32,8 @@ export default function MessagesTab({ userProfile, user }: MessagesTabProps) {
   const [contactError, setContactError] = useState<string | null>(null);
   const [showContactForm, setShowContactForm] = useState(false);
   const [loadingMessages, setLoadingMessages] = useState(false);
+  const [showInquiryForm, setShowInquiryForm] = useState(false);
+  const [inquiryDraft, setInquiryDraft] = useState("");
 
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
@@ -42,6 +44,8 @@ export default function MessagesTab({ userProfile, user }: MessagesTabProps) {
     setContactPhone("");
     setContactError(null);
     setShowContactForm(false);
+    setShowInquiryForm(false);
+    setInquiryDraft("");
   }, [activeConversation]);
 
   // Load conversations and poll every 15s
@@ -154,6 +158,22 @@ export default function MessagesTab({ userProfile, user }: MessagesTabProps) {
     }
     setSendingMessage(false);
   }, [activeConversation, sendingMessage, contactEmail, contactPhone, t]);
+
+  const handleSendInquiry = useCallback(async () => {
+    if (!activeConversation || sendingMessage || inquiryDraft.trim() === "") return;
+    setSendingMessage(true);
+    const msg = await MessageService.sendMessage(activeConversation, inquiryDraft.trim(), false);
+    if (msg) {
+      setConversationMessages(prev => [...prev, msg]);
+      setInquiryDraft("");
+      setShowInquiryForm(false);
+      const conv = conversations.find(c => c.id === activeConversation);
+      if (conv?.booking_id) {
+        notifyBooking("new_message", conv.booking_id, { conversationId: activeConversation });
+      }
+    }
+    setSendingMessage(false);
+  }, [activeConversation, sendingMessage, inquiryDraft, conversations]);
 
   const formatMessageTime = useCallback((dateStr: string) => {
     const date = new Date(dateStr);
@@ -300,7 +320,7 @@ export default function MessagesTab({ userProfile, user }: MessagesTabProps) {
                   ) : (
                     <div className="border-t border-gray-200">
 
-                      {/* Contact info prompt — shown after both have exchanged messages */}
+                      {/* Contact info prompt — after both have exchanged one message */}
                       {bothHaveMessaged && !alreadySharedContact && (
                         <div className="border-b border-gray-100 bg-amber-50 px-4 py-3">
                           <div className="flex items-start justify-between gap-3">
@@ -317,7 +337,6 @@ export default function MessagesTab({ userProfile, user }: MessagesTabProps) {
                               </button>
                             )}
                           </div>
-
                           {showContactForm && (
                             <div className="mt-3 space-y-2">
                               <input
@@ -355,19 +374,58 @@ export default function MessagesTab({ userProfile, user }: MessagesTabProps) {
                         </div>
                       )}
 
+                      {/* Contact already shared — conversation done, offer follow-up */}
                       {alreadySharedContact && (
-                        <div className="border-b border-gray-100 px-4 py-2.5 bg-green-50 flex items-center gap-2">
-                          <svg className="w-4 h-4 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                          <span className="text-xs text-green-800 font-medium">{t("messages.contactShared")}</span>
-                          <span className="text-xs text-green-600">· {t("messages.contactSharedDesc")}</span>
+                        <div>
+                          <div className="px-4 py-3 bg-green-50 flex items-center gap-2">
+                            <svg className="w-4 h-4 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                            <div className="min-w-0">
+                              <span className="text-xs text-green-800 font-medium">{t("messages.contactShared")}</span>
+                              <span className="text-xs text-green-600"> · {t("messages.contactSharedDesc")}</span>
+                            </div>
+                          </div>
+                          {!showInquiryForm ? (
+                            <div className="px-4 py-2.5 flex justify-center border-t border-gray-100">
+                              <button
+                                onClick={() => setShowInquiryForm(true)}
+                                className="text-xs text-gray-400 hover:text-brand-600 transition-colors underline underline-offset-2"
+                              >
+                                {t("messages.sendFollowUp")}
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="p-4 border-t border-gray-100">
+                              <textarea
+                                value={inquiryDraft}
+                                onChange={e => setInquiryDraft(e.target.value)}
+                                placeholder={t("messages.followUpPlaceholder")}
+                                rows={3}
+                                className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white"
+                              />
+                              <div className="flex gap-2 mt-2">
+                                <button
+                                  onClick={handleSendInquiry}
+                                  disabled={sendingMessage || inquiryDraft.trim() === ""}
+                                  className="flex-1 py-1.5 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700 transition-colors disabled:opacity-40"
+                                >
+                                  {sendingMessage ? "..." : t("messages.send")}
+                                </button>
+                                <button
+                                  onClick={() => { setShowInquiryForm(false); setInquiryDraft(""); }}
+                                  className="px-3 py-1.5 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50"
+                                >
+                                  {t("common.cancel")}
+                                </button>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )}
 
-                      {/* Compose area */}
-                      {/* Only show compose if user hasn't sent their one message yet */}
-                      {canSend ? (
+                      {/* Compose — only before first message is sent */}
+                      {canSend && (
                         <div className="p-4">
                           <textarea
                             value={draft}
@@ -398,7 +456,10 @@ export default function MessagesTab({ userProfile, user }: MessagesTabProps) {
                             {t("common.cmdEnterToSend") || "⌘ Enter to send"}
                           </p>
                         </div>
-                      ) : (
+                      )}
+
+                      {/* Waiting — only when I sent but they haven't replied yet */}
+                      {iSentMyMessage && !theySentMessage && !alreadySharedContact && (
                         <div className="p-4 bg-gray-50 flex items-center gap-3">
                           <div className="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center flex-shrink-0">
                             <svg className="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -2100,9 +2100,9 @@ export const translations = {
     ru: 'Ваш запрос на контакт принят! Теперь вы можете обсудить детали здесь.'
   },
   'messages.waitingForReply': {
-    en: 'Your message has been sent. Once {name} replies, you\'ll be able to share contact details to continue the conversation.',
-    lv: 'Jūsu ziņojums ir nosūtīts. Kad {name} atbildēs, varēsiet dalīties ar kontaktiem, lai turpinātu sarunu.',
-    ru: 'Ваше сообщение отправлено. Когда {name} ответит, вы сможете обменяться контактами для продолжения общения.'
+    en: 'Message sent — waiting for {name} to reply.',
+    lv: 'Ziņojums nosūtīts — gaida {name} atbildi.',
+    ru: 'Сообщение отправлено — ожидаем ответа от {name}.'
   },
   'messages.wordCount': {
     en: '{count}/100 words',
@@ -2210,9 +2210,9 @@ export const translations = {
     ru: 'Контактная информация отправлена'
   },
   'messages.contactSharedDesc': {
-    en: 'The other party can now reach you directly. Waiting for their response.',
-    lv: 'Otra puse tagad var ar jums sazināties tieši. Gaidām viņu atbildi.',
-    ru: 'Другая сторона теперь может связаться с вами напрямую. Ожидаем ответа.'
+    en: 'Continue the conversation directly — call, WhatsApp, or email.',
+    lv: 'Turpiniet sarunu tieši — pa tālruni, WhatsApp vai e-pastu.',
+    ru: 'Продолжайте общение напрямую — по телефону, WhatsApp или email.'
   },
   'messages.fillAtLeastOne': {
     en: 'Please enter at least an email or phone number',
@@ -2228,6 +2228,16 @@ export const translations = {
     en: 'Please enter a valid phone number (digits, +, spaces, dashes only)',
     lv: 'Lūdzu, ievadiet derīgu tālruņa numuru (cipari, +, atstarpes, domuzīmes)',
     ru: 'Пожалуйста, введите корректный номер телефона (цифры, +, пробелы, дефисы)'
+  },
+  'messages.sendFollowUp': {
+    en: 'Have a question? Send a follow-up',
+    lv: 'Ir jautājums? Sūtiet papildu ziņu',
+    ru: 'Есть вопрос? Отправьте уточнение'
+  },
+  'messages.followUpPlaceholder': {
+    en: 'Your follow-up question...',
+    lv: 'Jūsu papildu jautājums...',
+    ru: 'Ваш уточняющий вопрос...'
   },
   'booking.expired': {
     en: 'Expired',
