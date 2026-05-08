@@ -198,7 +198,7 @@ export default function MessagesTab({ userProfile, user }: MessagesTabProps) {
                 >
                   <div className="flex items-center gap-3">
                     {conv.counterparty_picture ? (
-                      <img src={conv.counterparty_picture} alt="" className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
+                      <img src={conv.counterparty_picture} alt={conv.counterparty_name || ""} className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
                     ) : (
                       <div className="w-10 h-10 rounded-full bg-brand-100 flex items-center justify-center flex-shrink-0">
                         <span className="text-brand-600 font-semibold text-sm">
@@ -244,7 +244,7 @@ export default function MessagesTab({ userProfile, user }: MessagesTabProps) {
                   {activeConvData && (
                     <div className="px-4 py-3 border-b border-gray-200 bg-gray-50 flex items-center gap-3">
                       {activeConvData.counterparty_picture ? (
-                        <img src={activeConvData.counterparty_picture} alt="" className="w-8 h-8 rounded-full object-cover" />
+                        <img src={activeConvData.counterparty_picture} alt={activeConvData.counterparty_name || ""} className="w-8 h-8 rounded-full object-cover" />
                       ) : (
                         <div className="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center">
                           <span className="text-brand-600 font-semibold text-xs">

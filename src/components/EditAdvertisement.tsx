@@ -11,6 +11,9 @@ import { useTranslation } from "./LanguageProvider";
 import { getTranslatedSkill } from "../lib/constants/skills";
 import { useSupabaseUser } from "../lib/useSupabaseUser";
 import { UserService } from "../lib/userService";
+import { Database } from "../types/database";
+
+type Advertisement = Database["public"]["Tables"]["advertisements"]["Row"];
 
 export default function EditAdvertisement({
   advertisementId,
@@ -22,7 +25,7 @@ export default function EditAdvertisement({
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [ad, setAd] = useState<any | null>(null);
+  const [ad, setAd] = useState<Advertisement | null>(null);
   const [title, setTitle] = useState("");
   const [pricePerHour, setPricePerHour] = useState<number>(0);
   const [description, setDescription] = useState("");

@@ -32,13 +32,11 @@ export default function AdminAdsPage() {
   const [filterStatus, setFilterStatus] = useState<"all" | "active" | "inactive">("all");
   const [filterType, setFilterType] = useState<"all" | "short-term" | "long-term">("all");
   const [acting, setActing] = useState<string | null>(null);
-  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) { router.replace("/login"); return; }
-      setToken(session.access_token);
 
       const res = await fetch("/api/admin/ads", {
         headers: { Authorization: `Bearer ${session.access_token}` },
@@ -56,11 +54,13 @@ export default function AdminAdsPage() {
     if (!confirm("Are you sure you want to delete this advertisement?")) return;
     setActing(adId);
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { router.replace("/login"); return; }
       const res = await fetch("/api/admin/ads", {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({ adId }),
       });

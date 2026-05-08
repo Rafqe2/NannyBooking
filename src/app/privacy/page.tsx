@@ -53,7 +53,7 @@ const content = {
     sections: [
       {
         heading: "1. Kas mēs esam",
-        body: "NannyBooking ir bērnu aprūpes savienošanas platforma, kas darbojas Latvijā. Mēs savienojam vecākus, kas meklē bērnu aprūpi, ar auklēm, kas piedāvā savus pakalpojumus. Šī politika paskaidro, kā mēs apkopojam, izmantojam un aizsargājam jūsu personas datus.",
+        body: "NannyBooking ir bērnu aprūpes savienošanas platforma, kas darbojas Latvijā. Mēs savienojam vecākus, kas meklē bērnu aprūpi, ar auklītēm, kas piedāvā savus pakalpojumus. Šī politika paskaidro, kā mēs apkopojam, izmantojam un aizsargājam jūsu personas datus.",
       },
       {
         heading: "2. Kādus datus mēs apkopojam",
@@ -61,11 +61,11 @@ const content = {
       },
       {
         heading: "3. Kā mēs izmantojam jūsu datus",
-        body: "Jūsu dati tiek izmantoti platformas darbībai — aukļu savienošanai ar vecākiem, rezervāciju apstrādei un saziņas nodrošināšanai starp lietotājiem. Mēs nepārdodam jūsu datus trešajām pusēm.",
+        body: "Jūsu dati tiek izmantoti platformas darbībai — auklīšu savienošanai ar vecākiem, rezervāciju apstrādei un saziņas nodrošināšanai starp lietotājiem. Mēs nepārdodam jūsu datus trešajām pusēm.",
       },
       {
         heading: "4. Datu kopīgošana",
-        body: "Kontaktinformācija (e-pasts vai tālrunis) tiek kopīgota starp vecāku un aukli tikai tad, kad abas puses to skaidri piekrīt caur ziņojumu sistēmu pēc rezervācijas apstiprināšanas. Profila informācija sludinājumos ir publiski pieejama visiem apmeklētājiem.",
+        body: "Kontaktinformācija (e-pasts vai tālrunis) tiek kopīgota starp vecāku un auklīti tikai tad, kad abas puses to skaidri piekrīt caur ziņojumu sistēmu pēc rezervācijas apstiprināšanas. Profila informācija sludinājumos ir publiski pieejama visiem apmeklētājiem.",
       },
       {
         heading: "5. Datu glabāšana",

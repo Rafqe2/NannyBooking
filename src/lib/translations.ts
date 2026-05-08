@@ -21,6 +21,11 @@ export const translations = {
     lv: 'gaida',
     ru: 'ожидает'
   },
+  'header.adminPanel': {
+    en: 'Admin Panel',
+    lv: 'Admina panelis',
+    ru: 'Панель администратора'
+  },
 
   // Home Page
   'home.title': {
@@ -83,7 +88,7 @@ export const translations = {
   },
   'profile.nanny': {
     en: 'Nanny offering childcare services',
-    lv: 'Aukle, kas piedāvā bērnu aprūpes pakalpojumus',
+    lv: 'Auklīte, kas piedāvā bērnu aprūpes pakalpojumus',
     ru: 'Няня, предлагающая услуги по уходу за детьми'
   },
   'profile.save': {
@@ -633,7 +638,7 @@ export const translations = {
   },
   'common.nanny': {
     en: 'Nanny',
-    lv: 'Aukle',
+    lv: 'Auklīte',
     ru: 'Няня'
   },
   'common.parent': {
@@ -1160,7 +1165,7 @@ export const translations = {
   },
   'adCreate.nannyOnly': {
     en: 'This page is for nannies',
-    lv: 'Šī lapa ir paredzēta auklēm',
+    lv: 'Šī lapa ir paredzēta auklītēm',
     ru: 'Эта страница предназначена для нянь'
   },
   'adCreate.nannyOnlyDesc': {
@@ -1255,12 +1260,12 @@ export const translations = {
   },
   'adCreate.titlePlaceholderParent': {
     en: 'e.g., Looking for a caring nanny in Rīga',
-    lv: 'piem., Meklējam rūpīgu aukli Rīgā',
+    lv: 'piem., Meklējam rūpīgu auklīti Rīgā',
     ru: 'например, Ищем заботливую няню в Риге'
   },
   'adCreate.titlePlaceholderNanny': {
     en: 'e.g., Experienced Nanny Available for Weekend Care',
-    lv: 'piem., Pieredzējusi aukle pieejama nedēļas nogales aprūpei',
+    lv: 'piem., Pieredzējusi auklīte pieejama nedēļas nogales aprūpei',
     ru: 'например, Опытная няня доступна для ухода в выходные'
   },
   'adCreate.skills': {
@@ -1582,7 +1587,7 @@ export const translations = {
   },
   'booking.noAvailabilityDesc': {
     en: 'This nanny has no available dates.',
-    lv: 'Šai auklei nav pieejamu datumu.',
+    lv: 'Šai auklītei nav pieejamu datumu.',
     ru: 'У этой няни нет доступных дат.'
   },
   'booking.errorSelectDate': {
@@ -2243,7 +2248,7 @@ export const translations = {
   },
   'userType.nanny': {
     en: 'Nanny',
-    lv: 'Aukle',
+    lv: 'Auklīte',
     ru: 'Няня'
   },
 

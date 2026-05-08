@@ -32,13 +32,11 @@ export default function AdminUsersPage() {
   const [search, setSearch] = useState("");
   const [filterType, setFilterType] = useState<string>("all");
   const [acting, setActing] = useState<string | null>(null);
-  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) { router.replace("/login"); return; }
-      setToken(session.access_token);
 
       const res = await fetch("/api/admin/users", {
         headers: { Authorization: `Bearer ${session.access_token}` },
@@ -57,11 +55,13 @@ export default function AdminUsersPage() {
     if (!confirm(`Are you sure you want to ${label}?`)) return;
     setActing(userId);
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { router.replace("/login"); return; }
       const res = await fetch("/api/admin/users", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({ userId, action }),
       });

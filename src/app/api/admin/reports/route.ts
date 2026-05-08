@@ -32,6 +32,9 @@ export async function GET(req: Request) {
     const { client } = await getAdminClient(req.headers.get("authorization"));
     const { searchParams } = new URL(req.url);
     const status = searchParams.get("status") || "pending";
+    if (!["pending", "reviewed", "dismissed"].includes(status)) {
+      return NextResponse.json({ error: "Invalid status" }, { status: 400 });
+    }
     const limit = Math.min(Number(searchParams.get("limit") || 50), 100);
     const offset = Number(searchParams.get("offset") || 0);
 

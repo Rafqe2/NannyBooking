@@ -60,7 +60,7 @@ export default function Home() {
         sessionStorage.removeItem("nannybooking:restoreNext");
         sessionStorage.removeItem("nannybooking:suppressRestore");
       }
-    } catch {}
+    } catch {} // sessionStorage throws SecurityError in restricted browsers
   }, []);
 
   if (isLoading || isCheckingProfile) {

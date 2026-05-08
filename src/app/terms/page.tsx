@@ -65,7 +65,7 @@ const content = {
       },
       {
         heading: "3. Ko nodrošina NannyBooking",
-        body: "NannyBooking ir tirgus vieta, kas savieno vecākus un aukles. Mēs nenodrošinām bērnu aprūpi paši un negarantējam neviena lietotāja piemērotību. Visas vienošanās tiek slēgtas tieši starp vecākiem un auklēm.",
+        body: "NannyBooking ir tirgus vieta, kas savieno vecākus un auklītes. Mēs nenodrošinām bērnu aprūpi paši un negarantējam neviena lietotāja piemērotību. Visas vienošanās tiek slēgtas tieši starp vecākiem un auklītēm.",
       },
       {
         heading: "4. Sludinājumi un rezervācijas",

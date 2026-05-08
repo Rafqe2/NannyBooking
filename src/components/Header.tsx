@@ -259,7 +259,7 @@ export default function Header() {
                         onClick={() => handleNavigation("/admin")}
                         className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors duration-200 border-b border-gray-100 text-sm font-medium bg-white text-brand-700"
                       >
-                        Admin Panel
+                        {t("header.adminPanel")}
                       </button>
                     )}
                     <button

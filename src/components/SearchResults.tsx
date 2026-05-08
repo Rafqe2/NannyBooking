@@ -442,20 +442,23 @@ export default function SearchResults({
                   )}
 
                   {/* Availability dates (short-term) */}
-                  {ad.adType === "short-term" && ad.availabilitySlots && ad.availabilitySlots.length > 0 && (
-                    <div className="mb-3">
-                      <div className="flex flex-wrap gap-1">
-                        {Array.from(new Set(ad.availabilitySlots.map(s => s.available_date))).sort().slice(0, 3).map((date) => (
-                          <span key={date} className="text-xs bg-emerald-50 text-emerald-700 border border-emerald-100 px-2 py-0.5 rounded-md font-medium">
-                            {formatDateDDMMYYYY(new Date(date + "T00:00:00Z"))}
-                          </span>
-                        ))}
-                        {new Set(ad.availabilitySlots.map(s => s.available_date)).size > 3 && (
-                          <span className="text-xs text-gray-400 px-1 py-0.5">+{new Set(ad.availabilitySlots.map(s => s.available_date)).size - 3} {t("ad.moreDates")}</span>
-                        )}
+                  {ad.adType === "short-term" && ad.availabilitySlots && ad.availabilitySlots.length > 0 && (() => {
+                    const uniqueDates = Array.from(new Set(ad.availabilitySlots.map(s => s.available_date))).sort();
+                    return (
+                      <div className="mb-3">
+                        <div className="flex flex-wrap gap-1">
+                          {uniqueDates.slice(0, 3).map((date) => (
+                            <span key={date} className="text-xs bg-emerald-50 text-emerald-700 border border-emerald-100 px-2 py-0.5 rounded-md font-medium">
+                              {formatDateDDMMYYYY(new Date(date + "T00:00:00Z"))}
+                            </span>
+                          ))}
+                          {uniqueDates.length > 3 && (
+                            <span className="text-xs text-gray-400 px-1 py-0.5">+{uniqueDates.length - 3} {t("ad.moreDates")}</span>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    );
+                  })()}
                   {ad.adType === "long-term" && ad.availability && (
                     <div className="mb-3 text-xs text-gray-500 flex items-center gap-1">
                       <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>

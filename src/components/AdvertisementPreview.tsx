@@ -5,6 +5,9 @@ import { AdvertisementService } from "../lib/advertisementService";
 import { useTranslation } from "./LanguageProvider";
 import { getTranslatedSkill } from "../lib/constants/skills";
 import { formatDateDDMMYYYY } from "../lib/date";
+import { Database } from "../types/database";
+
+type Advertisement = Database["public"]["Tables"]["advertisements"]["Row"];
 
 interface Slot {
   available_date: string;
@@ -20,7 +23,7 @@ export default function AdvertisementPreview({
   onClose: () => void;
 }) {
   const { t, language } = useTranslation();
-  const [ad, setAd] = useState<any | null>(null);
+  const [ad, setAd] = useState<Advertisement | null>(null);
   const [slots, setSlots] = useState<Slot[]>([]);
   const [locations, setLocations] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,12 +34,14 @@ export default function AdvertisementPreview({
       setLoading(true);
       setError(null);
       try {
-        const advertisement = await AdvertisementService.getAdvertisementById(advertisementId);
+        const [advertisement, s, locs] = await Promise.all([
+          AdvertisementService.getAdvertisementById(advertisementId),
+          AdvertisementService.getFilteredAvailabilitySlots(advertisementId),
+          AdvertisementService.getLocations(advertisementId),
+        ]);
         if (!advertisement) throw new Error("Advertisement not found");
         setAd(advertisement);
-        const s = await AdvertisementService.getFilteredAvailabilitySlots(advertisementId);
         setSlots(s);
-        const locs = await AdvertisementService.getLocations(advertisementId);
         setLocations((locs || []).map((x: any) => x.label));
       } catch (e: any) {
         setError(e?.message || "Failed to load");

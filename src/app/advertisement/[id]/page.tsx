@@ -16,6 +16,9 @@ import { useTranslation } from "../../../components/LanguageProvider";
 import { getTranslatedSkill } from "../../../lib/constants/skills";
 import { formatDateDDMMYYYY } from "../../../lib/date";
 import { saveRecentAd } from "../../../lib/recentlyViewed";
+import { Database } from "../../../types/database";
+
+type Advertisement = Database["public"]["Tables"]["advertisements"]["Row"];
 
 interface Slot {
   available_date: string;
@@ -41,7 +44,7 @@ export default function AdvertisementDetails({
   const router = useRouter();
   const { user } = useSupabaseUser();
   const { t, language } = useTranslation();
-  const [ad, setAd] = useState<any | null>(null);
+  const [ad, setAd] = useState<Advertisement | null>(null);
   const [owner, setOwner] = useState<Owner | null>(null);
   const [slots, setSlots] = useState<Slot[]>([]);
   const [locations, setLocations] = useState<string[]>([]);
@@ -76,7 +79,7 @@ export default function AdvertisementDetails({
             hourlyRate: Number(advertisement.price_per_hour || 0),
             adType: advertisement.type || "long-term",
           });
-        } catch {}
+        } catch (e) { console.error("saveRecentAd failed:", e); }
 
         // Fetch owner data
         const ownerData = await UserService.getPublicProfileById(
@@ -102,7 +105,7 @@ export default function AdvertisementDetails({
               ownerPicture: ownerData.picture || null,
               ownerFullName: ownerData.full_name || "",
             });
-          } catch {}
+          } catch (e) { console.error("saveRecentAd (with owner) failed:", e); }
         } else {
           setOwner({
             fullName: "",
@@ -122,7 +125,7 @@ export default function AdvertisementDetails({
             r.json()
           );
           if (Array.isArray(res)) setLocations(res.map((x: any) => x.label));
-        } catch {}
+        } catch (e) { console.error("Failed to load ad locations:", e); }
       } catch (e: any) {
         setError(e?.message || t("ad.errorLoadFailed"));
       } finally {

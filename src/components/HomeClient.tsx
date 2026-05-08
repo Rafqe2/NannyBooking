@@ -47,7 +47,7 @@ export default function HomeClient({
       try {
         const forceHome = sessionStorage.getItem("nannybooking:forceHome");
         if (forceHome) return false;
-      } catch {}
+      } catch {} // sessionStorage throws SecurityError in restricted browsers
     }
     return !!initialShowResults;
   });
@@ -70,7 +70,7 @@ export default function HomeClient({
           window.dispatchEvent(new CustomEvent("resetSearch"));
         }
       }
-    } catch {}
+    } catch {} // sessionStorage throws SecurityError in restricted browsers
   }, []);
 
   // Reset results when header logo is clicked
@@ -273,7 +273,7 @@ export default function HomeClient({
 
                 {/* Content */}
                 <div
-                  className="relative z-10 max-w-sm ml-auto"
+                  className="relative z-10 max-w-sm mx-auto"
                   style={{
                     opacity: heroHover === 'nannies' ? 0.45 : 1,
                     transition: 'opacity 0.5s ease',
@@ -410,7 +410,7 @@ export default function HomeClient({
 
                 {/* Content */}
                 <div
-                  className="relative z-10 max-w-sm mr-auto"
+                  className="relative z-10 max-w-sm mx-auto"
                   style={{
                     opacity: heroHover === 'parents' ? 0.45 : 1,
                     transition: 'opacity 0.5s ease',

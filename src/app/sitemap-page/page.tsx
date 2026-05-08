@@ -56,13 +56,13 @@ const siteMap = {
       category: "Vecākiem",
       links: [
         { label: "Kā tas darbojas vecākiem", href: "/for-parents" },
-        { label: "Pārlūkot aukļu sludinājumus", href: "/" },
+        { label: "Pārlūkot auklīšu sludinājumus", href: "/" },
       ],
     },
     {
-      category: "Auklēm",
+      category: "Auklītēm",
       links: [
-        { label: "Kā tas darbojas auklēm", href: "/for-nannies" },
+        { label: "Kā tas darbojas auklītēm", href: "/for-nannies" },
         { label: "Izveidot sludinājumu", href: "/create-advertisement" },
       ],
     },

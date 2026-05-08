@@ -79,10 +79,10 @@ const content = {
     ],
     bookingsTitle: "Rezervācijas",
     bookingsItems: [
-      { q: "Kā rezervēt aukli?", a: "Atrodiet sludinājumu, kas jums patīk, noklikšķiniet 'Rezervēt', izvēlieties datumu(-s), pievienojiet piezīmi un nosūtiet pieprasījumu. Aukle saņems paziņojumu un varēs pieņemt vai noraidīt." },
+      { q: "Kā rezervēt auklīti?", a: "Atrodiet sludinājumu, kas jums patīk, noklikšķiniet 'Rezervēt', izvēlieties datumu(-s), pievienojiet piezīmi un nosūtiet pieprasījumu. Auklīte saņems paziņojumu un varēs pieņemt vai noraidīt." },
       { q: "Kā uzzināt, vai rezervācija tika pieņemta?", a: "Skatiet cilni 'Rezervācijas' savā profilā. Pieņemtās rezervācijas rāda zaļu 'Apstiprināts' zīmi. Arī ziņojumu saruna kļūs pieejama." },
       { q: "Vai varu atcelt rezervāciju?", a: "Jā. Atveriet rezervāciju savā profilā un noklikšķiniet 'Atcelt rezervāciju'. Iesakām to darīt pēc iespējas agrāk ievērībā pret otru pusi." },
-      { q: "Ko darīt, ja aukle neatbild?", a: "Ja rezervācijas pieprasījums netiek pieņemts saprātīgā laikā, atceliet to un izmēģiniet citu aukli. Nav soda par neapstiprināta pieprasījuma atcelšanu." },
+      { q: "Ko darīt, ja auklīte neatbild?", a: "Ja rezervācijas pieprasījums netiek pieņemts saprātīgā laikā, atceliet to un izmēģiniet citu auklīti. Nav soda par neapstiprināta pieprasījuma atcelšanu." },
     ],
     messagingTitle: "Ziņojumi",
     messagingItems: [

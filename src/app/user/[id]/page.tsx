@@ -12,6 +12,16 @@ import { useTranslation } from "../../../components/LanguageProvider";
 import { stripLatvianGada } from "../../../lib/date";
 import { User } from "lucide-react";
 
+interface UserPublicProfile {
+  picture: string | null;
+  full_name: string;
+  user_type: "parent" | "nanny" | "pending" | "admin";
+  member_since: string | null;
+  rating: number | null;
+  reviews_count: number;
+  bio: string | null;
+}
+
 export default function UserProfile({
   params,
 }: {
@@ -21,7 +31,7 @@ export default function UserProfile({
   const router = useRouter();
   const { t, language } = useTranslation();
   const { user } = useSupabaseUser();
-  const [profile, setProfile] = useState<any | null>(null);
+  const [profile, setProfile] = useState<UserPublicProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showReport, setShowReport] = useState(false);
