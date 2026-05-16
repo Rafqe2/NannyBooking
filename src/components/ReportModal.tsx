@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { supabase } from "../lib/supabase";
 import { useTranslation } from "./LanguageProvider";
+import { useEscapeKey } from "../lib/useEscapeKey";
 
 interface ReportModalProps {
   reportedType: "user" | "ad";
@@ -28,6 +29,7 @@ const AD_REASONS = [
 
 export default function ReportModal({ reportedType, reportedId, onClose }: ReportModalProps) {
   const { t } = useTranslation();
+  useEscapeKey(onClose);
   const [reason, setReason] = useState("");
   const [note, setNote] = useState("");
   const [submitting, setSubmitting] = useState(false);

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useMemo } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Baby } from "lucide-react";
 import { supabase } from "../lib/supabase";
@@ -388,8 +389,7 @@ export default function SearchResults({
                   <div className="flex items-start gap-3 mb-4">
                     <div className="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center font-bold text-lg flex-shrink-0 border-2 border-white shadow-sm bg-brand-100 text-brand-700">
                       {ad.ownerPicture ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={ad.ownerPicture} alt={ad.ownerFullName || ""} className="w-full h-full object-cover" />
+                        <Image src={ad.ownerPicture} alt={ad.ownerFullName || "User"} width={48} height={48} className="w-full h-full object-cover" />
                       ) : (
                         <span>{(ad.ownerFullName || "?").charAt(0).toUpperCase()}</span>
                       )}

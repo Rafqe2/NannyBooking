@@ -6,6 +6,7 @@ import { useTranslation } from "./LanguageProvider";
 import { getTranslatedSkill } from "../lib/constants/skills";
 import { formatDateDDMMYYYY } from "../lib/date";
 import { Database } from "../types/database";
+import { useEscapeKey } from "../lib/useEscapeKey";
 
 type Advertisement = Database["public"]["Tables"]["advertisements"]["Row"];
 
@@ -23,6 +24,7 @@ export default function AdvertisementPreview({
   onClose: () => void;
 }) {
   const { t, language } = useTranslation();
+  useEscapeKey(onClose);
   const [ad, setAd] = useState<Advertisement | null>(null);
   const [slots, setSlots] = useState<Slot[]>([]);
   const [locations, setLocations] = useState<string[]>([]);

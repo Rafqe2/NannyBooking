@@ -15,7 +15,7 @@ export async function generateMetadata({
   const supabase = createClient(supabaseUrl, supabaseKey);
   const { data } = await supabase
     .from("advertisements")
-    .select("title, description, location_city, price_per_hour, type, skills")
+    .select("title, description, location_city, price_per_hour, type, skills, is_active")
     .eq("id", id)
     .single();
 
@@ -27,18 +27,24 @@ export async function generateMetadata({
   }
 
   const adTypeLabel =
-    data.type === "long-term" ? "Long-term childcare" : "Short-term childcare";
+    data.type === "long-term" ? "Long-term nanny" : "Short-term babysitter";
   const location = data.location_city ? ` in ${data.location_city}` : "";
   const price = data.price_per_hour ? ` · €${data.price_per_hour}/h` : "";
+
+  // SEO-friendly title: surface adTypeLabel + location + price ahead of free-text title.
+  // e.g. "Short-term babysitter in Riga · €8/h – Sarah's profile | NannyBooking"
+  const titleParts = [`${adTypeLabel}${location}${price}`, data.title].filter(Boolean);
+  const pageTitle = `${titleParts.join(" – ")} | NannyBooking`;
+
   const description =
     data.description?.slice(0, 155) ||
-    `${adTypeLabel}${location}${price} – NannyBooking`;
+    `${adTypeLabel}${location}${price}. Available now on NannyBooking.`;
 
   return {
-    title: `${data.title} – NannyBooking`,
+    title: pageTitle,
     description,
     openGraph: {
-      title: `${data.title} – NannyBooking`,
+      title: pageTitle,
       description,
       type: "website",
       siteName: "NannyBooking",
@@ -46,13 +52,13 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: `${data.title} – NannyBooking`,
+      title: pageTitle,
       description,
       images: ["/images/og-image.png"],
     },
-    alternates: {
-      canonical: `/advertisement/${id}`,
-    },
+    alternates: { canonical: `/advertisement/${id}` },
+    // Don't index inactive ads — they 404-ish from the user's perspective
+    robots: data.is_active ? undefined : { index: false, follow: false },
   };
 }
 

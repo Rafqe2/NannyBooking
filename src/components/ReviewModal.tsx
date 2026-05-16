@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Lightbulb } from "lucide-react";
 import { ReviewService } from "../lib/reviewService";
 import { useTranslation } from "./LanguageProvider";
+import { useEscapeKey } from "../lib/useEscapeKey";
 
 interface ReviewModalProps {
   bookingId: string;
@@ -23,6 +24,7 @@ export default function ReviewModal({
   onSuccess,
 }: ReviewModalProps) {
   const { t } = useTranslation();
+  useEscapeKey(onClose);
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [title, setTitle] = useState("");

@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import SearchBar from "./SearchBar";
@@ -513,7 +514,7 @@ export default function HomeClient({
                       {/* Avatar */}
                       <div className="w-14 h-14 rounded-full overflow-hidden bg-brand-100 flex items-center justify-center mb-3 mx-auto">
                         {nanny.owner_picture ? (
-                          <img src={nanny.owner_picture} alt={nanny.owner_full_name || ""} className="w-full h-full object-cover" />
+                          <Image src={nanny.owner_picture} alt={nanny.owner_full_name || "Nanny"} width={56} height={56} className="w-full h-full object-cover" />
                         ) : (
                           <span className="text-brand-600 font-bold text-xl">
                             {(nanny.owner_full_name || "?").charAt(0).toUpperCase()}
@@ -573,7 +574,7 @@ export default function HomeClient({
                     >
                       <div className="w-14 h-14 rounded-full overflow-hidden bg-brand-100 flex items-center justify-center mb-3 mx-auto">
                         {ad.owner_picture ? (
-                          <img src={ad.owner_picture} alt={ad.owner_full_name || ""} className="w-full h-full object-cover" />
+                          <Image src={ad.owner_picture} alt={ad.owner_full_name || "Parent"} width={56} height={56} className="w-full h-full object-cover" />
                         ) : (
                           <span className="text-brand-600 font-bold text-xl">
                             {(ad.owner_full_name || "?").charAt(0).toUpperCase()}

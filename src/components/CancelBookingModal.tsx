@@ -5,6 +5,7 @@ import { BookingService } from "../lib/bookingService";
 import { useTranslation } from "./LanguageProvider";
 import { getTranslatedCancellationReason } from "../lib/constants/skills";
 import { formatDateDDMMYYYY } from "../lib/date";
+import { useEscapeKey } from "../lib/useEscapeKey";
 
 interface BookingRecord {
   id: string;
@@ -63,6 +64,7 @@ export default function CancelBookingModal({
   userType,
 }: CancelBookingModalProps) {
   const { t, language } = useTranslation();
+  useEscapeKey(onClose);
   const [selectedReason, setSelectedReason] = useState<string>("");
   const [note, setNote] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);

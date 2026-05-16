@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { UserService, UserProfile } from "../../lib/userService";
 import { AdvertisementService } from "../../lib/advertisementService";
@@ -11,7 +12,6 @@ import Footer from "../../components/Footer";
 import { Database } from "../../types/database";
 import { useSupabaseUser } from "../../lib/useSupabaseUser";
 import { useTranslation } from "../../components/LanguageProvider";
-import { MessageService } from "../../lib/messageService";
 import ErrorBoundary from "../../components/ErrorBoundary";
 import { BookingItem } from "../../types/booking";
 import JobAdsTab from "../../components/profile/JobAdsTab";
@@ -20,6 +20,7 @@ import MessagesTab from "../../components/profile/MessagesTab";
 import ProfileTab from "../../components/profile/ProfileTab";
 import WalletTab from "../../components/profile/WalletTab";
 import { WalletService } from "../../lib/walletService";
+import { useNotificationCounts } from "../../components/NotificationCountsProvider";
 
 type Advertisement = Database["public"]["Tables"]["advertisements"]["Row"];
 
@@ -52,7 +53,7 @@ export default function ProfilePage() {
   });
   const [bookings, setBookings] = useState<BookingItem[]>([]);
   const [pendingBookings, setPendingBookings] = useState<number>(0);
-  const [unreadMessageCount, setUnreadMessageCount] = useState(0);
+  const { unreadMessages: unreadMessageCount } = useNotificationCounts();
   const [walletBalance, setWalletBalance] = useState<number | null>(null);
 
   const isParent = userProfile?.user_type === "parent";
@@ -221,18 +222,6 @@ export default function ProfilePage() {
     }
   }, [user, isLoading]);
 
-  // Messaging: poll unread count
-  useEffect(() => {
-    if (!user?.id) return;
-    let active = true;
-    const loadUnread = async () => {
-      const count = await MessageService.getUnreadCount();
-      if (active) setUnreadMessageCount(count);
-    };
-    loadUnread();
-    const interval = setInterval(loadUnread, 30000);
-    return () => { active = false; clearInterval(interval); };
-  }, [user?.id]);
 
   // Auto-dismiss toast after 4 seconds
   useEffect(() => {
@@ -340,12 +329,22 @@ export default function ProfilePage() {
       });
 
       if (updatedProfile) {
-        // Deactivate all ads if the user changed their role
+        // Deactivate all ads if the user changed their role. If the deactivate fails,
+        // roll back the role change so the DB and UI stay consistent.
         if (roleChanged && advertisements.length > 0) {
-          await supabase
+          const { error: deactivateErr } = await supabase
             .from("advertisements")
             .update({ is_active: false })
             .eq("user_id", user.id);
+
+          if (deactivateErr) {
+            console.error("Failed to deactivate ads after role change, rolling back:", deactivateErr);
+            await UserService.updateProfileById(user.id, {
+              user_type: userProfile?.user_type as any,
+            });
+            setToast({ message: "Could not change role — your ads could not be deactivated. Please try again.", type: "error" });
+            return;
+          }
           setAdvertisements((prev) => prev.map((ad) => ({ ...ad, is_active: false })));
         }
 
@@ -424,7 +423,7 @@ export default function ProfilePage() {
               <div className="relative w-14 h-14 flex-shrink-0 group/avatar">
                 <div className="w-14 h-14 rounded-full border-2 border-white/40 overflow-hidden bg-white/20 shadow-inner">
                   {displayAvatar ? (
-                    <img src={displayAvatar} alt="avatar" className="w-full h-full object-cover" />
+                    <Image src={displayAvatar} alt={`${displayNameFromProfile} avatar`} width={56} height={56} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-white font-bold text-xl">
                       {displayNameFromProfile[0]?.toUpperCase() || "?"}

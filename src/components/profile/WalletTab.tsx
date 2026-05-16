@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { WalletService, Wallet, WalletTransaction } from "../../lib/walletService";
+import { useEscapeKey } from "../../lib/useEscapeKey";
 
 const TYPE_LABELS: Record<WalletTransaction["type"], string> = {
   topup:  "Top-up",
@@ -33,6 +34,8 @@ function AddFundsModal({ onClose }: { onClose: () => void }) {
   const [selected, setSelected] = useState<number | null>(25);
   const [custom, setCustom] = useState("");
   const amount = custom !== "" ? parseFloat(custom) : selected;
+
+  useEscapeKey(onClose);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">

@@ -60,6 +60,19 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Cannot modify your own account" }, { status: 400 });
     }
 
+    // Look up target user — block any action on other admins
+    const { data: target, error: targetErr } = await client
+      .from("users")
+      .select("user_type")
+      .eq("id", userId)
+      .single();
+    if (targetErr || !target) {
+      return NextResponse.json({ error: "Target user not found" }, { status: 404 });
+    }
+    if (target.user_type === "admin") {
+      return NextResponse.json({ error: "Cannot modify another admin" }, { status: 403 });
+    }
+
     if (action === "suspend") {
       const { error } = await client
         .from("users")

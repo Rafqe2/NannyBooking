@@ -50,19 +50,9 @@ export const WalletService = {
     return (data as WalletTransaction[]) ?? [];
   },
 
-  // Admin / server-side only — normal users cannot call this directly
-  async topup(userId: string, amount: number, description?: string): Promise<Wallet | null> {
-    const { data, error } = await supabase.rpc("topup_wallet", {
-      p_user_id: userId,
-      p_amount: amount,
-      p_description: description ?? "Top-up",
-    });
-    if (error) {
-      console.error("WalletService.topup:", error);
-      return null;
-    }
-    return data as Wallet;
-  },
+  // NOTE: topup/refund are intentionally NOT exposed here.
+  // The SQL functions require service_role and will reject any client call.
+  // Top-ups happen server-side from /api/stripe/webhook once Stripe is wired up.
 
   async spend(
     userId: string,

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
-export async function GET() {
-  return NextResponse.redirect(new URL("/login", process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"));
+export async function GET(req: Request) {
+  // Build the redirect from the incoming request URL so we never fall back to localhost in prod.
+  return NextResponse.redirect(new URL("/login", req.url));
 }

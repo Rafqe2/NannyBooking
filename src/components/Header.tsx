@@ -8,43 +8,15 @@ import { supabase } from "../lib/supabase";
 import { useSupabaseUser } from "../lib/useSupabaseUser";
 import { useTranslation } from "./LanguageProvider";
 import { LANGUAGES } from "../lib/i18n";
-import { MessageService } from "../lib/messageService";
+import { useNotificationCounts } from "./NotificationCountsProvider";
 
 export default function Header() {
   const { user, isLoading } = useSupabaseUser();
   const { language, setLanguage, t } = useTranslation();
   const router = useRouter();
   const pathname = usePathname();
-  const [pendingCount, setPendingCount] = useState<number>(0);
-  const [unreadMessages, setUnreadMessages] = useState<number>(0);
+  const { pendingBookings: pendingCount, unreadMessages } = useNotificationCounts();
   const isOnProfilePage = pathname === "/profile";
-
-  useEffect(() => {
-    let active = true;
-    const load = async () => {
-      try {
-        if (!user?.id) {
-          if (active) { setPendingCount(0); setUnreadMessages(0); }
-          return;
-        }
-        const [bookingRes, msgCount] = await Promise.all([
-          supabase.rpc("get_pending_booking_count_for_me"),
-          MessageService.getUnreadCount(),
-        ]);
-        if (!active) return;
-        setPendingCount(bookingRes.error ? 0 : Number(bookingRes.data || 0));
-        setUnreadMessages(msgCount);
-      } catch {
-        if (active) { setPendingCount(0); setUnreadMessages(0); }
-      }
-    };
-    load();
-    const id = setInterval(load, 30000);
-    return () => {
-      active = false;
-      clearInterval(id);
-    };
-  }, [user?.id]);
 
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -128,6 +100,7 @@ export default function Header() {
             }}
           >
             <button
+              onClick={() => setShowLanguageMenu((v) => !v)}
               onFocus={() => setShowLanguageMenu(true)}
               className="h-10 px-4 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-800 shadow-sm hover:shadow transition-all flex items-center gap-2"
             >

@@ -6,6 +6,7 @@ import { BookingService } from "../lib/bookingService";
 import { notifyBooking } from "../lib/notifyService";
 import MultiDatePicker from "./MultiDatePicker";
 import { useTranslation } from "./LanguageProvider";
+import { useEscapeKey } from "../lib/useEscapeKey";
 
 type Slot = { available_date: string; start_time: string; end_time: string };
 
@@ -23,6 +24,7 @@ export default function BookingModal({
   adType?: "short-term" | "long-term";
 }) {
   const { t } = useTranslation();
+  useEscapeKey(onClose);
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
   const [perDateTimes, setPerDateTimes] = useState<
     Record<string, { start: string; end: string }>

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Target, ClipboardList, BookOpen } from "lucide-react";
 import { NANNY_SKILLS, getTranslatedSkill } from "../lib/constants/skills";
 import { useTranslation } from "./LanguageProvider";
+import { useEscapeKey } from "../lib/useEscapeKey";
 
 export interface AdvancedFilters {
   skills: string[];
@@ -37,6 +38,8 @@ export default function AdvancedSearchFilters({
   const { t, language } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [localFilters, setLocalFilters] = useState<AdvancedFilters>(filters);
+
+  useEscapeKey(() => setIsOpen(false), isOpen);
 
   useEffect(() => {
     setLocalFilters(filters);
