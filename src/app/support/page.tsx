@@ -269,6 +269,7 @@ export default function SupportPage() {
 function ContactForm({ c }: { c: typeof content["en"] }) {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [website, setWebsite] = useState(""); // honeypot — must stay empty
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -282,7 +283,7 @@ function ContactForm({ c }: { c: typeof content["en"] }) {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim(), message: message.trim() }),
+        body: JSON.stringify({ email: email.trim(), message: message.trim(), website }),
       });
       if (!res.ok) throw new Error("Failed");
       setSent(true);
@@ -306,6 +307,17 @@ function ContactForm({ c }: { c: typeof content["en"] }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Honeypot — hidden from humans, bots fill it */}
+      <input
+        type="text"
+        name="website"
+        tabIndex={-1}
+        autoComplete="off"
+        value={website}
+        onChange={(e) => setWebsite(e.target.value)}
+        style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }}
+        aria-hidden="true"
+      />
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">{c.contactEmailLabel}</label>
         <input

@@ -18,6 +18,8 @@ import JobAdsTab from "../../components/profile/JobAdsTab";
 import BookingsTab from "../../components/profile/BookingsTab";
 import MessagesTab from "../../components/profile/MessagesTab";
 import ProfileTab from "../../components/profile/ProfileTab";
+import WalletTab from "../../components/profile/WalletTab";
+import { WalletService } from "../../lib/walletService";
 
 type Advertisement = Database["public"]["Tables"]["advertisements"]["Row"];
 
@@ -39,7 +41,7 @@ export default function ProfilePage() {
   const photoInputRef = useRef<HTMLInputElement>(null);
   const [toast, setToast] = useState<{ message: string; type: "error" | "success" } | null>(null);
   const [activeTab, setActiveTab] = useState<
-    "job-ads" | "bookings" | "messages" | "profile"
+    "job-ads" | "bookings" | "messages" | "profile" | "wallet"
   >("job-ads");
   const [editForm, setEditForm] = useState({
     name: "",
@@ -51,6 +53,7 @@ export default function ProfilePage() {
   const [bookings, setBookings] = useState<BookingItem[]>([]);
   const [pendingBookings, setPendingBookings] = useState<number>(0);
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
+  const [walletBalance, setWalletBalance] = useState<number | null>(null);
 
   const isParent = userProfile?.user_type === "parent";
 
@@ -65,7 +68,8 @@ export default function ProfilePage() {
           tab === "job-ads" ||
           tab === "bookings" ||
           tab === "messages" ||
-          tab === "profile"
+          tab === "profile" ||
+          tab === "wallet"
         ) {
           setActiveTab(tab);
         }
@@ -84,7 +88,8 @@ export default function ProfilePage() {
         tab === "job-ads" ||
         tab === "bookings" ||
         tab === "messages" ||
-        tab === "profile"
+        tab === "profile" ||
+        tab === "wallet"
       ) {
         setActiveTab(tab);
       }
@@ -112,7 +117,11 @@ export default function ProfilePage() {
       if (!user?.email) return;
 
       try {
-        const profile = await UserService.getUserByEmail(user.email);
+        const [profile, wallet] = await Promise.all([
+          UserService.getUserByEmail(user.email),
+          WalletService.getWallet(user.id),
+        ]);
+        if (wallet) setWalletBalance(wallet.balance);
         if (profile) {
           setUserProfile(profile);
           setEditForm({
@@ -365,6 +374,7 @@ export default function ProfilePage() {
     },
     { id: "messages", label: t("profile.messages") + (unreadMessageCount > 0 ? ` (${unreadMessageCount})` : "") },
     { id: "profile", label: t("profile.profile") },
+    { id: "wallet", label: "Wallet" },
   ] as const;
 
   const renderTabContent = () => {
@@ -377,6 +387,8 @@ export default function ProfilePage() {
         return <MessagesTab userProfile={userProfile} user={user} />;
       case "profile":
         return <ProfileTab userProfile={userProfile} setUserProfile={setUserProfile} user={user} advertisements={advertisements} setAdvertisements={setAdvertisements} isEditing={isEditing} setIsEditing={setIsEditing} uploadingPhoto={uploadingPhoto} editForm={editForm} setEditForm={setEditForm} photoInputRef={photoInputRef} handlePhotoUpload={handlePhotoUpload} handleRemovePhoto={handleRemovePhoto} handleEditSubmit={handleEditSubmit} setToast={setToast} />;
+      case "wallet":
+        return <WalletTab userId={user!.id} />;
       default:
         return <JobAdsTab userProfile={userProfile} advertisements={advertisements} adSlotsMap={adSlotsMap} setAdvertisements={setAdvertisements} setToast={setToast} />;
     }
@@ -489,13 +501,22 @@ export default function ProfilePage() {
                   )}
                 </div>
               </div>
-              <button
-                onClick={() => { setActiveTab("profile"); setIsEditing(true); }}
-                className="hidden sm:flex items-center gap-1.5 text-xs text-brand-200 hover:text-white border border-white/20 hover:border-white/40 px-3 py-1.5 rounded-lg transition-colors flex-shrink-0"
-              >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                {t("profile.editProfile")}
-              </button>
+              <div className="hidden sm:flex flex-col items-end gap-2 flex-shrink-0">
+                <button
+                  onClick={() => { setActiveTab("wallet"); }}
+                  className="flex items-center gap-1.5 text-xs font-semibold text-white bg-white/15 hover:bg-white/25 border border-white/20 px-3 py-1.5 rounded-lg transition-colors"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                  €{walletBalance !== null ? walletBalance.toFixed(2) : "—"}
+                </button>
+                <button
+                  onClick={() => { setActiveTab("profile"); setIsEditing(true); }}
+                  className="flex items-center gap-1.5 text-xs text-brand-200 hover:text-white border border-white/20 hover:border-white/40 px-3 py-1.5 rounded-lg transition-colors"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                  {t("profile.editProfile")}
+                </button>
+              </div>
             </div>
           </div>
 

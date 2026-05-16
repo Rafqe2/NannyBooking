@@ -63,8 +63,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="icon" href="/icons/favicon.ico" />
-        <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#0F3D2E" />
@@ -114,14 +115,30 @@ export default function RootLayout({
         />
         {GA_ID && (
           <>
+            {/* Consent Mode v2: set default to DENIED before GA loads. CookieConsent.tsx flips this to granted when user accepts. */}
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  var c = { analytics_storage: 'denied', ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' };
+                  try {
+                    var s = localStorage.getItem('cookie_consent');
+                    if (s) {
+                      var p = JSON.parse(s);
+                      if (p.analytics) c.analytics_storage = 'granted';
+                      if (p.marketing) { c.ad_storage = 'granted'; c.ad_user_data = 'granted'; c.ad_personalization = 'granted'; }
+                    }
+                  } catch(e){}
+                  gtag('consent', 'default', c);
+                  gtag('js', new Date());
+                  gtag('config', '${GA_ID}');
+                `,
+              }}
+            />
             <script
               async
               src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
-            />
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_ID}');`,
-              }}
             />
           </>
         )}

@@ -48,6 +48,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Booking not found" }, { status: 404 });
     }
 
+    // Authorize: caller must be a party to the booking
+    if (me.user.id !== booking.parent_id && me.user.id !== booking.nanny_id) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     // Fetch both users and ad owner in parallel
     const [parentRow, nannyRow, adRow] = await Promise.all([
       admin.from("users").select("id, name, surname, email").eq("id", booking.parent_id).single(),
@@ -68,10 +73,10 @@ export async function POST(req: Request) {
     const formatDate = (d: string | null) =>
       d ? new Date(d + "T00:00:00").toLocaleDateString("en-GB") : "—";
 
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://auklite.lv";
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://nannybooking.org";
 
     const ctaButton = (label: string) =>
-      `<a href="${siteUrl}/profile" style="display:inline-block;margin-top:16px;padding:10px 20px;background:#7c3aed;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;">${label}</a>`;
+      `<a href="${siteUrl}/profile" style="display:inline-block;margin-top:16px;padding:10px 20px;background:#0F3D2E;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;">${label}</a>`;
 
     const emailWrapper = (title: string, body: string) => `
 <!DOCTYPE html>
@@ -79,14 +84,14 @@ export async function POST(req: Request) {
 <head><meta charset="utf-8"/></head>
 <body style="font-family:sans-serif;background:#f9fafb;margin:0;padding:24px;">
   <div style="max-width:520px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-    <div style="background:#7c3aed;padding:24px 32px;">
-      <span style="color:#fff;font-size:22px;font-weight:700;">Auklite</span>
+    <div style="background:#0F3D2E;padding:24px 32px;">
+      <span style="color:#fff;font-size:22px;font-weight:700;">NannyBooking</span>
     </div>
     <div style="padding:28px 32px;">
       <h2 style="margin:0 0 12px;color:#111827;font-size:18px;">${title}</h2>
       ${body}
       <hr style="margin:24px 0;border:none;border-top:1px solid #e5e7eb;"/>
-      <p style="color:#9ca3af;font-size:12px;margin:0;">Auklite · Latvia's childcare platform</p>
+      <p style="color:#9ca3af;font-size:12px;margin:0;">NannyBooking · Trusted childcare in Latvia</p>
     </div>
   </div>
 </body>

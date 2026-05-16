@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { supabase } from "../lib/supabase";
@@ -177,10 +178,15 @@ export default function Header() {
               } catch {}
               router.push("/");
             }}
-            className="text-2xl font-bold tracking-wide transition-opacity hover:opacity-80"
-            style={{ background: "linear-gradient(135deg, #0F3D2E 0%, #276b52 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}
+            className="flex items-center gap-2 transition-opacity hover:opacity-80"
           >
-            NannyBooking
+            <Image src="/images/NBLogo.jpg" alt="NannyBooking" width={32} height={32} className="rounded-lg object-cover" />
+            <span
+              className="text-2xl font-bold tracking-wide"
+              style={{ background: "linear-gradient(135deg, #0F3D2E 0%, #276b52 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}
+            >
+              NannyBooking
+            </span>
           </button>
         </div>
         {/* User Menu (right) */}

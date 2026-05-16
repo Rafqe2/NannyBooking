@@ -36,6 +36,18 @@ export default function CookieConsent() {
     try {
       localStorage.setItem(COOKIE_KEY, JSON.stringify(prefs));
     } catch {}
+    // Notify Google Consent Mode (no-op if GA not loaded)
+    try {
+      const gtag = (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag;
+      if (typeof gtag === "function") {
+        gtag("consent", "update", {
+          analytics_storage: prefs.analytics ? "granted" : "denied",
+          ad_storage: prefs.marketing ? "granted" : "denied",
+          ad_user_data: prefs.marketing ? "granted" : "denied",
+          ad_personalization: prefs.marketing ? "granted" : "denied",
+        });
+      }
+    } catch {}
     setVisible(false);
   };
 

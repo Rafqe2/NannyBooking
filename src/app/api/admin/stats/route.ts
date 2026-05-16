@@ -32,7 +32,7 @@ export async function GET(req: Request) {
 
     const [usersRes, adsRes, bookingsRes, recentRes] = await Promise.all([
       client.from("users").select("user_type"),
-      client.from("advertisements").select("is_active, ad_type"),
+      client.from("advertisements").select("is_active, type"),
       client.from("bookings").select("status"),
       client
         .from("users")
@@ -61,8 +61,8 @@ export async function GET(req: Request) {
         total: ads.length,
         active: ads.filter((a) => a.is_active).length,
         inactive: ads.filter((a) => !a.is_active).length,
-        shortTerm: ads.filter((a) => a.ad_type === "short-term").length,
-        longTerm: ads.filter((a) => a.ad_type === "long-term").length,
+        shortTerm: ads.filter((a) => a.type === "short-term").length,
+        longTerm: ads.filter((a) => a.type === "long-term").length,
       },
       bookings: {
         total: bookings.length,

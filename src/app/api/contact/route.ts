@@ -6,13 +6,18 @@ export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   try {
-    const { email, message } = await req.json();
+    const { email, message, website } = await req.json();
 
-    if (!email || typeof email !== "string" || !email.includes("@")) {
+    // Honeypot: legitimate users never fill this hidden field
+    if (website && typeof website === "string" && website.trim().length > 0) {
+      return NextResponse.json({ success: true });
+    }
+
+    if (!email || typeof email !== "string" || !email.includes("@") || email.length > 254) {
       return NextResponse.json({ error: "Invalid email" }, { status: 400 });
     }
-    if (!message || typeof message !== "string" || message.trim().length < 5) {
-      return NextResponse.json({ error: "Message too short" }, { status: 400 });
+    if (!message || typeof message !== "string" || message.trim().length < 5 || message.length > 5000) {
+      return NextResponse.json({ error: "Message too short or too long" }, { status: 400 });
     }
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string;

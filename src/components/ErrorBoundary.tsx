@@ -21,7 +21,7 @@ function getTranslation(key: keyof typeof translations, lang: Language): string 
 
 function getBrowserLanguage(): Language {
   if (typeof window === "undefined") return "en";
-  const stored = localStorage.getItem("language");
+  const stored = localStorage.getItem("nannybooking-language");
   if (stored === "lv" || stored === "ru" || stored === "en") return stored;
   return "en";
 }
