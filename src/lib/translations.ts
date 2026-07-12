@@ -917,6 +917,11 @@ export const translations = {
     lv: 'Pr,Ot,Tr,Ce,Pk,Se,Sv',
     ru: 'Пн,Вт,Ср,Чт,Пт,Сб,Вс'
   },
+  'calendar.clearDates': {
+    en: 'Clear dates',
+    lv: 'Notīrīt datumus',
+    ru: 'Сбросить даты'
+  },
 
   // Profile Page
   'profile.yourAdvertisement': {
@@ -3163,6 +3168,109 @@ export const translations = {
     en: 'Other',
     lv: 'Cits',
     ru: 'Другое'
+  },
+
+  // Booking status timeline
+  'timeline.requested': {
+    en: 'Requested',
+    lv: 'Pieprasīts',
+    ru: 'Запрошено'
+  },
+  'timeline.confirmed': {
+    en: 'Confirmed',
+    lv: 'Apstiprināts',
+    ru: 'Подтверждено'
+  },
+  'timeline.completed': {
+    en: 'Completed',
+    lv: 'Pabeigts',
+    ru: 'Завершено'
+  },
+  'timeline.cancelled': {
+    en: 'Cancelled',
+    lv: 'Atcelts',
+    ru: 'Отменено'
+  },
+  'timeline.expired': {
+    en: 'Expired',
+    lv: 'Beidzies',
+    ru: 'Истекло'
+  },
+
+  // Empty states
+  'empty.bookings.upcoming.title': {
+    en: 'No upcoming bookings',
+    lv: 'Nav gaidāmo rezervāciju',
+    ru: 'Нет предстоящих бронирований'
+  },
+  'empty.bookings.upcoming.desc': {
+    en: 'Find a nanny or family and send your first booking request.',
+    lv: 'Atrodiet auklīti vai ģimeni un nosūtiet savu pirmo rezervācijas pieprasījumu.',
+    ru: 'Найдите няню или семью и отправьте свой первый запрос на бронирование.'
+  },
+  'empty.bookings.past.title': {
+    en: 'No past bookings yet',
+    lv: 'Vēl nav pagājušo rezervāciju',
+    ru: 'Пока нет прошлых бронирований'
+  },
+  'empty.bookings.past.desc': {
+    en: 'Completed and cancelled bookings will appear here.',
+    lv: 'Pabeigtās un atceltās rezervācijas parādīsies šeit.',
+    ru: 'Завершённые и отменённые бронирования появятся здесь.'
+  },
+  'empty.bookings.cta': {
+    en: 'Browse advertisements',
+    lv: 'Pārlūkot sludinājumus',
+    ru: 'Просмотреть объявления'
+  },
+
+  // PWA install prompt
+  'pwa.title': {
+    en: 'Install NannyBooking',
+    lv: 'Instalēt NannyBooking',
+    ru: 'Установить NannyBooking'
+  },
+  'pwa.desc': {
+    en: 'Add the app to your home screen for quick access.',
+    lv: 'Pievienojiet lietotni sākuma ekrānam ātrai piekļuvei.',
+    ru: 'Добавьте приложение на главный экран для быстрого доступа.'
+  },
+  'pwa.install': {
+    en: 'Install',
+    lv: 'Instalēt',
+    ru: 'Установить'
+  },
+  'pwa.dismiss': {
+    en: 'Not now',
+    lv: 'Ne tagad',
+    ru: 'Не сейчас'
+  },
+
+  // Mobile bottom navigation
+  'nav.home': {
+    en: 'Home',
+    lv: 'Sākums',
+    ru: 'Главная'
+  },
+  'nav.search': {
+    en: 'Search',
+    lv: 'Meklēt',
+    ru: 'Поиск'
+  },
+  'nav.bookings': {
+    en: 'Bookings',
+    lv: 'Rezervācijas',
+    ru: 'Брони'
+  },
+  'nav.messages': {
+    en: 'Messages',
+    lv: 'Ziņas',
+    ru: 'Сообщения'
+  },
+  'nav.profile': {
+    en: 'Profile',
+    lv: 'Profils',
+    ru: 'Профиль'
   }
 } as const;
 

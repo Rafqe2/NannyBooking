@@ -38,3 +38,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local tool state (machine-specific)
+/.expo/
+.claude/settings.local.json

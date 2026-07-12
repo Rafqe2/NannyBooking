@@ -19,7 +19,7 @@ export default function Footer() {
   const isParent = userProfile?.user_type === "parent";
 
   return (
-    <footer className="bg-brand-600 text-brand-100">
+    <footer className="bg-brand-600 text-brand-100 pb-16 md:pb-0">
       <div className="max-w-7xl mx-auto px-8 py-16">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">

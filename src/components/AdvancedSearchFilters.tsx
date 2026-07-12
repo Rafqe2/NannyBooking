@@ -70,17 +70,14 @@ export default function AdvancedSearchFilters({
     onReset();
   };
 
-  const activeFiltersCount = () => {
-    let count = 0;
-    if (filters.skills.length > 0) count++;
-    if (filters.experienceYears !== null) count++;
-    if (filters.hasReviews) count++;
-    if (filters.verifiedOnly) count++;
-    if (filters.adType !== null) count++;
-    return count;
-  };
-
-  const count = activeFiltersCount();
+  // Each selected skill counts individually so the badge reflects the true
+  // number of applied filters, not the number of filter categories.
+  const count =
+    filters.skills.length +
+    (filters.experienceYears !== null ? 1 : 0) +
+    (filters.hasReviews ? 1 : 0) +
+    (filters.verifiedOnly ? 1 : 0) +
+    (filters.adType !== null ? 1 : 0);
 
   return (
     <div className="relative">

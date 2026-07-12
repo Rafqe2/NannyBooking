@@ -6,6 +6,8 @@ import { LanguageProvider } from "../components/LanguageProvider";
 import { NotificationCountsProvider } from "../components/NotificationCountsProvider";
 import CookieConsent from "../components/CookieConsent";
 import ScrollToTop from "../components/ScrollToTop";
+import MobileBottomNav from "../components/MobileBottomNav";
+import PWAInstallPrompt from "../components/PWAInstallPrompt";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
@@ -152,6 +154,8 @@ export default function RootLayout({
             <ErrorBoundary>{children}</ErrorBoundary>
             <CookieConsent />
             <ScrollToTop />
+            <PWAInstallPrompt />
+            <MobileBottomNav />
           </NotificationCountsProvider>
         </LanguageProvider>
         <Analytics />

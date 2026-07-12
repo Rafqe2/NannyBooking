@@ -173,7 +173,7 @@ export default function HomeClient({
   };
 
   return (
-    <div className="relative overflow-x-hidden">
+    <div className="relative overflow-x-hidden flex-1 flex flex-col">
       {/* Unified page-level background bubbles */}
       <div className="absolute -top-20 -right-28 w-[560px] h-[560px] rounded-full bg-brand-200 opacity-[0.07] pointer-events-none" />
       <div className="absolute top-[5%] left-[20%] w-48 h-48 rounded-full bg-brand-300 opacity-[0.04] pointer-events-none" />

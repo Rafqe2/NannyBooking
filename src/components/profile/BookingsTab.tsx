@@ -8,6 +8,7 @@ import { BookingService } from "../../lib/bookingService";
 import { MessageService } from "../../lib/messageService";
 import { notifyBooking } from "../../lib/notifyService";
 import BookingCalendar from "../BookingCalendar";
+import BookingStatusTimeline from "../BookingStatusTimeline";
 import CancelBookingModal from "../CancelBookingModal";
 import ReviewModal from "../ReviewModal";
 import { formatDateDDMMYYYY } from "../../lib/date";
@@ -143,8 +144,33 @@ export default function BookingsTab({
             </div>
             <div className="p-6 sm:p-8">
               {bookings.length === 0 ? (
-                <div className="text-gray-600">
-                  {t("profile.noBookingsYet")}
+                <div className="flex flex-col items-center justify-center text-center py-10 px-4">
+                  <div className="w-14 h-14 rounded-2xl bg-brand-50 flex items-center justify-center mb-4">
+                    <svg className="w-7 h-7 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-base font-semibold text-gray-900 mb-1">
+                    {bookingView === "past"
+                      ? t("empty.bookings.past.title")
+                      : t("empty.bookings.upcoming.title")}
+                  </h3>
+                  <p className="text-sm text-gray-500 max-w-xs mb-5">
+                    {bookingView === "past"
+                      ? t("empty.bookings.past.desc")
+                      : t("empty.bookings.upcoming.desc")}
+                  </p>
+                  {bookingView !== "past" && (
+                    <button
+                      onClick={() => router.push("/")}
+                      className="inline-flex items-center gap-2 bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-brand-700 transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                      {t("empty.bookings.cta")}
+                    </button>
+                  )}
                 </div>
               ) : (
                 <div className="h-[304px] flex flex-col justify-between">
@@ -410,31 +436,9 @@ export default function BookingsTab({
               </div>
             </div>
             <div className="p-6 space-y-4">
-              {/* Status Badge */}
-              <div className="flex items-center justify-center">
-                <span
-                  className={`px-4 py-2 rounded-full text-sm font-medium ${
-                    selectedBooking.status === "confirmed"
-                      ? "bg-green-100 text-green-800 border border-green-200"
-                      : selectedBooking.status === "pending"
-                      ? "bg-yellow-100 text-yellow-800 border border-yellow-200"
-                      : selectedBooking.status === "cancelled"
-                      ? "bg-red-100 text-red-800 border border-red-200"
-                      : selectedBooking.status === "expired"
-                      ? "bg-gray-100 text-gray-500 border border-gray-200"
-                      : "bg-gray-100 text-gray-800 border border-gray-200"
-                  }`}
-                >
-                  {selectedBooking.status === "confirmed"
-                    ? t("booking.confirmed")
-                    : selectedBooking.status === "pending"
-                    ? t("booking.pending")
-                    : selectedBooking.status === "cancelled"
-                    ? t("booking.cancelled")
-                    : selectedBooking.status === "expired"
-                    ? t("booking.expired")
-                    : selectedBooking.status}
-                </span>
+              {/* Status Timeline */}
+              <div className="rounded-xl border border-gray-100 bg-gray-50/60 px-3">
+                <BookingStatusTimeline status={selectedBooking.status as any} />
               </div>
 
               {/* Booking Details Grid */}

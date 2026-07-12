@@ -23,10 +23,13 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
   const [currentLocationQuery, setCurrentLocationQuery] = useState<string>(""); // Track typed text
 
   const dateRef = useRef<HTMLDivElement>(null);
+  const datePopupRef = useRef<HTMLDivElement>(null);
 
   const handleClickOutside = useCallback((event: MouseEvent) => {
     const target = event.target as Node;
-    if (dateRef.current && !dateRef.current.contains(target)) {
+    const insideTrigger = dateRef.current?.contains(target);
+    const insidePopup = datePopupRef.current?.contains(target);
+    if (!insideTrigger && !insidePopup) {
       setShowDatePicker(false);
     }
   }, []);
@@ -125,7 +128,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
       <div className="max-w-7xl mx-auto relative">
         {/* Single Responsive Search Bar */}
         <div className="flex justify-center px-2 sm:px-4 md:px-8 lg:px-16">
-          <div className="w-full max-w-4xl bg-white shadow-2xl border border-gray-100 p-4 md:p-6 hover:shadow-3xl transition-shadow duration-300 rounded-3xl lg:rounded-full lg:flex lg:items-center lg:space-x-4 lg:space-y-0 space-y-4">
+          <div className="relative w-full max-w-4xl bg-white shadow-2xl border border-gray-100 p-4 md:p-6 hover:shadow-3xl transition-shadow duration-300 rounded-3xl lg:rounded-full lg:flex lg:items-center lg:space-x-4 lg:space-y-0 space-y-4">
             {/* Where */}
             <div className="relative flex-1">
               <label className="block text-sm font-medium text-gray-700 mb-2 lg:hidden">
@@ -168,16 +171,6 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
               >
                 {dateRangeLabel}
               </button>
-              {showDatePicker && (
-                <div className="absolute top-full left-0 mt-2 lg:mt-3 bg-white rounded-xl lg:rounded-2xl shadow-2xl border border-gray-200 p-4 lg:p-8 z-50">
-                  <Calendar
-                    startDate={startDate}
-                    endDate={endDate}
-                    onDateSelect={handleDateSelect}
-                    minDate={today}
-                  />
-                </div>
-              )}
             </div>
 
             {/* Divider - Only visible on desktop */}
@@ -190,6 +183,25 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
             >
               {t("search.findMatch")}
             </button>
+
+            {/* Date picker — anchored to the whole search bar so it spans its full width */}
+            {showDatePicker && (
+              <div
+                ref={datePopupRef}
+                className="absolute top-full left-0 right-0 mt-3 bg-white rounded-2xl lg:rounded-3xl shadow-2xl border border-gray-200 p-5 md:p-7 z-50"
+              >
+                <Calendar
+                  startDate={startDate}
+                  endDate={endDate}
+                  onDateSelect={handleDateSelect}
+                  minDate={today}
+                  onClear={() => {
+                    setStartDate(null);
+                    setEndDate(null);
+                  }}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>
