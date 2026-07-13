@@ -188,7 +188,10 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
             {showDatePicker && (
               <div
                 ref={datePopupRef}
-                className="absolute top-full left-0 right-0 mt-3 bg-white rounded-2xl lg:rounded-3xl shadow-2xl border border-gray-200 p-5 md:p-7 z-50"
+                // !ml-0/!mt-3 override the parent's space-x-4/space-y-4 sibling
+                // margins, which would otherwise shift and narrow this absolutely
+                // positioned popup.
+                className="absolute top-full left-0 right-0 !ml-0 !mt-3 bg-white rounded-2xl lg:rounded-3xl shadow-2xl border border-gray-200 p-5 md:p-7 z-50"
               >
                 <Calendar
                   startDate={startDate}

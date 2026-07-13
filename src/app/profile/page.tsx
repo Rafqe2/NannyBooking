@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { UserService, UserProfile } from "../../lib/userService";
@@ -52,8 +52,22 @@ export default function ProfilePage() {
     location: "",
   });
   const [bookings, setBookings] = useState<BookingItem[]>([]);
-  const [pendingBookings, setPendingBookings] = useState<number>(0);
   const { unreadMessages: unreadMessageCount } = useNotificationCounts();
+
+  // Derived from bookings so the tab badge stays in sync after accept/decline
+  // in place (no page reload). Mirrors get_pending_booking_count_for_me:
+  // pending, and either a future/today date or a long-term contact request.
+  const pendingBookings = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return bookings.filter(
+      (b) =>
+        b.status === "pending" &&
+        (b.ad_type === "long-term" ||
+          !b.booking_date ||
+          new Date(b.booking_date + "T00:00:00") >= today)
+    ).length;
+  }, [bookings]);
   const [walletBalance, setWalletBalance] = useState<number | null>(null);
 
   const isParent = userProfile?.user_type === "parent";
@@ -197,17 +211,6 @@ export default function ProfilePage() {
             setBookings((bdata as BookingItem[]) || []);
           } catch (error) {
             console.error("Exception loading bookings:", error);
-          }
-          try {
-            const { data: pcount, error: perror } = await supabase.rpc(
-              "get_pending_booking_count_for_me"
-            );
-            if (perror) {
-              console.error("Error loading pending count:", perror);
-            }
-            setPendingBookings(Number(pcount || 0));
-          } catch (error) {
-            console.error("Exception loading pending count:", error);
           }
         }
       } catch (error) {
@@ -381,7 +384,7 @@ export default function ProfilePage() {
       case "job-ads":
         return <JobAdsTab userProfile={userProfile} advertisements={advertisements} adSlotsMap={adSlotsMap} setAdvertisements={setAdvertisements} setToast={setToast} />;
       case "bookings":
-        return <BookingsTab userProfile={userProfile} user={user} bookings={bookings} pendingBookings={pendingBookings} setBookings={setBookings} />;
+        return <BookingsTab userProfile={userProfile} user={user} bookings={bookings} pendingBookings={pendingBookings} setBookings={setBookings} setToast={setToast} />;
       case "messages":
         return <MessagesTab userProfile={userProfile} user={user} />;
       case "profile":

@@ -1533,6 +1533,11 @@ export const translations = {
     lv: 'Īstermiņa sludinājumiem jābūt vismaz vienam nākotnes datumam, lai tos varētu saglabāt',
     ru: 'Краткосрочные объявления должны иметь хотя бы одну будущую дату для сохранения'
   },
+  'adEdit.saveFailed': {
+    en: 'Could not save your changes. Please try again.',
+    lv: 'Neizdevās saglabāt izmaiņas. Lūdzu, mēģiniet vēlreiz.',
+    ru: 'Не удалось сохранить изменения. Пожалуйста, попробуйте ещё раз.'
+  },
 
   // Booking Modal
   'booking.bookThis': {
@@ -1604,6 +1609,16 @@ export const translations = {
     en: 'Confirmed',
     lv: 'Apstiprināts',
     ru: 'Подтвержден'
+  },
+  'booking.goToMessages': {
+    en: 'Message',
+    lv: 'Ziņot',
+    ru: 'Написать'
+  },
+  'booking.acceptedCheckMessages': {
+    en: 'Booking accepted — check your messages to arrange details.',
+    lv: 'Rezervācija apstiprināta — pārbaudiet ziņas, lai vienotos par detaļām.',
+    ru: 'Бронирование принято — проверьте сообщения, чтобы согласовать детали.'
   },
   'booking.bookingDetails': {
     en: 'Booking Details',
@@ -3079,6 +3094,16 @@ export const translations = {
     lv: 'Ziņot',
     ru: 'Пожаловаться'
   },
+  'report.subtitle': {
+    en: 'Tell us what\'s wrong. Your report is confidential.',
+    lv: 'Pastāstiet, kas nav kārtībā. Jūsu ziņojums ir konfidenciāls.',
+    ru: 'Расскажите, что не так. Ваша жалоба конфиденциальна.'
+  },
+  'report.noteOptional': {
+    en: 'Add details (optional)',
+    lv: 'Pievienot detaļas (nav obligāti)',
+    ru: 'Добавить детали (необязательно)'
+  },
   'report.reasonLabel': {
     en: 'Reason',
     lv: 'Iemesls',
@@ -3168,6 +3193,115 @@ export const translations = {
     en: 'Other',
     lv: 'Cits',
     ru: 'Другое'
+  },
+
+  // 404 Not Found
+  'notFound.title': {
+    en: 'Page not found',
+    lv: 'Lapa nav atrasta',
+    ru: 'Страница не найдена'
+  },
+  'notFound.desc': {
+    en: "The page you're looking for doesn't exist or has been moved.",
+    lv: 'Meklētā lapa neeksistē vai ir pārvietota.',
+    ru: 'Страница, которую вы ищете, не существует или была перемещена.'
+  },
+  'notFound.backHome': {
+    en: 'Back to home',
+    lv: 'Atpakaļ uz sākumu',
+    ru: 'На главную'
+  },
+
+  // Wallet
+  'wallet.badge': {
+    en: 'Wallet',
+    lv: 'Maks',
+    ru: 'Кошелёк'
+  },
+  'wallet.addFunds': {
+    en: 'Add Funds',
+    lv: 'Papildināt',
+    ru: 'Пополнить'
+  },
+  'wallet.availableBalance': {
+    en: 'Available Balance',
+    lv: 'Pieejamais atlikums',
+    ru: 'Доступный баланс'
+  },
+  'wallet.selectAmount': {
+    en: 'Select amount',
+    lv: 'Izvēlieties summu',
+    ru: 'Выберите сумму'
+  },
+  'wallet.customAmount': {
+    en: 'Or enter custom amount',
+    lv: 'Vai ievadiet citu summu',
+    ru: 'Или введите свою сумму'
+  },
+  'wallet.youWillReceive': {
+    en: 'You will receive',
+    lv: 'Jūs saņemsiet',
+    ru: 'Вы получите'
+  },
+  'wallet.proceedToPayment': {
+    en: 'Proceed to Payment',
+    lv: 'Turpināt uz maksājumu',
+    ru: 'Перейти к оплате'
+  },
+  'wallet.paymentComingSoon': {
+    en: 'Payment integration coming soon — card, bank transfer & more',
+    lv: 'Maksājumu integrācija drīzumā — karte, bankas pārskaitījums un vairāk',
+    ru: 'Интеграция оплаты скоро — карта, банковский перевод и другое'
+  },
+  'wallet.transactionHistory': {
+    en: 'Transaction History',
+    lv: 'Darījumu vēsture',
+    ru: 'История транзакций'
+  },
+  'wallet.transactionsCount': {
+    en: '{{count}} transactions',
+    lv: '{{count}} darījumi',
+    ru: 'Транзакций: {{count}}'
+  },
+  'wallet.totalCount': {
+    en: '{{count}} total',
+    lv: 'Kopā {{count}}',
+    ru: 'Всего {{count}}'
+  },
+  'wallet.noTransactions': {
+    en: 'No transactions yet',
+    lv: 'Vēl nav darījumu',
+    ru: 'Пока нет транзакций'
+  },
+  'wallet.addToStart': {
+    en: 'Add funds to get started',
+    lv: 'Papildiniet, lai sāktu',
+    ru: 'Пополните, чтобы начать'
+  },
+  'wallet.addFirstFunds': {
+    en: 'Add your first funds',
+    lv: 'Pievienojiet pirmos līdzekļus',
+    ru: 'Добавьте первые средства'
+  },
+  'wallet.type.topup': {
+    en: 'Top-up',
+    lv: 'Papildinājums',
+    ru: 'Пополнение'
+  },
+  'wallet.type.spend': {
+    en: 'Purchase',
+    lv: 'Pirkums',
+    ru: 'Покупка'
+  },
+  'wallet.type.refund': {
+    en: 'Refund',
+    lv: 'Atmaksa',
+    ru: 'Возврат'
+  },
+  'wallet.type.bonus': {
+    en: 'Bonus',
+    lv: 'Bonuss',
+    ru: 'Бонус'
   },
 
   // Booking status timeline

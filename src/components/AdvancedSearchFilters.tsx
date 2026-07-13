@@ -110,14 +110,15 @@ export default function AdvancedSearchFilters({
       {/* Filters Panel */}
       {isOpen && (
         <>
-          {/* Backdrop */}
+          {/* Backdrop — above the fixed mobile bottom nav (z-40) so a tap on
+              the nav closes the panel instead of navigating away */}
           <div
-            className="fixed inset-0 bg-black/20 z-40"
+            className="fixed inset-0 bg-black/20 z-50"
             onClick={() => setIsOpen(false)}
           />
 
-          {/* Panel */}
-          <div className="absolute top-full right-0 mt-2 w-96 bg-white rounded-2xl shadow-2xl border border-gray-200 z-50 max-h-[80vh] overflow-hidden flex flex-col">
+          {/* Panel — above the backdrop (z-50) */}
+          <div className="absolute top-full right-0 mt-2 w-96 bg-white rounded-2xl shadow-2xl border border-gray-200 z-[60] max-h-[80vh] overflow-hidden flex flex-col">
             {/* Header */}
             <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-brand-50 to-brand-100">
               <div className="flex items-center justify-between">

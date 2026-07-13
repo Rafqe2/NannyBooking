@@ -3,12 +3,14 @@
 import { useEffect, useState } from "react";
 import { WalletService, Wallet, WalletTransaction } from "../../lib/walletService";
 import { useEscapeKey } from "../../lib/useEscapeKey";
+import { useTranslation } from "../LanguageProvider";
 
-const TYPE_LABELS: Record<WalletTransaction["type"], string> = {
-  topup:  "Top-up",
-  spend:  "Purchase",
-  refund: "Refund",
-  bonus:  "Bonus",
+type TxType = WalletTransaction["type"];
+const TYPE_KEYS: Record<TxType, string> = {
+  topup: "wallet.type.topup",
+  spend: "wallet.type.spend",
+  refund: "wallet.type.refund",
+  bonus: "wallet.type.bonus",
 };
 
 const TYPE_COLORS: Record<WalletTransaction["type"], string> = {
@@ -31,6 +33,7 @@ function formatDate(iso: string) {
 }
 
 function AddFundsModal({ onClose }: { onClose: () => void }) {
+  const { t } = useTranslation();
   const [selected, setSelected] = useState<number | null>(25);
   const [custom, setCustom] = useState("");
   const amount = custom !== "" ? parseFloat(custom) : selected;
@@ -44,8 +47,8 @@ function AddFundsModal({ onClose }: { onClose: () => void }) {
         {/* Header */}
         <div className="bg-gradient-to-r from-brand-600 to-brand-700 px-5 py-4 flex items-center justify-between">
           <div>
-            <p className="text-brand-200 text-[10px] font-bold tracking-[0.2em] uppercase">Wallet</p>
-            <h2 className="text-white font-bold text-lg">Add Funds</h2>
+            <p className="text-brand-200 text-[10px] font-bold tracking-[0.2em] uppercase">{t("wallet.badge")}</p>
+            <h2 className="text-white font-bold text-lg">{t("wallet.addFunds")}</h2>
           </div>
           <button onClick={onClose} className="text-brand-200 hover:text-white transition-colors">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -57,7 +60,7 @@ function AddFundsModal({ onClose }: { onClose: () => void }) {
         <div className="p-5 space-y-5">
           {/* Preset amounts */}
           <div>
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Select amount</p>
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">{t("wallet.selectAmount")}</p>
             <div className="grid grid-cols-4 gap-2">
               {PRESET_AMOUNTS.map((amt) => (
                 <button
@@ -77,7 +80,7 @@ function AddFundsModal({ onClose }: { onClose: () => void }) {
 
           {/* Custom amount */}
           <div>
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Or enter custom amount</p>
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">{t("wallet.customAmount")}</p>
             <div className="relative">
               <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 font-medium">€</span>
               <input
@@ -95,7 +98,7 @@ function AddFundsModal({ onClose }: { onClose: () => void }) {
           {/* Summary */}
           {amount && amount > 0 && (
             <div className="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-3 border border-gray-100">
-              <span className="text-sm text-gray-600">You will receive</span>
+              <span className="text-sm text-gray-600">{t("wallet.youWillReceive")}</span>
               <span className="text-lg font-bold text-brand-700">€{amount.toFixed(2)}</span>
             </div>
           )}
@@ -108,10 +111,10 @@ function AddFundsModal({ onClose }: { onClose: () => void }) {
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
             </svg>
-            Proceed to Payment
+            {t("wallet.proceedToPayment")}
           </button>
           <p className="text-center text-xs text-gray-400">
-            Payment integration coming soon — card, bank transfer &amp; more
+            {t("wallet.paymentComingSoon")}
           </p>
         </div>
       </div>
@@ -120,10 +123,12 @@ function AddFundsModal({ onClose }: { onClose: () => void }) {
 }
 
 export default function WalletTab({ userId }: { userId: string }) {
+  const { t } = useTranslation();
   const [wallet, setWallet] = useState<Wallet | null>(null);
   const [transactions, setTransactions] = useState<WalletTransaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddFunds, setShowAddFunds] = useState(false);
+  const typeLabel = (type: TxType) => t(TYPE_KEYS[type]);
 
   useEffect(() => {
     if (!userId) return;
@@ -159,14 +164,14 @@ export default function WalletTab({ userId }: { userId: string }) {
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-brand-200 text-xs font-bold tracking-[0.2em] uppercase mb-2">
-                Available Balance
+                {t("wallet.availableBalance")}
               </p>
               <p className="text-4xl font-bold tracking-tight">
                 €{(wallet?.balance ?? 0).toFixed(2)}
                 <span className="text-lg font-normal text-brand-300 ml-1">{wallet?.currency ?? "EUR"}</span>
               </p>
               <p className="text-brand-300 text-xs mt-2">
-                {transactions.length} transaction{transactions.length !== 1 ? "s" : ""}
+                {t("wallet.transactionsCount", { count: transactions.length })}
               </p>
             </div>
             <button
@@ -176,7 +181,7 @@ export default function WalletTab({ userId }: { userId: string }) {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              Add Funds
+              {t("wallet.addFunds")}
             </button>
           </div>
         </div>
@@ -184,9 +189,9 @@ export default function WalletTab({ userId }: { userId: string }) {
         {/* Transaction history */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-gray-900">Transaction History</h3>
+            <h3 className="text-sm font-semibold text-gray-900">{t("wallet.transactionHistory")}</h3>
             {transactions.length > 0 && (
-              <span className="text-xs text-gray-400">{transactions.length} total</span>
+              <span className="text-xs text-gray-400">{t("wallet.totalCount", { count: transactions.length })}</span>
             )}
           </div>
 
@@ -197,8 +202,8 @@ export default function WalletTab({ userId }: { userId: string }) {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                 </svg>
               </div>
-              <p className="text-sm text-gray-500">No transactions yet</p>
-              <p className="text-xs text-gray-400 mt-1">Add funds to get started</p>
+              <p className="text-sm text-gray-500">{t("wallet.noTransactions")}</p>
+              <p className="text-xs text-gray-400 mt-1">{t("wallet.addToStart")}</p>
               <button
                 onClick={() => setShowAddFunds(true)}
                 className="mt-4 inline-flex items-center gap-1.5 text-brand-600 text-sm font-medium hover:underline"
@@ -206,7 +211,7 @@ export default function WalletTab({ userId }: { userId: string }) {
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
-                Add your first funds
+                {t("wallet.addFirstFunds")}
               </button>
             </div>
           ) : (
@@ -215,10 +220,10 @@ export default function WalletTab({ userId }: { userId: string }) {
                 <li key={tx.id} className="flex items-center justify-between px-5 py-3.5 hover:bg-gray-50 transition-colors">
                   <div className="flex items-center gap-3 min-w-0">
                     <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border flex-shrink-0 ${TYPE_COLORS[tx.type]}`}>
-                      {TYPE_LABELS[tx.type]}
+                      {typeLabel(tx.type)}
                     </span>
                     <div className="min-w-0">
-                      <p className="text-sm text-gray-800 truncate">{tx.description || TYPE_LABELS[tx.type]}</p>
+                      <p className="text-sm text-gray-800 truncate">{tx.description || typeLabel(tx.type)}</p>
                       <p className="text-xs text-gray-400">{formatDate(tx.created_at)}</p>
                     </div>
                   </div>

@@ -49,6 +49,17 @@ export default function MessagesTab({ userProfile, user }: MessagesTabProps) {
     setInquiryDraft("");
   }, [activeConversation]);
 
+  // Deep link from BookingsTab: open a specific conversation once on mount.
+  useEffect(() => {
+    try {
+      const pending = sessionStorage.getItem("nannybooking:openConversation");
+      if (pending) {
+        sessionStorage.removeItem("nannybooking:openConversation");
+        setActiveConversation(pending);
+      }
+    } catch {}
+  }, []);
+
   // Load conversations and poll every 15s
   useEffect(() => {
     if (!userProfile?.id) return;

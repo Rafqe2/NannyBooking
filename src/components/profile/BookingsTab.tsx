@@ -7,6 +7,7 @@ import { supabase } from "../../lib/supabase";
 import { BookingService } from "../../lib/bookingService";
 import { MessageService } from "../../lib/messageService";
 import { notifyBooking } from "../../lib/notifyService";
+import { useNotificationCounts } from "../NotificationCountsProvider";
 import BookingCalendar from "../BookingCalendar";
 import BookingStatusTimeline from "../BookingStatusTimeline";
 import CancelBookingModal from "../CancelBookingModal";
@@ -22,7 +23,11 @@ interface BookingsTabProps {
   bookings: BookingItem[];
   pendingBookings: number;
   setBookings: React.Dispatch<React.SetStateAction<BookingItem[]>>;
+  setToast?: (toast: { message: string; type: "error" | "success" } | null) => void;
 }
+
+// Deep-link key read by MessagesTab on mount to auto-open a conversation.
+const OPEN_CONVERSATION_KEY = "nannybooking:openConversation";
 
 export default function BookingsTab({
   userProfile,
@@ -30,11 +35,47 @@ export default function BookingsTab({
   bookings,
   pendingBookings,
   setBookings,
+  setToast,
 }: BookingsTabProps) {
   const { t } = useTranslation();
   const router = useRouter();
+  const { refresh: refreshCounts } = useNotificationCounts();
   const isNanny = userProfile?.user_type === "nanny";
   const bookingsPerPage = 4;
+
+  // Reload bookings and refresh the global pending/unread badges. Called after
+  // every accept/decline/withdraw/cancel so counts never go stale in place.
+  const reloadBookings = async () => {
+    try {
+      const { data } = await supabase.rpc("get_my_bookings");
+      setBookings((data as BookingItem[]) || []);
+    } catch (error) {
+      console.error("Error reloading bookings:", error);
+    }
+    refreshCounts();
+  };
+
+  // Open (or create) the conversation for a booking and jump to the Messages tab.
+  const goToConversation = async (bookingId: string) => {
+    try {
+      const convId = await MessageService.getOrCreateConversation(bookingId);
+      if (convId) {
+        try {
+          sessionStorage.setItem(OPEN_CONVERSATION_KEY, convId);
+        } catch {}
+      }
+    } catch (err) {
+      console.error("Error opening conversation:", err);
+    }
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      url.searchParams.set("tab", "messages");
+      window.history.pushState({}, "", url.toString());
+      window.dispatchEvent(
+        new CustomEvent("profileTabChange", { detail: { tab: "messages" } })
+      );
+    }
+  };
 
   const [selectedCalendarDate, setSelectedCalendarDate] = useState<string | null>(null);
   const [bookingView, setBookingView] = useState<"upcoming" | "past">("upcoming");
@@ -143,7 +184,7 @@ export default function BookingsTab({
               </div>
             </div>
             <div className="p-6 sm:p-8">
-              {bookings.length === 0 ? (
+              {filteredBookings.length === 0 ? (
                 <div className="flex flex-col items-center justify-center text-center py-10 px-4">
                   <div className="w-14 h-14 rounded-2xl bg-brand-50 flex items-center justify-center mb-4">
                     <svg className="w-7 h-7 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -259,11 +300,8 @@ export default function BookingsTab({
                                               } catch (err) {
                                                 console.error("Error creating conversation:", err);
                                               }
-                                              const { data: bdata } =
-                                                await supabase.rpc(
-                                                  "get_my_bookings"
-                                                );
-                                              setBookings((bdata as BookingItem[]) || []);
+                                              await reloadBookings();
+                                              setToast?.({ message: t("booking.acceptedCheckMessages"), type: "success" });
                                             }
                                           } finally {
                                             setRespondingBookingId(null);
@@ -285,11 +323,7 @@ export default function BookingsTab({
                                               );
                                             if (success) {
                                               notifyBooking("booking_cancelled", b.id);
-                                              const { data: bdata } =
-                                                await supabase.rpc(
-                                                  "get_my_bookings"
-                                                );
-                                              setBookings((bdata as BookingItem[]) || []);
+                                              await reloadBookings();
                                             }
                                           } finally {
                                             setRespondingBookingId(null);
@@ -323,11 +357,7 @@ export default function BookingsTab({
                                               );
                                             if (success) {
                                               notifyBooking("booking_cancelled", b.id);
-                                              const { data: bdata } =
-                                                await supabase.rpc(
-                                                  "get_my_bookings"
-                                                );
-                                              setBookings((bdata as BookingItem[]) || []);
+                                              await reloadBookings();
                                             }
                                           } finally {
                                             setRespondingBookingId(null);
@@ -438,7 +468,7 @@ export default function BookingsTab({
             <div className="p-6 space-y-4">
               {/* Status Timeline */}
               <div className="rounded-xl border border-gray-100 bg-gray-50/60 px-3">
-                <BookingStatusTimeline status={selectedBooking.status as any} />
+                <BookingStatusTimeline status={selectedBooking.status} />
               </div>
 
               {/* Booking Details Grid */}
@@ -587,7 +617,23 @@ export default function BookingsTab({
                   </div>
                 )}
             </div>
-            <div className="px-5 py-3 border-t border-gray-100 flex justify-between gap-2">
+            <div className="px-5 py-3 border-t border-gray-100 flex justify-between items-center gap-2">
+              {(selectedBooking?.status === "confirmed" ||
+                selectedBooking?.status === "completed") && (
+                <button
+                  className="inline-flex items-center gap-1.5 px-4 py-2 border border-brand-600 text-brand-600 rounded-lg hover:bg-brand-50 transition-colors"
+                  onClick={() => {
+                    const id = selectedBooking.id;
+                    setSelectedBooking(null);
+                    goToConversation(id);
+                  }}
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  </svg>
+                  {t("booking.goToMessages")}
+                </button>
+              )}
               {selectedBooking?.status === "completed" &&
                 !selectedBooking.has_review && (
                   <button
@@ -659,13 +705,7 @@ export default function BookingsTab({
           onClose={() => setCancellingBooking(null)}
           onSuccess={async () => {
             if (cancellingBooking) notifyBooking("booking_cancelled", cancellingBooking.id);
-            // Reload bookings after successful cancellation
-            try {
-              const { data: bdata } = await supabase.rpc("get_my_bookings");
-              setBookings((bdata as BookingItem[]) || []);
-            } catch (error) {
-              console.error("Error reloading bookings:", error);
-            }
+            await reloadBookings();
           }}
         />
       )}
@@ -678,13 +718,7 @@ export default function BookingsTab({
             revieweeName={reviewingBooking.counterparty_full_name || "User"}
             onClose={() => setReviewingBooking(null)}
             onSuccess={async () => {
-              // Reload bookings after successful review
-              try {
-                const { data: bdata } = await supabase.rpc("get_my_bookings");
-                setBookings((bdata as BookingItem[]) || []);
-              } catch (error) {
-                console.error("Error reloading bookings:", error);
-              }
+              await reloadBookings();
               setReviewingBooking(null);
             }}
           />

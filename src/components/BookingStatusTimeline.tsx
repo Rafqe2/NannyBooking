@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Clock, X } from "lucide-react";
+import { Check, Clock, X, Ban } from "lucide-react";
 import { useTranslation } from "./LanguageProvider";
 
 type BookingStatus =
@@ -12,8 +12,9 @@ type BookingStatus =
 
 // A compact horizontal progress indicator for a booking's lifecycle.
 // Happy path: Requested -> Confirmed -> Completed.
-// Terminal states (cancelled / expired) collapse the remaining steps into a
-// single red/grey end node so the user always sees where the booking stopped.
+// Terminal states end the line at a distinct node: cancelled = red (an action),
+// expired = grey (a lapse). The reached steps always render as done (check);
+// only the next, not-yet-reached step shows as current (clock).
 export default function BookingStatusTimeline({
   status,
 }: {
@@ -23,9 +24,10 @@ export default function BookingStatusTimeline({
 
   const isTerminalBad = status === "cancelled" || status === "expired";
 
-  // Index of the furthest reached step on the happy path.
-  const reachedIndex =
-    status === "completed" ? 2 : status === "confirmed" ? 1 : 0;
+  // How many happy-path steps are fully completed. 'pending' already means the
+  // request was made, so Requested is done (1) and Confirmed is the current step.
+  const doneCount =
+    status === "completed" ? 3 : status === "confirmed" ? 2 : 1;
 
   const steps = [
     { key: "requested", label: t("timeline.requested") },
@@ -34,8 +36,10 @@ export default function BookingStatusTimeline({
   ];
 
   if (isTerminalBad) {
-    const badLabel =
-      status === "cancelled" ? t("timeline.cancelled") : t("timeline.expired");
+    const isCancelled = status === "cancelled";
+    const badLabel = isCancelled
+      ? t("timeline.cancelled")
+      : t("timeline.expired");
     return (
       <div className="flex items-center justify-center gap-3 py-2">
         <StepNode state="done" icon={<Check className="w-4 h-4" />} />
@@ -43,8 +47,23 @@ export default function BookingStatusTimeline({
           {t("timeline.requested")}
         </span>
         <div className="h-px w-8 bg-gray-200" />
-        <StepNode state="bad" icon={<X className="w-4 h-4" />} />
-        <span className="text-sm font-medium text-red-600">{badLabel}</span>
+        <StepNode
+          state={isCancelled ? "bad" : "ended"}
+          icon={
+            isCancelled ? (
+              <X className="w-4 h-4" />
+            ) : (
+              <Ban className="w-4 h-4" />
+            )
+          }
+        />
+        <span
+          className={`text-sm font-medium ${
+            isCancelled ? "text-red-600" : "text-gray-500"
+          }`}
+        >
+          {badLabel}
+        </span>
       </div>
     );
   }
@@ -52,8 +71,8 @@ export default function BookingStatusTimeline({
   return (
     <div className="flex items-center justify-between px-1 py-2">
       {steps.map((step, i) => {
-        const done = i < reachedIndex;
-        const current = i === reachedIndex;
+        const done = i < doneCount;
+        const current = i === doneCount; // next step awaiting action
         const state: NodeState = done
           ? "done"
           : current
@@ -85,7 +104,7 @@ export default function BookingStatusTimeline({
             {i < steps.length - 1 && (
               <div
                 className={`h-px flex-1 mx-2 -mt-5 ${
-                  i < reachedIndex ? "bg-brand-500" : "bg-gray-200"
+                  i < doneCount - 1 ? "bg-brand-500" : "bg-gray-200"
                 }`}
               />
             )}
@@ -96,7 +115,7 @@ export default function BookingStatusTimeline({
   );
 }
 
-type NodeState = "done" | "current" | "upcoming" | "bad";
+type NodeState = "done" | "current" | "upcoming" | "bad" | "ended";
 
 function StepNode({
   state,
@@ -110,6 +129,7 @@ function StepNode({
     current: "bg-white text-brand-600 border-brand-500",
     upcoming: "bg-white text-gray-400 border-gray-200",
     bad: "bg-red-500 text-white border-red-500",
+    ended: "bg-gray-400 text-white border-gray-400",
   };
   return (
     <div

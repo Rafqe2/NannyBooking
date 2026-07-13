@@ -11,6 +11,7 @@ interface LocationAutocompleteProps {
   onQueryChange?: (query: string) => void;
   placeholder?: string;
   variant?: "default" | "borderless";
+  disabled?: boolean;
 }
 
 interface Suggestion {
@@ -57,6 +58,7 @@ export default function LocationAutocomplete({
   onQueryChange,
   placeholder,
   variant = "default",
+  disabled = false,
 }: LocationAutocompleteProps) {
   const { t } = useTranslation();
   const [query, setQuery] = useState<string>(value || "");
@@ -183,6 +185,7 @@ export default function LocationAutocomplete({
       <input
         type="text"
         value={query}
+        disabled={disabled}
         onChange={(e) => {
           const newQuery = e.target.value;
           setQuery(newQuery);
@@ -193,7 +196,7 @@ export default function LocationAutocomplete({
         className={
           variant === "borderless"
             ? "w-full px-0 lg:px-0 py-3 lg:py-4 bg-transparent border-0 outline-none focus:outline-none focus:ring-0"
-            : "w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+            : "w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed"
         }
         aria-autocomplete="list"
         aria-expanded={isOpen}

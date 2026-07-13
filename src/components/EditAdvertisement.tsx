@@ -218,7 +218,7 @@ export default function EditAdvertisement({
                 }
               }
             }}
-            className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-50"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed"
           />
           <p className="text-xs text-gray-500 mt-1">
             {pricePerHour > 0 ? `€${pricePerHour.toFixed(2)}` : t("adCreate.enterPrice")}
@@ -239,7 +239,7 @@ export default function EditAdvertisement({
               }
             }}
             maxLength={100}
-            className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-50"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed"
           />
           <p className="text-xs text-gray-500 mt-1">
             {title.length}/100 {title.length < 6 && (
@@ -305,6 +305,7 @@ export default function EditAdvertisement({
           value={locationCity}
           onChange={(v) => setLocationCity(v.label)}
           placeholder={t("adCreate.placeholderSearch")}
+          disabled={isActive}
         />
       </div>
 
@@ -352,12 +353,11 @@ export default function EditAdvertisement({
           <div className="mt-2">
             <button
               type="button"
-              disabled={isActive}
               onClick={() => {
                 setShowLocationsEditor(true);
                 if (extraLocations.length === 0) setExtraLocations([""]);
               }}
-              className="px-4 py-2 border rounded-lg text-sm hover:bg-gray-50 disabled:opacity-60"
+              className="px-4 py-2 border rounded-lg text-sm hover:bg-gray-50"
             >
               {t("adEdit.addLocation")}
             </button>
@@ -379,12 +379,11 @@ export default function EditAdvertisement({
                 </div>
                 <button
                   type="button"
-                  disabled={isActive}
                   onClick={() => {
                     const next = extraLocations.filter((_, i) => i !== idx);
                     setExtraLocations(next);
                   }}
-                  className="px-3 py-2 border rounded-lg text-sm hover:bg-gray-50 disabled:opacity-60"
+                  className="px-3 py-2 border rounded-lg text-sm hover:bg-gray-50"
                 >
                   {t("adEdit.remove")}
                 </button>
@@ -393,9 +392,8 @@ export default function EditAdvertisement({
             {extraLocations.length < 3 && (
               <button
                 type="button"
-                disabled={isActive}
                 onClick={() => setExtraLocations([...extraLocations, ""])}
-                className="px-4 py-2 border rounded-lg text-sm hover:bg-gray-50 disabled:opacity-60"
+                className="px-4 py-2 border rounded-lg text-sm hover:bg-gray-50"
               >
                 {t("adEdit.addAnotherLocation")}
               </button>
@@ -585,8 +583,8 @@ export default function EditAdvertisement({
             }
             setSaving(true);
             try {
-              // update base ad
-              await AdvertisementService.updateAdvertisement(advertisementId, {
+              // update base ad — the service returns null on failure (does not throw)
+              const updated = await AdvertisementService.updateAdvertisement(advertisementId, {
                 title,
                 price_per_hour: pricePerHour as any,
                 description: description as any,
@@ -598,17 +596,20 @@ export default function EditAdvertisement({
                 availability_end_time: "17:00" as any,
                 type: type as any,
               } as any);
+              if (!updated) throw new Error("update_failed");
               // replace locations (deduplicate)
               const allLocs = Array.from(new Set(
                 [locationCity, ...extraLocations]
                   .map((x) => (x || "").trim())
                   .filter((x) => x.length > 0)
               )).slice(0, 3);
-              await AdvertisementService.replaceLocations(
+              const locOk = await AdvertisementService.replaceLocations(
                 advertisementId,
                 allLocs
               );
+              if (!locOk) throw new Error("locations_failed");
               // replace availability
+              let availOk = true;
               if (type === "short-term") {
                 const slots = selectedDates.map((d) => {
                   const key = toLocalYYYYMMDD(d);
@@ -619,21 +620,22 @@ export default function EditAdvertisement({
                     end_time: (ov?.end || "17:00") as any,
                   };
                 });
-                await AdvertisementService.replaceAvailabilitySlots(
+                availOk = await AdvertisementService.replaceAvailabilitySlots(
                   advertisementId,
                   slots
                 );
               } else {
                 // long-term: clear any slots
-                await AdvertisementService.deleteAvailabilitySlots(
+                availOk = await AdvertisementService.deleteAvailabilitySlots(
                   advertisementId
                 );
               }
+              if (!availOk) throw new Error("availability_failed");
               history.back();
             } catch (e) {
               // eslint-disable-next-line no-console
               console.error(e);
-            } finally {
+              setSaveError(t("adEdit.saveFailed"));
               setSaving(false);
             }
           }}

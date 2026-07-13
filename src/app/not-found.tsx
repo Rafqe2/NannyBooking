@@ -1,7 +1,11 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
+import { useTranslation } from "../components/LanguageProvider";
 
 export default function NotFound() {
+  const { t } = useTranslation();
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4">
       <div className="text-center max-w-md">
@@ -13,9 +17,9 @@ export default function NotFound() {
           className="rounded-2xl mx-auto mb-6 shadow-sm"
         />
         <p className="text-[10px] font-bold tracking-[0.22em] uppercase text-brand-400 mb-2">404</p>
-        <h1 className="text-2xl font-bold text-gray-900 mb-3">Page not found</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-3">{t("notFound.title")}</h1>
         <p className="text-sm text-gray-500 mb-8 leading-relaxed">
-          The page you're looking for doesn't exist or has been moved.
+          {t("notFound.desc")}
         </p>
         <Link
           href="/"
@@ -24,7 +28,7 @@ export default function NotFound() {
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
           </svg>
-          Back to home
+          {t("notFound.backHome")}
         </Link>
       </div>
     </div>
