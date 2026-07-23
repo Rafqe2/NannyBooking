@@ -69,7 +69,7 @@ export default function Home() {
         <Header />
         <main className="flex-1 flex items-center justify-center">
           <BlockingLoader
-            message={isLoading ? t("common.loading") : "Checking profile…"}
+            message={isLoading ? t("common.loading") : t("common.checkingProfile")}
           />
         </main>
       </div>

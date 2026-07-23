@@ -172,8 +172,11 @@ export default function HomeClient({
     setShowResults(true);
   };
 
+    // overflow-hidden (not just -x): the decorative bubbles are positioned by
+    // percentage and the lowest ones extend past the footer; clipping both axes
+    // stops them adding a small scrollable strip under the footer.
   return (
-    <div className="relative overflow-x-hidden flex-1 flex flex-col">
+    <div className="relative overflow-hidden flex-1 flex flex-col">
       {/* Unified page-level background bubbles */}
       <div className="absolute -top-20 -right-28 w-[560px] h-[560px] rounded-full bg-brand-200 opacity-[0.07] pointer-events-none" />
       <div className="absolute top-[5%] left-[20%] w-48 h-48 rounded-full bg-brand-300 opacity-[0.04] pointer-events-none" />

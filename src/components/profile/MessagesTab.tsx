@@ -292,7 +292,7 @@ export default function MessagesTab({ userProfile, user }: MessagesTabProps) {
                   {/* Message history */}
                   <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3">
                     {loadingMessages && conversationMessages.length === 0 && (
-                      <div className="text-center text-gray-400 text-sm py-8">Loading...</div>
+                      <div className="text-center text-gray-400 text-sm py-8">{t("common.loading")}</div>
                     )}
                     {conversationMessages.map(msg => {
                       const isOwn = msg.sender_id === user?.id;

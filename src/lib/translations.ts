@@ -601,6 +601,41 @@ export const translations = {
     lv: 'Ielādē...',
     ru: 'Загрузка...'
   },
+  'common.redirectingToLogin': {
+    en: 'Redirecting to login…',
+    lv: 'Novirza uz pieteikšanos…',
+    ru: 'Перенаправление на вход…'
+  },
+  'common.checkingProfile': {
+    en: 'Checking profile…',
+    lv: 'Pārbauda profilu…',
+    ru: 'Проверка профиля…'
+  },
+  'common.backToTop': {
+    en: 'Back to top',
+    lv: 'Atpakaļ uz augšu',
+    ru: 'Наверх'
+  },
+  'common.prevMonth': {
+    en: 'Previous month',
+    lv: 'Iepriekšējais mēnesis',
+    ru: 'Предыдущий месяц'
+  },
+  'common.nextMonth': {
+    en: 'Next month',
+    lv: 'Nākamais mēnesis',
+    ru: 'Следующий месяц'
+  },
+  'common.removeLocation': {
+    en: 'Remove location',
+    lv: 'Noņemt atrašanās vietu',
+    ru: 'Удалить местоположение'
+  },
+  'common.removeDate': {
+    en: 'Remove date',
+    lv: 'Noņemt datumu',
+    ru: 'Удалить дату'
+  },
   'common.error': {
     en: 'Error',
     lv: 'Kļūda',

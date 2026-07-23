@@ -123,7 +123,7 @@ export default function BookingCalendar({
             )
           }
           className="p-2 rounded-lg hover:bg-gray-100"
-          aria-label="Previous month"
+          aria-label={t("common.prevMonth")}
         >
           ‹
         </button>
@@ -135,7 +135,7 @@ export default function BookingCalendar({
             )
           }
           className="p-2 rounded-lg hover:bg-gray-100"
-          aria-label="Next month"
+          aria-label={t("common.nextMonth")}
         >
           ›
         </button>

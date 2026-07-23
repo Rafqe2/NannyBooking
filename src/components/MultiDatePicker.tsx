@@ -213,8 +213,8 @@ export default function MultiDatePicker({
                     if (onRemoveDate) onRemoveDate(date);
                   }}
                   className="absolute -top-1 -right-1 h-5 w-5 rounded-full border border-red-300 bg-white text-red-600 text-xs leading-5 flex items-center justify-center hover:bg-red-50"
-                  aria-label={`Remove ${date.toLocaleDateString()}`}
-                  title="Remove date"
+                  aria-label={`${t("common.removeDate")} ${date.toLocaleDateString()}`}
+                  title={t("common.removeDate")}
                 >
                   ×
                 </button>

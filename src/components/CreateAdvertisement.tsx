@@ -586,7 +586,7 @@ export default function CreateAdvertisement() {
                       )
                     }
                     className="px-3 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50"
-                    aria-label="Remove location"
+                    aria-label={t("common.removeLocation")}
                   >
                     {t("adCreate.remove")}
                   </button>

@@ -13,7 +13,7 @@ export default function CompleteProfilePage() {
       <div className="min-h-screen flex flex-col bg-gray-50">
         <Header />
         <main className="flex-1 flex items-center justify-center">
-          <BlockingLoader message="Loading…" />
+          <BlockingLoader />
         </main>
         <Footer />
       </div>

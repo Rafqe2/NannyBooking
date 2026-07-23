@@ -146,7 +146,7 @@ export default function Calendar({
               new Date(baseMonth.getFullYear(), baseMonth.getMonth() - 1, 1)
             )
           }
-          aria-label="Previous month"
+          aria-label={t("common.prevMonth")}
           className="absolute left-0 -top-1 p-2 rounded-full border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors z-10"
         >
           <ChevronLeft className="w-4 h-4" />
@@ -158,7 +158,7 @@ export default function Calendar({
               new Date(baseMonth.getFullYear(), baseMonth.getMonth() + 1, 1)
             )
           }
-          aria-label="Next month"
+          aria-label={t("common.nextMonth")}
           className="absolute right-0 -top-1 p-2 rounded-full border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors z-10"
         >
           <ChevronRight className="w-4 h-4" />
