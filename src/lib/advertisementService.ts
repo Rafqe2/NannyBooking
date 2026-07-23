@@ -129,9 +129,26 @@ export class AdvertisementService {
     advertisementId: string,
     labels: string[]
   ): Promise<boolean> {
-    const cleared = await this.deleteLocations(advertisementId);
-    if (!cleared) return false;
-    return this.addLocations(advertisementId, labels);
+    // Atomic server-side replace: validates, deletes and re-inserts in one
+    // transaction, so a failed insert can never wipe the existing locations
+    // (unlike a client-side delete-then-insert).
+    try {
+      const cleaned = (labels || [])
+        .map((l) => String(l).trim())
+        .filter((l) => l.length > 0);
+      const { error } = await supabase.rpc("replace_ad_locations", {
+        p_ad_id: advertisementId,
+        p_labels: cleaned,
+      });
+      if (error) {
+        console.error("Error replacing locations:", error);
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.error("Error replacing locations:", error);
+      return false;
+    }
   }
 
   static async deleteLocations(advertisementId: string): Promise<boolean> {
@@ -318,9 +335,24 @@ export class AdvertisementService {
     advertisementId: string,
     slots: { available_date: string; start_time: string; end_time: string }[]
   ): Promise<boolean> {
-    const cleared = await this.deleteAvailabilitySlots(advertisementId);
-    if (!cleared) return false;
-    return this.addAvailabilitySlots(advertisementId, slots);
+    // Atomic server-side replace: validates every slot, then deletes and
+    // re-inserts in a single transaction. If the insert fails the whole thing
+    // rolls back, so the ad's existing availability is never left wiped
+    // (unlike a client-side delete-then-insert).
+    try {
+      const { error } = await supabase.rpc("replace_ad_availability", {
+        p_ad_id: advertisementId,
+        p_slots: slots || [],
+      });
+      if (error) {
+        console.error("Error replacing availability slots:", error);
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.error("Error replacing availability slots:", error);
+      return false;
+    }
   }
 
   static async deleteAdvertisement(advertisementId: string): Promise<boolean> {

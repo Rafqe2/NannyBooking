@@ -631,7 +631,11 @@ export default function EditAdvertisement({
                 );
               }
               if (!availOk) throw new Error("availability_failed");
-              history.back();
+              // Navigate to a definite destination rather than history.back():
+              // back() is a no-op when there's no history entry (ad opened via a
+              // direct link / after an auth redirect), which would leave the
+              // Save button stuck spinning on saving=true.
+              router.push("/profile?tab=job-ads");
             } catch (e) {
               // eslint-disable-next-line no-console
               console.error(e);

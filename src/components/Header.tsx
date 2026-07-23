@@ -3,20 +3,19 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { supabase } from "../lib/supabase";
 import { useSupabaseUser } from "../lib/useSupabaseUser";
 import { useTranslation } from "./LanguageProvider";
 import { LANGUAGES } from "../lib/i18n";
 import { useNotificationCounts } from "./NotificationCountsProvider";
+import { navigateToProfileTab, ProfileTab } from "../lib/profileNav";
 
 export default function Header() {
   const { user, isLoading } = useSupabaseUser();
   const { language, setLanguage, t } = useTranslation();
   const router = useRouter();
-  const pathname = usePathname();
   const { pendingBookings: pendingCount, unreadMessages } = useNotificationCounts();
-  const isOnProfilePage = pathname === "/profile";
 
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -57,19 +56,9 @@ export default function Header() {
     router.push(url);
   };
 
-  const handleTabSwitch = (tab: string) => {
+  const handleTabSwitch = (tab: ProfileTab) => {
     setShowUserMenu(false);
-    if (isOnProfilePage) {
-      // If on profile page, update URL without navigation
-      const url = new URL(window.location.href);
-      url.searchParams.set("tab", tab);
-      window.history.pushState({}, "", url.toString());
-      // Trigger a custom event that profile page can listen to
-      window.dispatchEvent(new CustomEvent("profileTabChange", { detail: { tab } }));
-    } else {
-      // If not on profile page, navigate to profile with tab
-      router.push(`/profile?tab=${tab}`);
-    }
+    navigateToProfileTab(tab, router);
   };
 
   const handleSignIn = (e: React.MouseEvent) => {

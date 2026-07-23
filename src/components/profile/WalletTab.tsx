@@ -171,7 +171,9 @@ export default function WalletTab({ userId }: { userId: string }) {
                 <span className="text-lg font-normal text-brand-300 ml-1">{wallet?.currency ?? "EUR"}</span>
               </p>
               <p className="text-brand-300 text-xs mt-2">
-                {t("wallet.transactionsCount", { count: transactions.length })}
+                {transactions.length === 1
+                  ? t("wallet.transactionsCountOne", { count: 1 })
+                  : t("wallet.transactionsCount", { count: transactions.length })}
               </p>
             </div>
             <button

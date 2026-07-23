@@ -13,6 +13,7 @@ import BookingStatusTimeline from "../BookingStatusTimeline";
 import CancelBookingModal from "../CancelBookingModal";
 import ReviewModal from "../ReviewModal";
 import { formatDateDDMMYYYY } from "../../lib/date";
+import { navigateToProfileTab, OPEN_CONVERSATION_KEY } from "../../lib/profileNav";
 import { BookingItem } from "../../types/booking";
 import { UserProfile } from "../../lib/userService";
 import { User } from "@supabase/supabase-js";
@@ -25,9 +26,6 @@ interface BookingsTabProps {
   setBookings: React.Dispatch<React.SetStateAction<BookingItem[]>>;
   setToast?: (toast: { message: string; type: "error" | "success" } | null) => void;
 }
-
-// Deep-link key read by MessagesTab on mount to auto-open a conversation.
-const OPEN_CONVERSATION_KEY = "nannybooking:openConversation";
 
 export default function BookingsTab({
   userProfile,
@@ -67,14 +65,7 @@ export default function BookingsTab({
     } catch (err) {
       console.error("Error opening conversation:", err);
     }
-    if (typeof window !== "undefined") {
-      const url = new URL(window.location.href);
-      url.searchParams.set("tab", "messages");
-      window.history.pushState({}, "", url.toString());
-      window.dispatchEvent(
-        new CustomEvent("profileTabChange", { detail: { tab: "messages" } })
-      );
-    }
+    navigateToProfileTab("messages", router);
   };
 
   const [selectedCalendarDate, setSelectedCalendarDate] = useState<string | null>(null);

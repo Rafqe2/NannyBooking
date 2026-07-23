@@ -8,6 +8,7 @@ import { formatDateDDMMYYYY } from "../../lib/date";
 import { UserProfile } from "../../lib/userService";
 import { User } from "@supabase/supabase-js";
 import { notifyBooking } from "../../lib/notifyService";
+import { OPEN_CONVERSATION_KEY } from "../../lib/profileNav";
 
 const WORD_LIMIT = 100;
 
@@ -52,9 +53,9 @@ export default function MessagesTab({ userProfile, user }: MessagesTabProps) {
   // Deep link from BookingsTab: open a specific conversation once on mount.
   useEffect(() => {
     try {
-      const pending = sessionStorage.getItem("nannybooking:openConversation");
+      const pending = sessionStorage.getItem(OPEN_CONVERSATION_KEY);
       if (pending) {
-        sessionStorage.removeItem("nannybooking:openConversation");
+        sessionStorage.removeItem(OPEN_CONVERSATION_KEY);
         setActiveConversation(pending);
       }
     } catch {}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, useMemo } from "react";
+import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { UserService, UserProfile } from "../../lib/userService";
@@ -21,6 +21,7 @@ import ProfileTab from "../../components/profile/ProfileTab";
 import WalletTab from "../../components/profile/WalletTab";
 import { WalletService } from "../../lib/walletService";
 import { useNotificationCounts } from "../../components/NotificationCountsProvider";
+import { PROFILE_TAB_EVENT, isProfileTab } from "../../lib/profileNav";
 
 type Advertisement = Database["public"]["Tables"]["advertisements"]["Row"];
 
@@ -52,22 +53,12 @@ export default function ProfilePage() {
     location: "",
   });
   const [bookings, setBookings] = useState<BookingItem[]>([]);
-  const { unreadMessages: unreadMessageCount } = useNotificationCounts();
-
-  // Derived from bookings so the tab badge stays in sync after accept/decline
-  // in place (no page reload). Mirrors get_pending_booking_count_for_me:
-  // pending, and either a future/today date or a long-term contact request.
-  const pendingBookings = useMemo(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return bookings.filter(
-      (b) =>
-        b.status === "pending" &&
-        (b.ad_type === "long-term" ||
-          !b.booking_date ||
-          new Date(b.booking_date + "T00:00:00") >= today)
-    ).length;
-  }, [bookings]);
+  // Single source of truth for the pending count: the same provider the header
+  // badge and mobile nav use (backed by get_pending_booking_count_for_me).
+  // BookingsTab calls refresh() after every accept/decline/cancel, so the tab
+  // badge stays in sync in place without re-deriving the SQL rule client-side.
+  const { unreadMessages: unreadMessageCount, pendingBookings } =
+    useNotificationCounts();
   const [walletBalance, setWalletBalance] = useState<number | null>(null);
 
   const isParent = userProfile?.user_type === "parent";
@@ -77,15 +68,8 @@ export default function ProfilePage() {
     // Read tab from URL query parameter
     const updateTabFromUrl = () => {
       if (typeof window !== "undefined") {
-        const params = new URLSearchParams(window.location.search);
-        const tab = params.get("tab");
-        if (
-          tab === "job-ads" ||
-          tab === "bookings" ||
-          tab === "messages" ||
-          tab === "profile" ||
-          tab === "wallet"
-        ) {
+        const tab = new URLSearchParams(window.location.search).get("tab");
+        if (isProfileTab(tab)) {
           setActiveTab(tab);
         }
       }
@@ -96,16 +80,10 @@ export default function ProfilePage() {
     // Listen for popstate events (back/forward navigation)
     const handlePopState = () => updateTabFromUrl();
 
-    // Listen for custom tab change events from header dropdown
+    // Listen for in-place tab-switch events (header, mobile nav, deep links)
     const handleTabChange = (e: CustomEvent) => {
       const tab = e.detail?.tab;
-      if (
-        tab === "job-ads" ||
-        tab === "bookings" ||
-        tab === "messages" ||
-        tab === "profile" ||
-        tab === "wallet"
-      ) {
+      if (isProfileTab(tab)) {
         setActiveTab(tab);
       }
     };
@@ -113,14 +91,14 @@ export default function ProfilePage() {
     if (typeof window !== "undefined") {
       window.addEventListener("popstate", handlePopState);
       window.addEventListener(
-        "profileTabChange",
+        PROFILE_TAB_EVENT,
         handleTabChange as EventListener
       );
 
       return () => {
         window.removeEventListener("popstate", handlePopState);
         window.removeEventListener(
-          "profileTabChange",
+          PROFILE_TAB_EVENT,
           handleTabChange as EventListener
         );
       };

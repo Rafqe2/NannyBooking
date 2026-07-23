@@ -5,6 +5,7 @@ import { Search, Calendar, MessageCircle, User } from "lucide-react";
 import { useSupabaseUser } from "../lib/useSupabaseUser";
 import { useNotificationCounts } from "./NotificationCountsProvider";
 import { useTranslation } from "./LanguageProvider";
+import { navigateToProfileTab, ProfileTab } from "../lib/profileNav";
 
 // Fixed bottom tab bar, shown only on small screens (<md). Desktop keeps the
 // existing Header. Tabs mirror the Header's profile-tab navigation so that
@@ -21,18 +22,7 @@ export default function MobileBottomNav() {
   const hiddenPrefixes = ["/login", "/complete-profile", "/admin"];
   if (hiddenPrefixes.some((p) => pathname?.startsWith(p))) return null;
 
-  const isOnProfilePage = pathname?.startsWith("/profile");
-
-  const goToTab = (tab: string) => {
-    if (isOnProfilePage && typeof window !== "undefined") {
-      const url = new URL(window.location.href);
-      url.searchParams.set("tab", tab);
-      window.history.pushState({}, "", url.toString());
-      window.dispatchEvent(new CustomEvent("profileTabChange", { detail: { tab } }));
-    } else {
-      router.push(`/profile?tab=${tab}`);
-    }
-  };
+  const goToTab = (tab: ProfileTab) => navigateToProfileTab(tab, router);
 
   const items: {
     key: string;

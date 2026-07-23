@@ -3263,6 +3263,11 @@ export const translations = {
     lv: '{{count}} darījumi',
     ru: 'Транзакций: {{count}}'
   },
+  'wallet.transactionsCountOne': {
+    en: '1 transaction',
+    lv: '1 darījums',
+    ru: 'Транзакций: 1'
+  },
   'wallet.totalCount': {
     en: '{{count}} total',
     lv: 'Kopā {{count}}',
